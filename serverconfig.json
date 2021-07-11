@@ -1,0 +1,61 @@
+{
+  "port": 3002,
+  "initPaths": [
+    "init/",
+    "init2/",
+    "init/init3"
+  ],
+  "proxy": {
+    "allowProxyFor": [
+      "127.0.0.1",
+      "127.0.0.1:3002",
+      "127.0.0.1:3003",
+      "docs.nestjs.com",
+      "ci.terria.io",
+      "nationalmap.gov.au",
+      "services.ga.gov.au"
+    ],
+    "proxyAuth": {
+      "127.0.0.1:3002": {
+        "authorization": ""
+      }
+    }
+  },
+  "share": {
+    "maxRequestSize": 200,
+    "newPrefix": "s",
+    "availablePrefixes": [
+      {
+        "service": "gist",
+        "prefix": "g",
+        "accessToken": ""
+      },
+      {
+        "service": "gist",
+        "prefix": "g1",
+        "accessToken": ""
+      },
+      {
+        "service": "s3",
+        "prefix": "s",
+        "region": "eu-central-1",
+        "bucket": "geoportal-test",
+        "credentials": {
+          "accessKeyId": "",
+          "secretAccessKey": ""
+        }
+      }
+    ]
+  },
+  "feedback": {
+    "primaryId": "g1",
+    "options": [
+      {
+        "service": "github",
+        "id": "g1",
+        "accessToken": "",
+        "issuesUrl": ""
+      }
+    ]
+  }
+}
