@@ -15,6 +15,7 @@ const logger = new LoggerService('main');
  * TESTING = 'log', 'error', 'warn'
  * DEVELOPMENT = 'log', 'error', 'warn', 'debug', 'verbose'
  */
+
 /* function getLoggerLevelByEnvironment(): LogLevel[] {
   const levels: LogLevel[] = ['log', 'error'];
 
@@ -34,15 +35,17 @@ const logger = new LoggerService('main');
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: logger,
+    bufferLogs: true,
+    autoFlushLogs: true,
   });
 
   const configService = app.get(CustomConfigService);
+  const logger = await app.resolve(LoggerService);
   app.useLogger(logger);
-  /* const compressResponse = configService.get('compressResponse');
+  const compressResponse = configService.get('compressResponse');
   if (compressResponse) {
     app.use(compression());
-  } */
+  }
 
   // eventually this mime type configuration will need to change
   // https://github.com/visionmedia/send/commit/d2cb54658ce65948b0ed6e5fb5de69d022bef941
@@ -81,6 +84,7 @@ async function bootstrap() {
   await app.use(helmet()).listen(port);
   logger.log(`started listening on port: ${port}`);
 }
+
 bootstrap().catch((reason: Error) => {
   logger.error(reason.message);
   logger.error(reason.stack);

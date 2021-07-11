@@ -1,18 +1,12 @@
-import {
-  HttpModule as BaseHttpModule,
-  HttpService,
-  Logger,
-  Module,
-  OnModuleInit,
-} from '@nestjs/common';
-import { LoggerService } from 'src/common/logger/logger.service';
+import { HttpModule as BaseHttpModule, HttpService } from '@nestjs/axios';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 
 @Module({
   imports: [BaseHttpModule],
   exports: [BaseHttpModule],
 })
 export class HttpModule implements OnModuleInit {
-  private readonly logger: Logger = new LoggerService(HttpModule.name);
+  private readonly logger = new Logger(HttpModule.name);
 
   constructor(private readonly httpService: HttpService) {}
 

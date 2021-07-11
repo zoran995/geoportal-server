@@ -1,4 +1,5 @@
-import { HttpService, Injectable } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
 import { GithubFeedbackDto } from './dto/github-feedback.dto';
 import { MailFeedbackDto } from './dto/mail-feedback.dto';
 import { RedmineFeedbackDto } from './dto/redmine-feedback.dto';
@@ -20,7 +21,7 @@ export class FeedbackServiceManager {
 
   /**
    * Check if feedback service with given id exists in manager
-   * @param id ID of the feedback service
+   * @param id - ID of the feedback service
    */
   has(id: string): boolean {
     return !!this.feedbackServices.find((feedback) => feedback.id === id);
@@ -28,9 +29,9 @@ export class FeedbackServiceManager {
 
   /**
    * Gets registered feedback service with given id.
-   * @param id ID of the feedback service.
+   * @param id - ID of the feedback service.
    * @returns instance of the feedback service.
-   * @throws {Error} if feedback with given name was not found.
+   * @throws { Error} if feedback with given name was not found.
    */
   get(id: string): AbstractFeedbackService<FeedbackServiceDtoType> {
     const feedbackService = this.feedbackServices.find(
@@ -57,9 +58,9 @@ export class FeedbackServiceManager {
 
   /**
    * Creates new instance of feedback service and registers it in manager.
-   * @param options feedback configuration
+   * @param options - feedback configuration
    * @returns instance of feedback service
-   * @throws {Error} Unknown feedback service specified.
+   * @throws { Error} Unknown feedback service specified.
    */
   create(
     options: FeedbackServiceDtoType,

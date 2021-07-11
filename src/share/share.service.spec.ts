@@ -1,6 +1,6 @@
+import { HttpService } from '@nestjs/axios';
 import {
   BadRequestException,
-  HttpService,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';

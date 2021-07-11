@@ -1,4 +1,5 @@
-import { HttpService, Injectable } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
 import { ShareGistDto } from './dto/share-gist.dto';
 import { ShareS3Dto } from './dto/share-s3.dto';
 import { AbstractShareService } from './providers/abstract-share.service';
@@ -24,7 +25,7 @@ export class ShareServiceManager {
    * Gets registered share service with given id.
    * @param id ID of the share service.
    * @returns instance of the share service.
-   * @throws {Error} if share service with given name was not found.
+   * @throws { Error} if share service with given name was not found.
    */
   get(id: string): AbstractShareService<ShareServiceDtoType> {
     const shareService = this.shareServices.find((share) => share.id === id);
@@ -34,9 +35,9 @@ export class ShareServiceManager {
   }
 
   /**
-   *
-   * @param options
-   * @returns
+   * Remove share service from share service manager
+   * @param id - id of the service to be removed
+   * @returns whether share service is removed
    */
   remove(id: string): boolean {
     const share = this.shareServices.find((service) => service.id === id);

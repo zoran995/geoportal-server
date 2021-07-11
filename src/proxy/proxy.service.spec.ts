@@ -1,9 +1,6 @@
 import { createMock } from '@golevelup/ts-jest';
-import {
-  ExecutionContext,
-  ForbiddenException,
-  HttpService,
-} from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { REQUEST } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';

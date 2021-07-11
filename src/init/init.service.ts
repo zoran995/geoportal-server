@@ -7,6 +7,11 @@ import * as path from 'path';
 export class InitService {
   constructor(private readonly configService: ConfigService) {}
 
+  /**
+   * Gets the path to the requested file
+   * @param fileName Name of the file
+   * @returns file path
+   */
   getFilePath(fileName: string): string | undefined {
     const configFile = this.configService.get('configFile');
 

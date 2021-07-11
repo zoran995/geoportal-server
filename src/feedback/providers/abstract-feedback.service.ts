@@ -11,10 +11,8 @@ export abstract class AbstractFeedbackService<T extends BaseFeedbackDto> {
 
   /**
    *
-   * @param {GithubFeedbackDto} options Feedback configuration
-   * @param {CreateFeedbackDto} feedback payload
-   * @param {Request} request
-   * @returns {Promise<any>}
+   * @param feedback - payload
+   * @param request  - request
    */
   abstract post(feedback: CreateFeedbackDto, request: Request): Promise<any>;
 }

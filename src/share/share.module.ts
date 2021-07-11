@@ -1,4 +1,5 @@
-import { HttpModule, Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
+import { Module } from '@nestjs/common';
 import Agent, { HttpsAgent } from 'agentkeepalive';
 import { ShareConfigService } from './config/share-config.service';
 import { ShareServiceManager } from './share-service-manager.service';

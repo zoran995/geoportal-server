@@ -1,12 +1,11 @@
-import { Inject, Injectable, Optional } from '@nestjs/common';
+import { Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
-import { LoggerService } from 'src/common/logger/logger.service';
 import { AWS_CONFIG_OPTIONS } from './aws-s3.contants';
 
 @Injectable()
 export class AwsS3Service {
   private readonly _s3: AWS.S3;
-  private readonly logger = new LoggerService(AwsS3Service.name);
+  private readonly logger = new Logger(AwsS3Service.name);
 
   constructor(
     @Optional()

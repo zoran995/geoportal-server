@@ -6,7 +6,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { isDefined } from 'class-validator';
-import { LoggerService } from 'src/common/logger/logger.service';
 import { ShareConfigService } from './config/share-config.service';
 import { AbstractShareService } from './providers/abstract-share.service';
 import { ShareServiceManager } from './share-service-manager.service';
@@ -14,13 +13,18 @@ import { ShareServiceDtoType } from './types/share-service-dto.type';
 
 @Injectable()
 export class ShareService {
-  private readonly logger: Logger = new LoggerService(ShareService.name);
+  private readonly logger = new Logger(ShareService.name);
 
   constructor(
     private readonly configService: ShareConfigService,
     private readonly shareServiceManager: ShareServiceManager,
   ) {}
 
+  /**
+   * Save the share data
+   * @param body Share data
+   * @returns Share id
+   */
   async save(body: any): Promise<string> {
     const newSharePrefix = this.configService.newPrefix;
     if (!isDefined(newSharePrefix)) {
@@ -46,6 +50,11 @@ export class ShareService {
     return shareService.save(body);
   }
 
+  /**
+   * Resolves the share data using id
+   * @param id Share id
+   * @returns Share data
+   */
   async resolve(id: string): Promise<string> {
     const prefix = id.match(splitPrefixRe)[2];
     const shareId = id.match(splitPrefixRe)[3];
@@ -61,7 +70,7 @@ export class ShareService {
     return shareService.resolve(shareId);
   }
 
-  createOrGetShareService(prefix: string) {
+  private createOrGetShareService(prefix: string) {
     if (!this.shareServiceManager.has(prefix)) {
       const availableConfigs = this.configService.availablePrefixes;
       const shareConfig: ShareServiceDtoType = availableConfigs.find(

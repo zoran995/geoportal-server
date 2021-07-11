@@ -1,8 +1,7 @@
 import { createMock } from '@golevelup/ts-jest';
+import { HttpModule, HttpService } from '@nestjs/axios';
 import {
   ExecutionContext,
-  HttpModule,
-  HttpService,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';

@@ -1,4 +1,4 @@
-import { HttpService } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpModule } from 'src/http/http.module';
 import { ShareGistDto } from './dto/share-gist.dto';

@@ -1,12 +1,12 @@
 import {
   Injectable,
-  Logger as NestLogger,
+  ConsoleLogger,
   LoggerService as NestLoggerService,
   Scope,
 } from '@nestjs/common';
 
 @Injectable({ scope: Scope.TRANSIENT })
-export class LoggerService extends NestLogger implements NestLoggerService {
+export class LoggerService extends ConsoleLogger implements NestLoggerService {
   log(message: any, context?: string) {
     super.log(message, context);
   }

@@ -4,13 +4,12 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import * as crypto from 'crypto';
-import { AwsS3Service } from 'src/aws-sdk/aws-s3.service';
-import { LoggerService } from 'src/common/logger/logger.service';
-import { ShareS3Dto } from '../dto/share-s3.dto';
-import { AbstractShareService } from './abstract-share.service';
 import Agent, { HttpsAgent } from 'agentkeepalive';
 import baseX from 'base-x';
+import * as crypto from 'crypto';
+import { AwsS3Service } from 'src/aws-sdk/aws-s3.service';
+import { ShareS3Dto } from '../dto/share-s3.dto';
+import { AbstractShareService } from './abstract-share.service';
 
 const agentConfig: Agent.HttpOptions = {
   keepAlive: true,
@@ -21,7 +20,7 @@ const agentConfig: Agent.HttpOptions = {
 
 @Injectable()
 export class S3ShareService extends AbstractShareService<ShareS3Dto> {
-  private readonly logger: Logger = new LoggerService(S3ShareService.name);
+  private readonly logger = new Logger(S3ShareService.name);
   private readonly awsS3Service: AwsS3Service;
 
   constructor(protected readonly config: ShareS3Dto) {
@@ -38,9 +37,7 @@ export class S3ShareService extends AbstractShareService<ShareS3Dto> {
 
   /**
    * Save share configuration in s3 bucket
-   * @param config
-   * @param data share configuration
-   * @returns id of saved share configuration
+   * {@inheritdoc}
    */
   async save(data: any): Promise<string> {
     const id = shortId(data, this.config.keyLength);
@@ -68,9 +65,7 @@ export class S3ShareService extends AbstractShareService<ShareS3Dto> {
 
   /**
    * Resolve saved share configuration from s3 bucket
-   * @param config
-   * @param id
-   * @returns
+   * {@inheritdoc}
    */
   async resolve(id: string): Promise<string> {
     const params = {

@@ -1,17 +1,18 @@
+import { HttpService } from '@nestjs/axios';
 import {
   BadRequestException,
   ForbiddenException,
   HttpException,
-  HttpService,
   Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { AxiosProxyConfig } from 'axios';
 import { Request } from 'express';
 import { inRange } from 'range_check';
-import { LoggerService } from 'src/common/logger/logger.service';
+import { lastValueFrom } from 'rxjs';
 import { format, URL } from 'url';
 import { ProxyConfigService } from './config/proxy-config.service';
 import { AppendParamToQueryStringDto } from './dto/proxy-config.dto';
@@ -23,15 +24,13 @@ import { urlValidator } from './utils/urlValidator';
 
 @Injectable()
 export class ProxyService {
-  logger = new LoggerService();
+  logger = new Logger(ProxyService.name);
 
   constructor(
     @Inject(REQUEST) private readonly request: Request,
     private readonly proxyConfigService: ProxyConfigService,
     private readonly httpService: HttpService,
-  ) {
-    this.logger.setContext(ProxyService.name);
-  }
+  ) {}
 
   /**
    *
@@ -39,7 +38,7 @@ export class ProxyService {
    * @param duration - Duration of the cache
    * @returns
    */
-  async proxyRequest(target: string, duration?: string) {
+  async proxyRequest(target: string, duration?: string, payload?: any) {
     target = this.processTargetUrl(target);
 
     //store maxAge in request so we can access it in interceptor and assign to
@@ -116,8 +115,8 @@ export class ProxyService {
       }
     }
 
-    return await this.httpService
-      .request({
+    return lastValueFrom(
+      await this.httpService.request({
         method: this.request.method === 'POST' ? 'POST' : 'GET',
         url: format(remoteUrl),
         headers: proxyHeaders,
@@ -145,8 +144,8 @@ export class ProxyService {
             }
           });
         },
-      })
-      .toPromise()
+      }),
+    )
       .then((response) => {
         return response.data;
       })
@@ -305,6 +304,7 @@ export class ProxyService {
 
 /**
  * Check if address is blacklisted
+ * @returns Whether address is blacklisted
  */
 function addressBlacklisted(address) {
   return !!inRange(address, Blacklist.list);

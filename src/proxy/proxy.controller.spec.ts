@@ -1,6 +1,6 @@
-import { HttpModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { HttpModule } from 'src/http/http.module';
 import { ProxyConfigService } from './config/proxy-config.service';
 import { ProxyController } from './proxy.controller';
 import { ProxyService } from './proxy.service';

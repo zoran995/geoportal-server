@@ -30,8 +30,8 @@ export class ShareController {
 
   /**
    * Stores the share configuration and returns id of the share file.
-   * @param shareDto
-   * @returns {string}
+   * @param shareDto Share data
+   * @returns The share ID
    */
   @Post()
   @ApiOperation({ summary: 'Create new short url.' })
@@ -50,7 +50,8 @@ export class ShareController {
 
   /**
    * Resolves the existing share ID.
-   * @returns The share configuration
+   * @param params.id The share id
+   * @returns The share data
    */
   @Get(':id')
   @ApiOperation({ summary: 'Resolves the existing share ID' })

@@ -19,7 +19,7 @@ export class InitController {
 
   /**
    * Special handling for /init/foo.json requests: look in initPaths, not just wwwroot/init
-   * @param params
+   * @param params.fileName Name of the file
    * @param res Express res
    */
   @Get(':fileName')

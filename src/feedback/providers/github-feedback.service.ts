@@ -1,11 +1,12 @@
+import { HttpService } from '@nestjs/axios';
 import {
-  HttpService,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { Request } from 'express';
+import { lastValueFrom } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { LoggerService } from 'src/common/logger/logger.service';
 import { formatBody } from '../common/formatBody';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
 import { GithubFeedbackDto } from '../dto/github-feedback.dto';
@@ -16,7 +17,7 @@ import { AbstractFeedbackService } from './abstract-feedback.service';
  */
 @Injectable()
 export class GithubFeedbackService extends AbstractFeedbackService<GithubFeedbackDto> {
-  logger = new LoggerService(GithubFeedbackService.name);
+  logger = new Logger(GithubFeedbackService.name);
 
   constructor(
     protected readonly options: GithubFeedbackDto,
@@ -34,26 +35,27 @@ export class GithubFeedbackService extends AbstractFeedbackService<GithubFeedbac
       Accept: 'application/vnd.github.v3+json',
       Authorization: `Token ${this.options.accessToken}`,
     };
-    return this.httpService
-      .post(
-        this.options.issuesUrl,
-        {
-          title: feedback.title,
-          body: formatBody(
-            feedback,
-            this.options.additionalParameters,
-            request,
-          ),
-        },
-        { headers },
-      )
-      .pipe(
-        map((res) => res.data),
-        catchError((e) => {
-          this.logger.error(`Creating feedback failed with: '${e.message}'`);
-          throw new InternalServerErrorException();
-        }),
-      )
-      .toPromise();
+    return lastValueFrom(
+      await this.httpService
+        .post(
+          this.options.issuesUrl,
+          {
+            title: feedback.title,
+            body: formatBody(
+              feedback,
+              this.options.additionalParameters,
+              request,
+            ),
+          },
+          { headers },
+        )
+        .pipe(
+          map((res) => res.data),
+          catchError((e) => {
+            this.logger.error(`Creating feedback failed with: '${e.message}'`);
+            throw new InternalServerErrorException();
+          }),
+        ),
+    );
   }
 }

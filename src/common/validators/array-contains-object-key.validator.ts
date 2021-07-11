@@ -8,9 +8,9 @@ import {
 
 /**
  * Check if array contains object with specified key value.
- * @param array Array that is checked
- * @param key key that are checked
- * @param value value that of the object object should
+ * @param array - Array that is checked
+ * @param key - key that are checked
+ * @param value - value that of the object object should
  */
 export function arrayContainsObjectKey(
   array: any[],

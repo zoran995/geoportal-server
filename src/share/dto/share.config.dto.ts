@@ -14,7 +14,7 @@ import { ShareDto } from './share.dto';
 
 export class ShareConfigDto {
   /**
-   * Which service (of those defined in `availablePrefixes`) should be used when
+   * Which service (of those defined in {@link ShareConfigDto.availablePrefixes}) should be used when
    * new URLs are requested.
    */
   @IsAlphanumeric()

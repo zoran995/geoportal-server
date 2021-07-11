@@ -10,23 +10,27 @@ import { arrayContainsObjectKey } from 'src/common/validators/array-contains-obj
 import { FeedbackConfigService } from './config/feedback.config.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { FeedbackServiceManager } from './feedback-service-manager.service';
-import { FeedbackServiceDtoType } from './types/feedback-service.type';
 import { AbstractFeedbackService } from './providers/abstract-feedback.service';
+import { FeedbackServiceDtoType } from './types/feedback-service.type';
 
 @Injectable()
 export class FeedbackService {
+  private readonly logger = new Logger(FeedbackService.name);
   constructor(
     private readonly feedbackServiceManager: FeedbackServiceManager,
     private readonly feedbackConfigService: FeedbackConfigService,
-    private readonly logger: Logger,
-  ) {
-    logger.setContext(FeedbackService.name);
-  }
+  ) {}
 
+  /**
+   * Stores feedback in configured feedback service
+   * @param feedbackData - Feedback payload {@link CreateFeedbackDto}
+   * @param request - Express request
+   * @returns
+   */
   async create(
-    createFeedback: CreateFeedbackDto,
+    feedbackData: CreateFeedbackDto,
     request: Request,
-  ): Promise<any> {
+  ): Promise<any> | never {
     const primaryId = this.feedbackConfigService.primaryId;
     if (!isDefined(primaryId)) {
       this.logger.error(
@@ -66,6 +70,6 @@ export class FeedbackService {
       feedback = this.feedbackServiceManager.get(primaryId);
     }
 
-    return feedback.post(createFeedback, request);
+    return feedback.post(feedbackData, request);
   }
 }

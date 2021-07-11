@@ -2,7 +2,7 @@ import { ValidationError } from 'class-validator';
 
 export class ValidationErrorsFormatter {
   /**
-   * @param {ValidationError[]} validationErrors
+   * @param validationErrors - list of validation errors to format
    * @returns
    */
   public static format(validationErrors: ValidationError[]): ValidationObject {

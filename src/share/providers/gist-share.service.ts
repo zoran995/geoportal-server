@@ -1,18 +1,18 @@
+import { HttpService } from '@nestjs/axios';
 import {
-  HttpService,
   InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { isDefined } from 'class-validator';
+import { lastValueFrom } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { combineURLs } from 'src/common/helpers/combineURLs';
-import { LoggerService } from 'src/common/logger/logger.service';
 import { ShareGistDto } from '../dto/share-gist.dto';
 import { AbstractShareService } from './abstract-share.service';
 
 export class GistShareService extends AbstractShareService<ShareGistDto> {
-  private readonly logger: Logger = new LoggerService(GistShareService.name);
+  private readonly logger = new Logger(GistShareService.name);
 
   constructor(
     protected readonly config: ShareGistDto,
@@ -23,9 +23,7 @@ export class GistShareService extends AbstractShareService<ShareGistDto> {
 
   /**
    * Save share configuration using gist.
-   * @param config
-   * @param data share configuration.
-   * @returns ID od saved share configuration.
+   * {@inheritdoc}
    */
   public async save(data: any): Promise<string> {
     const gistFile: any = {};
@@ -39,41 +37,40 @@ export class GistShareService extends AbstractShareService<ShareGistDto> {
     if (isDefined(this.config.accessToken)) {
       headers['Authorization'] = `Token ${this.config.accessToken}`;
     }
-    return this.httpService
-      .post(
-        this.config.apiUrl,
-        {
-          files: gistFile,
-          description: this.config.description,
-          public: false,
-        },
-        { headers },
-      )
-      .pipe(
-        map((res) => {
-          if (!isDefined(res.data) || !isDefined(res.data.id)) {
-            this.logger.error(`Got bad response from server: '${res.data}'`);
-            throw new NotFoundException();
-          }
-          this.logger.verbose(`Created Gist with ID '${res.data.id}`);
-          return <string>res.data.id;
-        }),
-        catchError((e) => {
-          this.logger.error(`Creating share url failed with: '${e.message}'`);
-          if (e instanceof NotFoundException) {
-            throw e;
-          }
-          throw new InternalServerErrorException();
-        }),
-      )
-      .toPromise();
+    return lastValueFrom(
+      await this.httpService
+        .post(
+          this.config.apiUrl,
+          {
+            files: gistFile,
+            description: this.config.description,
+            public: false,
+          },
+          { headers },
+        )
+        .pipe(
+          map((res) => {
+            if (!isDefined(res.data) || !isDefined(res.data.id)) {
+              this.logger.error(`Got bad response from server: '${res.data}'`);
+              throw new NotFoundException();
+            }
+            this.logger.verbose(`Created Gist with ID '${res.data.id}`);
+            return <string>res.data.id;
+          }),
+          catchError((e) => {
+            this.logger.error(`Creating share url failed with: '${e.message}'`);
+            if (e instanceof NotFoundException) {
+              throw e;
+            }
+            throw new InternalServerErrorException();
+          }),
+        ),
+    );
   }
 
   /**
    * Resolve saved share configuration from gist using id.
-   * @param config
-   * @param id id of the object
-   * @returns share configuration
+   * {@inheritdoc}
    */
   public async resolve(id: string): Promise<any> {
     const headers: any = {
@@ -84,9 +81,8 @@ export class GistShareService extends AbstractShareService<ShareGistDto> {
       headers['Authorization'] = `Token ${this.config.accessToken}`;
     }
     const getUrl = combineURLs(this.config.apiUrl, id);
-    return this.httpService
-      .get(getUrl, { headers: headers })
-      .pipe(
+    return lastValueFrom(
+      await this.httpService.get(getUrl, { headers: headers }).pipe(
         map((res) => {
           if (
             !isDefined(res.data.files) ||
@@ -101,7 +97,7 @@ export class GistShareService extends AbstractShareService<ShareGistDto> {
           this.logger.debug(`Getting share url failed with: '${e.message}'`);
           throw new NotFoundException();
         }),
-      )
-      .toPromise();
+      ),
+    );
   }
 }
