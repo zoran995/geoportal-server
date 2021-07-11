@@ -23,11 +23,6 @@ import { ProxyService } from './proxy.service';
 export class ProxyController {
   constructor(private readonly proxyService: ProxyService) {}
 
-  @Post('test')
-  async test() {
-    return 'test';
-  }
-
   /**
    * Proxy request where target and duration are passed as query params
    * @param queryParams
