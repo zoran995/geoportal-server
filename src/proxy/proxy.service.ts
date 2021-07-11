@@ -38,7 +38,7 @@ export class ProxyService {
    * @param duration - Duration of the cache
    * @returns
    */
-  async proxyRequest(target: string, duration?: string, payload?: any) {
+  async proxyRequest(target: string, duration?: string) {
     target = this.processTargetUrl(target);
 
     //store maxAge in request so we can access it in interceptor and assign to
@@ -188,6 +188,13 @@ export class ProxyService {
               response: { value: err.getResponse().toString() },
             });
           }
+        }
+
+        if ((err.response?.status || err.response?.statusCode) && err.message) {
+          throw new HttpException(
+            err.message,
+            err.response?.status || err.response?.statusCode,
+          );
         }
         //throw err;
         throw new InternalServerErrorException('Proxy error');
