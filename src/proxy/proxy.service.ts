@@ -125,6 +125,7 @@ export class ProxyService {
         data: this.request.body,
         maxBodyLength: this.proxyConfigService.postSizeLimit,
         beforeRedirect: (options, { headers }) => {
+          // Before redirect check if we are allowed to proxy that host
           const location = headers.location;
           if (location && location.length > 0) {
             const url = new URL(location);
