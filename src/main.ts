@@ -36,7 +36,6 @@ function getLoggerLevelByEnvironment(): LogLevel[] {
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
-    autoFlushLogs: true,
   });
 
   const configService = app.get(CustomConfigService);
