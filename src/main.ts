@@ -61,12 +61,12 @@ async function bootstrap() {
 
   // options.settings.redirectToHttps
 
-  /* app.enableCors({
+  app.enableCors({
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept'],
     exposedHeaders: ['Set-Cookie'],
     credentials: true,
     origin: true,
-  }); */
+  });
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
