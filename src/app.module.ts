@@ -4,22 +4,20 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
-
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { existsSync } from 'fs';
+import { extname } from 'path';
 import { AppService } from './app.service';
 import { LoggerModule } from './common/logger/logger.module';
 import { ConfigModule } from './config/config.module';
+import { CustomConfigService } from './config/config.service';
+import { ServeStaticDto } from './config/dto/serve-static.dto';
 import { FeedbackModule } from './feedback/feedback.module';
 import { HttpModule } from './http/http.module';
 import { InitModule } from './init/init.module';
 import { HttpLoggerMiddleware } from './middleware/http-logger.middleware';
-import { ShareModule } from './share/share.module';
 import { ProxyModule } from './proxy/proxy.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { CustomConfigService } from './config/config.service';
-import { ServeStaticDto } from './config/dto/serve-static.dto';
-import { existsSync } from 'fs';
-import { application } from 'express';
-import { extname } from 'path';
+import { ShareModule } from './share/share.module';
 
 @Module({
   imports: [

@@ -47,13 +47,6 @@ async function bootstrap() {
     app.use(compression());
   }
 
-  // eventually this mime type configuration will need to change
-  // https://github.com/visionmedia/send/commit/d2cb54658ce65948b0ed6e5fb5de69d022bef941
-  // var mime = express.static.mime;
-  // mime.define({
-  //     'application/json' : ['czml', 'json', 'geojson'],
-  //     'text/plain' : ['glsl']
-  // });
   const trustProxy = configService.get('trustProxy');
   if (typeof trustProxy !== 'undefined' && trustProxy !== false) {
     app.set('trust proxy', trustProxy);
