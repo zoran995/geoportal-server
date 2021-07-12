@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Get,
   Param,
@@ -15,6 +14,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { GetProxyQueryDto } from './dto/get-proxy-query.dto';
+import { ProxyPayloadLimitInterceptor } from './interceptors/proxy-payload-limit.interceptor';
 import { SetResponseHeaders } from './interceptors/SetResponseHeaders';
 import { ProxyService } from './proxy.service';
 
@@ -45,6 +45,7 @@ export class ProxyController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseInterceptors(new SetResponseHeaders())
+  @UseInterceptors(ProxyPayloadLimitInterceptor)
   async proxyQueryPost(@Query() queryParams: GetProxyQueryDto) {
     return this.proxyService.proxyRequest(
       queryParams.target,
@@ -75,6 +76,7 @@ export class ProxyController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseInterceptors(new SetResponseHeaders())
+  @UseInterceptors(ProxyPayloadLimitInterceptor)
   async proxyPost(@Param('duration') duration: string, @Param() params) {
     return this.proxyService.proxyRequest(params['0'], duration);
   }
@@ -102,6 +104,7 @@ export class ProxyController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseInterceptors(new SetResponseHeaders())
+  @UseInterceptors(ProxyPayloadLimitInterceptor)
   async proxyDefaultPost(@Param() params) {
     return this.proxyService.proxyRequest(params['0'], undefined);
   }

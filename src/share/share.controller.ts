@@ -18,9 +18,9 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { NotFoundExceptionFilter } from 'src/common/exceptions/not-found.exception';
-import { PayloadLimitInterceptor } from 'src/interceptor/payload-limit.interceptor';
+import { NotFoundExceptionFilter } from '../common/exceptions/not-found.exception';
 import { GetShareDto } from './dto/get-share.dto';
+import { SharePayloadLimitInterceptor } from './interceptor/share-payload-limit.interceptor';
 import { ShareService } from './share.service';
 
 @ApiTags('share')
@@ -43,7 +43,7 @@ export class ShareController {
   })
   @ApiNotFoundResponse()
   @ApiInternalServerErrorResponse()
-  @UseInterceptors(new PayloadLimitInterceptor(1024 * 200))
+  @UseInterceptors(SharePayloadLimitInterceptor)
   async create(@Body() shareDto: Record<string, unknown>) {
     return this.shareService.save(shareDto);
   }
