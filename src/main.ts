@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { LogLevel, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
@@ -9,14 +9,14 @@ import compression from 'compression';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 const logger = new LoggerService('main');
+
 /**
  *
  * PRODUCTION = 'log', 'error'
  * TESTING = 'log', 'error', 'warn'
  * DEVELOPMENT = 'log', 'error', 'warn', 'debug', 'verbose'
  */
-
-/* function getLoggerLevelByEnvironment(): LogLevel[] {
+function getLoggerLevelByEnvironment(): LogLevel[] {
   const levels: LogLevel[] = ['log', 'error'];
 
   if (process.env.PRODUCTION === 'true') {
@@ -31,7 +31,7 @@ const logger = new LoggerService('main');
   levels.push('debug', 'verbose');
 
   return levels;
-} */
+}
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -42,6 +42,7 @@ async function bootstrap() {
   const configService = app.get(CustomConfigService);
   const logger = await app.resolve(LoggerService);
   app.useLogger(logger);
+  logger.setLogLevels(getLoggerLevelByEnvironment());
   const compressResponse = configService.get('compressResponse');
   if (compressResponse) {
     app.use(compression());
