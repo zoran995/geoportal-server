@@ -17,7 +17,6 @@ import { ValidationErrorsFormatter } from 'src/common/validators/validation-erro
 import { FeedbackConfigDto } from 'src/feedback/dto/feedback.config.dto';
 import { ProxyConfigDto } from 'src/proxy/dto/proxy-config.dto';
 import { ShareConfigDto } from 'src/share/dto/share.config.dto';
-import { HttpsDto } from '../dto/Https.dto';
 import { ServeStaticDto } from '../dto/serve-static.dto';
 
 /* enum Environment {Development = 'development', Production = 'production',
@@ -161,14 +160,6 @@ export class ConfigurationVariables {
    * {@link http://expressjs.com/en/api.html#trust.proxy.options.table}
    */
   trustProxy: boolean | string | string[] | number = false;
-
-  /**
-   * Configuration for the https
-   */
-  @IsObject()
-  @NotNull()
-  @ValidateNested()
-  https?: HttpsDto = undefined;
 
   /**
    * Configuration for serving static files.
