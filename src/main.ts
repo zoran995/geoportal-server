@@ -1,14 +1,15 @@
 import { LogLevel, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import compression from 'compression';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
+import { GlobalExceptionFilter } from './common/exceptions/global.exception';
+import { InternalServerErrorExceptionFilter } from './common/exceptions/internal-server-error.exception';
+import { NotFoundExceptionFilter } from './common/exceptions/not-found.exception';
 import { LoggerService } from './common/logger/logger.service';
 import { CustomConfigService } from './config/config.service';
-import compression from 'compression';
-import { NestExpressApplication } from '@nestjs/platform-express';
-
-const logger = new LoggerService('main');
 
 /**
  *
@@ -62,6 +63,11 @@ async function bootstrap() {
   });
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalFilters(
+    new GlobalExceptionFilter(),
+    new InternalServerErrorExceptionFilter(configService),
+    new NotFoundExceptionFilter(configService),
+  );
 
   const openApiConfig = new DocumentBuilder()
     .setTitle('Geoportal server')
