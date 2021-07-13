@@ -1,4 +1,5 @@
 import { Equals, IsOptional, IsString } from 'class-validator';
+import { NotNull } from 'src/common/validators/not-null.validator';
 import { ShareType } from '../types/share.type';
 import { ShareDto } from './share.dto';
 
@@ -23,7 +24,7 @@ export class ShareS3Dto extends ShareDto {
    * If not provided here, you must ensure they're available as environment variables or in a shared credentials file.
    * See {@link http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html node configuring aws guide}.
    */
-  @IsOptional()
+  @NotNull()
   readonly credentials?: {
     readonly accessKeyId: string;
     readonly secretAccessKey: string;
@@ -33,6 +34,6 @@ export class ShareS3Dto extends ShareDto {
    * The length of the random share key to generate (not including prefix), up to 54 characters. Defaults to the full length.
    */
   @IsString()
-  @IsOptional()
+  @NotNull()
   readonly keyLength?: number;
 }

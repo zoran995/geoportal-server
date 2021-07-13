@@ -8,6 +8,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { ArrayContainsObjectKey } from 'src/common/validators/array-contains-object-key.validator';
+import { NotNull } from 'src/common/validators/not-null.validator';
 import { ShareGistDto } from './share-gist.dto';
 import { ShareS3Dto } from './share-s3.dto';
 import { ShareDto } from './share.dto';
@@ -25,7 +26,7 @@ export class ShareConfigDto {
    * Max payload size for share in kb.
    */
   @IsNumber()
-  @IsOptional()
+  @NotNull()
   maxRequestSize = 200;
 
   /**

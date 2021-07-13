@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { NotNull } from 'src/common/validators/not-null.validator';
 
 export class GetProxyQueryDto {
   /**
@@ -8,7 +9,7 @@ export class GetProxyQueryDto {
   @IsNotEmpty()
   target: string;
 
-  @IsOptional()
+  @NotNull()
   @IsString()
   duration?: string;
 }

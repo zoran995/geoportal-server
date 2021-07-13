@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { NotNull } from 'src/common/validators/not-null.validator';
 import { FeedbackServiceType } from '../types/feedback-service.type';
 import { BaseFeedbackDto } from './base-feedback.dto';
 
@@ -48,7 +49,7 @@ export class MailFeedbackDto extends BaseFeedbackDto {
   secure?: boolean = false;
 
   //@ValidateIf((o: MailFeedbackDto) => o.secure)
-  @IsOptional()
+  @NotNull()
   auth?: MailFeedbackAuth;
 
   @IsEmail()

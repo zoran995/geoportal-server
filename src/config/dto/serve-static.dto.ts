@@ -1,4 +1,5 @@
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { NotNull } from 'src/common/validators/not-null.validator';
 
 export class ServeStaticDto {
   /**
@@ -6,19 +7,19 @@ export class ServeStaticDto {
    * @defaultValue `true`
    */
   @IsBoolean()
-  @IsOptional()
+  @NotNull()
   serveStatic = true;
 
   /**
    * The index file served at root.
    */
   @IsString()
-  @IsOptional()
+  @NotNull()
   resolvePathRelativeToWwwroot = '/index.html';
   /**
    * Whether to route unmatched routes to /index.html and let the frontend resolve the route
    */
   @IsBoolean()
-  @IsOptional()
+  @NotNull()
   resolveUnmatchedPathsWithIndexHtml = false;
 }

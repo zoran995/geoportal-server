@@ -5,6 +5,7 @@ import {
   IsOptional,
   ValidateNested,
 } from 'class-validator';
+import { NotNull } from 'src/common/validators/not-null.validator';
 
 export class HttpsDto {
   /**
@@ -16,7 +17,7 @@ export class HttpsDto {
    * ```
    */
   @IsObject()
-  @IsOptional()
+  @NotNull()
   @ValidateNested()
   httpsOptions: HttpsOptions;
 
@@ -26,6 +27,6 @@ export class HttpsDto {
    * header if it exists. The default is false.
    */
   @IsBoolean()
-  @IsOptional()
+  @NotNull()
   redirectToHttps = false;
 }

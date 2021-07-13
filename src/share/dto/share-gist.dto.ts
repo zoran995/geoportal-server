@@ -5,6 +5,7 @@ import {
   IsString,
   IsUrl,
 } from 'class-validator';
+import { NotNull } from 'src/common/validators/not-null.validator';
 import { ShareType } from '../types/share.type';
 import { ShareDto } from './share.dto';
 
@@ -22,7 +23,7 @@ export class ShareGistDto extends ShareDto {
   /**
    * Github access token with access to create gist.
    */
-  @IsOptional()
+  @NotNull()
   @IsString()
   @IsNotEmpty()
   accessToken?: string;
@@ -37,13 +38,13 @@ export class ShareGistDto extends ShareDto {
    * The filename to give to the gist file
    */
   @IsString()
-  @IsOptional()
+  @NotNull()
   fileName?: string = 'usercatalog.json';
 
   /**
    * The description attached to each Gist
    */
   @IsString()
-  @IsOptional()
+  @NotNull()
   description?: string = 'User-created catalog';
 }

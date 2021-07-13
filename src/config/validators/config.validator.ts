@@ -12,6 +12,7 @@ import {
   ValidateNested,
   validateSync,
 } from 'class-validator';
+import { NotNull } from 'src/common/validators/not-null.validator';
 import { ValidationErrorsFormatter } from 'src/common/validators/validation-errors.formater';
 import { FeedbackConfigDto } from 'src/feedback/dto/feedback.config.dto';
 import { ProxyConfigDto } from 'src/proxy/dto/proxy-config.dto';
@@ -35,20 +36,20 @@ class RateLimitDto {
    * The number of retries the user gets before they need to start waiting.
    */
   @IsNumber()
-  @IsOptional()
+  @NotNull()
   freeRetries? = 2;
 
   /**
    * The initial wait time (in milliseconds) after the free retries above.
    */
   @IsNumber()
-  @IsOptional()
+  @NotNull()
   minWait? = 200;
   /**
    * The maximum time that the user will need to wait.
    */
   @IsNumber()
-  @IsOptional()
+  @NotNull()
   maxWait? = 6000;
 }
 
@@ -75,7 +76,7 @@ export class BasicAuthenticationDto {
    * of the two previous wait times, up to `maxWait`.
    */
   @IsObject()
-  @IsOptional()
+  @NotNull()
   @ValidateNested()
   rateLimit?: RateLimitDto;
 }
@@ -91,11 +92,11 @@ export class ConfigurationVariables {
    * middleware.
    */
   @IsBoolean()
-  @IsOptional()
+  @NotNull()
   compressResponse = true;
 
   @IsObject()
-  @IsOptional()
+  @NotNull()
   @ValidateNested()
   basicAuthentication?: BasicAuthenticationDto;
 
@@ -104,7 +105,7 @@ export class ConfigurationVariables {
    */
   @IsNumber()
   @IsPositive()
-  @IsOptional()
+  @NotNull()
   port = 3001;
 
   /**
@@ -120,7 +121,7 @@ export class ConfigurationVariables {
    * disabled.
    */
   @IsObject()
-  @IsOptional()
+  @NotNull()
   @ValidateNested()
   share?: ShareConfigDto;
 
@@ -138,7 +139,7 @@ export class ConfigurationVariables {
    * ```
    */
   @IsObject()
-  @IsOptional()
+  @NotNull()
   @ValidateNested()
   feedback?: FeedbackConfigDto;
 
@@ -146,7 +147,7 @@ export class ConfigurationVariables {
    * Configuration for the proxy service.
    */
   @IsObject()
-  @IsOptional()
+  @NotNull()
   @ValidateNested()
   proxy?: ProxyConfigDto = new ProxyConfigDto();
 
@@ -163,7 +164,7 @@ export class ConfigurationVariables {
    * Configuration for the https
    */
   @IsObject()
-  @IsOptional()
+  @NotNull()
   @ValidateNested()
   https?: HttpsDto = undefined;
 
@@ -172,7 +173,7 @@ export class ConfigurationVariables {
    * {@link ServeStaticDto}
    */
   @IsObject()
-  @IsOptional()
+  @NotNull()
   @ValidateNested()
   serveStatic: ServeStaticDto = new ServeStaticDto();
 }

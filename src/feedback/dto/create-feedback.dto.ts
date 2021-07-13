@@ -5,34 +5,35 @@ import {
   IsUrl,
   MinLength,
 } from 'class-validator';
+import { NotNull } from 'src/common/validators/not-null.validator';
 
 export class CreateFeedbackDto {
   /**
    * Title of the feedback.
    */
   @IsString()
-  @IsOptional()
+  @NotNull()
   readonly title?: string = 'User feedback';
 
   /**
    * Name of the user sending the feedback.
    */
   @IsString()
-  @IsOptional()
+  @NotNull()
   readonly name?: string = 'No name';
 
   /**
    * Email of the user sending the feedback.
    */
   @IsEmail()
-  @IsOptional()
+  @NotNull()
   readonly email?: string = 'No email';
 
   /**
    * Map share url.
    */
   @IsUrl()
-  @IsOptional()
+  @NotNull()
   readonly shareLink?: string;
 
   /**
@@ -40,6 +41,6 @@ export class CreateFeedbackDto {
    */
   @IsString()
   @MinLength(30)
-  @IsOptional()
+  @NotNull()
   readonly comment?: string = 'No comment';
 }
