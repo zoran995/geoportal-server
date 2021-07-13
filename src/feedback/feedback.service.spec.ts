@@ -7,8 +7,7 @@ import {
 } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { of } from 'rxjs';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable, of } from 'rxjs';
 import { LoggerModule } from 'src/common/logger/logger.module';
 import { FeedbackConfigService } from './config/feedback.config.service';
 import { FeedbackServiceManager } from './feedback-service-manager.service';

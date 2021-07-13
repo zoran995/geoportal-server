@@ -12,6 +12,7 @@ import { ProxyConfigService } from './config/proxy-config.service';
 import { ProxyConfigDto } from './dto/proxy-config.dto';
 import { ProxyService } from './proxy.service';
 import { filterHeaders } from './utils/filterHeaders';
+import { ProxyListService } from './utils/proxy-list.service';
 
 jest.mock('./utils/filterHeaders');
 
@@ -67,6 +68,7 @@ describe('ProxyService', () => {
           useClass: ConfigServiceMock,
         },
         ProxyConfigService,
+        ProxyListService,
         ProxyService,
         {
           provide: REQUEST,
@@ -401,7 +403,7 @@ describe('ProxyService', () => {
     });
   });
 
-  describe('append param to querry', async () => {
+  describe('append param to querry', () => {
     beforeEach(() => {
       jest.spyOn(service as any, 'getQuery').mockImplementation(() => '');
     });

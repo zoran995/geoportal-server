@@ -6,7 +6,11 @@ import {
   IsObject,
   IsOptional,
   IsString,
+  NotEquals,
+  ValidateIf,
 } from 'class-validator';
+import { NotNull } from '../../common/validators/not-null.validator';
+import { DEFAULT_BLACKLIST } from '../proxy.constants';
 
 export class ProxyConfigDto {
   /**
@@ -14,7 +18,7 @@ export class ProxyConfigDto {
    * request.
    */
   @IsNumber()
-  @IsOptional()
+  @NotNull()
   postSizeLimit = 102400;
 
   /**
@@ -22,17 +26,26 @@ export class ProxyConfigDto {
    * requests are accepted.
    */
   @IsBoolean()
-  @IsOptional()
+  @NotNull()
   proxyAllDomains = false;
 
   /**
    * List of domains which the server is willing to proxy for. Subdomains are
    * included automatically.
+   * It will be ignored if {@link ProxyConfigDto.whitelistPath} is defined and file exists.
    */
   @IsArray()
   //@IsFQDN({ allow_underscores: true }, { each: true })
-  @IsOptional()
+  @NotNull()
   allowProxyFor: string[] = [];
+
+  /**
+   * IP addresses to refuse to proxy for, even if they're resolved from a hostname that we would ordinarily allow.
+   * It will be ignored if {@link ProxyConfigDto.blacklistPath} is defined and file exists.
+   */
+  @IsArray()
+  @NotNull()
+  blacklistedAddresses: string[] = DEFAULT_BLACKLIST;
 
   /**
    * Location of the file containing the list of domains which the server is
@@ -40,8 +53,8 @@ export class ProxyConfigDto {
    * should be in its own row.
    */
   @IsString()
-  @IsOptional()
-  whitelistPath = './whitelist';
+  @NotNull()
+  whitelistPath?: string;
 
   /**
    * Location of the file containing the list of IP addresses to refuse to proxy
@@ -53,18 +66,18 @@ export class ProxyConfigDto {
    * file content will be picked up automatically without restarting server.
    */
   @IsString()
-  @IsOptional()
-  blacklistPath = './blacklist';
+  @NotNull()
+  blacklistPath?: string;
 
   /**
    * Pass requests through to another proxy upstream.
    */
   @IsFQDN()
-  @IsOptional()
+  @NotNull()
   upstreamProxy?: string;
 
   @IsObject()
-  @IsOptional()
+  @NotNull()
   bypassUpstreamProxyHosts?: { [key: string]: boolean } = {};
 
   /**
@@ -72,12 +85,12 @@ export class ProxyConfigDto {
    * appended to the url querystring.
    */
   @IsObject()
-  @IsOptional()
+  @NotNull()
   appendParamToQueryString?: { [key: string]: AppendParamToQueryStringDto[] } =
     {};
 
   @IsObject()
-  @IsOptional()
+  @NotNull()
   proxyAuth?: { [key: string]: any };
 }
 

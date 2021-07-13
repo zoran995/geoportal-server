@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { BasicAuthenticationDto } from 'src/config/validators/config.validator';
 import { ProxyConfigDto } from '../dto/proxy-config.dto';
-import { Blacklist } from '../utils/blacklist';
 
 @Injectable()
 export class ProxyConfigService {
@@ -26,7 +25,22 @@ export class ProxyConfigService {
    * {@link ProxyConfigDto.allowProxyFor}
    */
   get proxyDomains() {
-    return this.proxyConfig.allowProxyFor || [];
+    return this.proxyConfig.allowProxyFor;
+  }
+
+  /**
+   * {@link ProxyConfigDto.blacklistedAddresses}
+   */
+  get blacklist() {
+    return this.proxyConfig.blacklistedAddresses;
+  }
+
+  get blacklistPath() {
+    return this.proxyConfig.blacklistPath;
+  }
+
+  get whitelistPath() {
+    return this.proxyConfig.whitelistPath;
   }
 
   /**
@@ -40,21 +54,14 @@ export class ProxyConfigService {
    * {@link ProxyConfigDto.bypassUpstreamProxyHosts}
    */
   get bypassUpstreamProxyHosts() {
-    return this.proxyConfig.bypassUpstreamProxyHosts || {};
+    return this.proxyConfig.bypassUpstreamProxyHosts;
   }
 
   /**
    * {@link ProxyConfigDto.appendParamToQueryString}
    */
   get appendParamToQueryString() {
-    return this.proxyConfig.appendParamToQueryString || {};
-  }
-
-  /**
-   * {@link Blacklist.list}
-   */
-  get blacklist() {
-    return Blacklist.list;
+    return this.proxyConfig.appendParamToQueryString;
   }
 
   get basicAuthentication() {

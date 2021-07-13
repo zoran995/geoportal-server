@@ -1,4 +1,6 @@
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { ShareConfigService } from './config/share-config.service';
 import { ShareController } from './share.controller';
 import { ShareService } from './share.service';
 
@@ -21,6 +23,13 @@ describe('ShareController', () => {
           provide: ShareService,
           useValue: shareServiceMock,
         },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn(),
+          },
+        },
+        ShareConfigService,
       ],
     }).compile();
 

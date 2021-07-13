@@ -4,6 +4,7 @@ import { HttpModule } from 'src/http/http.module';
 import { ProxyConfigService } from './config/proxy-config.service';
 import { ProxyController } from './proxy.controller';
 import { ProxyService } from './proxy.service';
+import { ProxyListService } from './utils/proxy-list.service';
 
 describe('ProxyController', () => {
   let controller: ProxyController;
@@ -12,7 +13,7 @@ describe('ProxyController', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [HttpModule, ConfigModule],
       controllers: [ProxyController],
-      providers: [ProxyService, ProxyConfigService],
+      providers: [ProxyService, ProxyConfigService, ProxyListService],
     }).compile();
 
     controller = module.get<ProxyController>(ProxyController);

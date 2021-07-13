@@ -78,7 +78,4 @@ async function bootstrap() {
   logger.log(`started listening on port: ${port}`);
 }
 
-bootstrap().catch((reason: Error) => {
-  logger.error(reason.message);
-  logger.error(reason.stack);
-});
+bootstrap();

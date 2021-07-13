@@ -11,15 +11,14 @@ import {
 import { REQUEST } from '@nestjs/core';
 import { AxiosProxyConfig } from 'axios';
 import { Request } from 'express';
-import { inRange } from 'range_check';
 import { lastValueFrom } from 'rxjs';
 import { format, URL } from 'url';
 import { ProxyConfigService } from './config/proxy-config.service';
 import { AppendParamToQueryStringDto } from './dto/proxy-config.dto';
 import { PROTOCOL_REGEX } from './proxy.constants';
-import { Blacklist } from './utils/blacklist';
 import { filterHeaders } from './utils/filterHeaders';
 import { processDuration } from './utils/processDuration';
+import { ProxyListService } from './utils/proxy-list.service';
 import { urlValidator } from './utils/urlValidator';
 
 @Injectable()
@@ -30,6 +29,7 @@ export class ProxyService {
     @Inject(REQUEST) private readonly request: Request,
     private readonly proxyConfigService: ProxyConfigService,
     private readonly httpService: HttpService,
+    private readonly proxyListService: ProxyListService,
   ) {}
 
   /**
@@ -136,7 +136,7 @@ export class ProxyService {
         },
         onHttpSocketEvent: (socket: NodeJS.Socket) => {
           socket.once('lookup', function (err, address) {
-            if (addressBlacklisted(address)) {
+            if (this.proxyListService.addressBlacklisted(address)) {
               // ip address is blacklisted so emit an error to abort request
               socket.emit(
                 'error',
@@ -283,7 +283,7 @@ export class ProxyService {
    */
   private proxyAllowedHost(host): void | never {
     // Exclude hosts that are really IP addresses and are in our blacklist.
-    if (addressBlacklisted(host)) {
+    if (this.proxyListService.addressBlacklisted(host)) {
       throw new ForbiddenException(
         `Host is not in list of allowed hosts: ${host}`,
       );
@@ -308,12 +308,4 @@ export class ProxyService {
       `Host is not in list of allowed hosts: ${host}`,
     );
   }
-}
-
-/**
- * Check if address is blacklisted
- * @returns Whether address is blacklisted
- */
-function addressBlacklisted(address) {
-  return !!inRange(address, Blacklist.list);
 }
