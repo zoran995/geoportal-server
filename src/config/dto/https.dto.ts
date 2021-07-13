@@ -1,8 +1,9 @@
 import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface';
 import {
+  IsArray,
   IsBoolean,
   IsObject,
-  IsOptional,
+  IsString,
   ValidateNested,
 } from 'class-validator';
 import { NotNull } from 'src/common/validators/not-null.validator';
@@ -29,4 +30,9 @@ export class HttpsDto {
   @IsBoolean()
   @NotNull()
   redirectToHttps = false;
+
+  @IsArray()
+  @IsString({ each: true })
+  @NotNull()
+  httpAllowedHosts: string[] = [];
 }

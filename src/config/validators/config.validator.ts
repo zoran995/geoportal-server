@@ -7,8 +7,8 @@ import {
   IsNotEmpty,
   IsNumber,
   IsObject,
-  IsOptional,
   IsPositive,
+  IsString,
   ValidateNested,
   validateSync,
 } from 'class-validator';
@@ -114,6 +114,8 @@ export class ConfigurationVariables {
    * separately from the main codebase.
    */
   @IsArray()
+  @IsString({ each: true })
+  @NotNull()
   initPaths: string[] = [];
 
   /**

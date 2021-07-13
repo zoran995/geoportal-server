@@ -4,10 +4,7 @@ import {
   IsFQDN,
   IsNumber,
   IsObject,
-  IsOptional,
   IsString,
-  NotEquals,
-  ValidateIf,
 } from 'class-validator';
 import { NotNull } from '../../common/validators/not-null.validator';
 import { DEFAULT_BLACKLIST } from '../proxy.constants';
@@ -35,6 +32,7 @@ export class ProxyConfigDto {
    * It will be ignored if {@link ProxyConfigDto.whitelistPath} is defined and file exists.
    */
   @IsArray()
+  @IsString({ each: true })
   //@IsFQDN({ allow_underscores: true }, { each: true })
   @NotNull()
   allowProxyFor: string[] = [];
@@ -44,6 +42,7 @@ export class ProxyConfigDto {
    * It will be ignored if {@link ProxyConfigDto.blacklistPath} is defined and file exists.
    */
   @IsArray()
+  @IsString({ each: true })
   @NotNull()
   blacklistedAddresses: string[] = DEFAULT_BLACKLIST;
 
