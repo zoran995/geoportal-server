@@ -76,9 +76,7 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
         fsWait = setTimeout(() => {
           fsWait = false;
         }, 1000);
-        console.log(readFileWithoutComments(filePath));
         storage.push(...readFileWithoutComments(filePath));
-        //console.log(storage);
       }
     });
   }

@@ -7,6 +7,8 @@ import { validate } from './validators/config.validator';
 import { YARGS_CONFIG_LOADER } from './yargs-config/yargs-config.constants';
 import yargsConfiguration from './yargs-config/yargs-configuration';
 import { CustomConfigService } from './config.service';
+import { ProxyModule } from '../proxy/proxy.module';
+import { ServerConfigController } from './server-config.controller';
 
 @Global()
 @Module({
@@ -16,6 +18,7 @@ import { CustomConfigService } from './config.service';
       filePath: yargsConfiguration().configFile || 'serverconfig.json',
       validate,
     }),
+    ProxyModule,
   ],
   providers: [
     // Add CustomConfigService to context.
@@ -32,6 +35,7 @@ import { CustomConfigService } from './config.service';
     // Alias CustomConfigService with NestConfigService so we can import NestConfigService.
     { provide: NestConfigService, useExisting: CustomConfigService },
   ],
+  controllers: [ServerConfigController],
   exports: [YARGS_CONFIG_LOADER, CustomConfigService, NestConfigService],
 })
 export class ConfigModule {}

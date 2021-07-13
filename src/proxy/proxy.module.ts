@@ -9,5 +9,6 @@ import { ProxyListService } from './utils/proxy-list.service';
   imports: [HttpModule],
   controllers: [ProxyController],
   providers: [ProxyService, ProxyConfigService, ProxyListService],
+  exports: [ProxyListService, ProxyConfigService],
 })
 export class ProxyModule {}

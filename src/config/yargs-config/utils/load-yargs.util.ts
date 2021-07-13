@@ -19,7 +19,7 @@ export function loadYargs(
     })
     .option('config-file', {
       description:
-        'File containing settings such as allowed domains to proxy. See serverconfig.json.example',
+        'File containing settings such as allowed domains to proxy. See server-config.json.example',
     })
     .option('proxy-auth', {
       description:
