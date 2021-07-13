@@ -19,6 +19,7 @@ import { HttpLoggerMiddleware } from './middleware/http-logger.middleware';
 import { ProxyModule } from './proxy/proxy.module';
 import { ShareModule } from './share/share.module';
 import { PingModule } from './ping/ping.module';
+import { Proj4Module } from './proj4/proj4.module';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { PingModule } from './ping/ping.module';
       inject: [CustomConfigService],
     }),
     PingModule,
+    Proj4Module,
   ],
   providers: [AppService],
 })
