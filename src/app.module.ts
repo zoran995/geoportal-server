@@ -20,6 +20,8 @@ import { ProxyModule } from './proxy/proxy.module';
 import { ShareModule } from './share/share.module';
 import { PingModule } from './ping/ping.module';
 import { Proj4Module } from './proj4/proj4.module';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -71,6 +73,8 @@ import { Proj4Module } from './proj4/proj4.module';
     }),
     PingModule,
     Proj4Module,
+    AuthModule,
+    UsersModule,
   ],
   providers: [AppService],
 })
