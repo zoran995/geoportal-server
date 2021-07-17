@@ -4,7 +4,6 @@ import {
   IsDefined,
   IsNotEmpty,
   IsNumber,
-  IsOptional,
   ValidateNested,
 } from 'class-validator';
 import { ArrayContainsObjectKey } from 'src/common/validators/array-contains-object-key.validator';

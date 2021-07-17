@@ -7,7 +7,6 @@ import {
 import { Request, Response } from 'express';
 import { existsSync } from 'fs';
 import { CustomConfigService } from 'src/config/config.service';
-import { ServeStaticDto } from 'src/config/dto/serve-static.dto';
 import { defaultExceptionResponse } from './default-exception-response';
 
 @Catch(InternalServerErrorException)
