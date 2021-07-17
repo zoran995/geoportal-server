@@ -1,4 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ProxyModule } from 'src/proxy/proxy.module';
+import { ConfigModule } from './config.module';
 import { ServerConfigController } from './server-config.controller';
 
 describe('ServerConfigController', () => {
@@ -6,6 +8,7 @@ describe('ServerConfigController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [ConfigModule, ProxyModule],
       controllers: [ServerConfigController],
     }).compile();
 

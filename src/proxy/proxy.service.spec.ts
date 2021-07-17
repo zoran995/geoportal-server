@@ -62,20 +62,12 @@ describe('ProxyService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [HttpModule, ConfigModule],
-      providers: [
-        {
-          provide: ConfigService,
-          useClass: ConfigServiceMock,
-        },
-        ProxyConfigService,
-        ProxyListService,
-        ProxyService,
-        {
-          provide: REQUEST,
-          useValue: mockRequest,
-        },
-      ],
+      providers: [ProxyConfigService, ProxyListService, ProxyService],
     })
+      .overrideProvider(ConfigService)
+      .useClass(ConfigServiceMock)
+      .overrideProvider(REQUEST)
+      .useValue(mockRequest)
       .overrideProvider(HttpService)
       .useValue(httpServiceMock)
       .compile();
