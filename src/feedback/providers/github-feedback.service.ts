@@ -36,7 +36,7 @@ export class GithubFeedbackService extends AbstractFeedbackService<GithubFeedbac
       Authorization: `Token ${this.options.accessToken}`,
     };
     return lastValueFrom(
-      await this.httpService
+      this.httpService
         .post(
           this.options.issuesUrl,
           {

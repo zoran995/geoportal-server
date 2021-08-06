@@ -38,7 +38,7 @@ export class GistShareService extends AbstractShareService<ShareGistDto> {
       headers['Authorization'] = `Token ${this.config.accessToken}`;
     }
     return lastValueFrom(
-      await this.httpService
+      this.httpService
         .post(
           this.config.apiUrl,
           {
@@ -82,7 +82,7 @@ export class GistShareService extends AbstractShareService<ShareGistDto> {
     }
     const getUrl = combineURLs(this.config.apiUrl, id);
     return lastValueFrom(
-      await this.httpService.get(getUrl, { headers: headers }).pipe(
+      this.httpService.get(getUrl, { headers: headers }).pipe(
         map((res) => {
           if (
             !isDefined(res.data.files) ||

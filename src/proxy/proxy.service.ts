@@ -116,7 +116,7 @@ export class ProxyService {
     }
 
     return lastValueFrom(
-      await this.httpService.request({
+      this.httpService.request({
         method: this.request.method === 'POST' ? 'POST' : 'GET',
         url: format(remoteUrl),
         headers: proxyHeaders,
