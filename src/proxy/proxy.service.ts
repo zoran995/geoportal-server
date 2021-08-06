@@ -222,8 +222,7 @@ export class ProxyService {
     options: AppendParamToQueryStringDto[],
     remoteUrl: URL,
   ) {
-    for (let i = 0; i < options.length; i++) {
-      const option = options[i];
+    for (const option of options) {
       const re = new RegExp(option.regexPattern, 'g');
       const params = option.params;
       if (re.test(remoteUrl.href)) {
@@ -296,11 +295,8 @@ export class ProxyService {
     host = host.toLowerCase();
     const proxyDomains = this.proxyConfigService.proxyDomains;
     //check that host is from one of these domains
-    for (let i = 0; i < proxyDomains.length; i++) {
-      if (
-        host.indexOf(proxyDomains[i], host.length - proxyDomains[i].length) !==
-        -1
-      ) {
+    for (const proxyDomain of proxyDomains) {
+      if (host.indexOf(proxyDomain, host.length - proxyDomain.length) !== -1) {
         return;
       }
     }
