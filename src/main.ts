@@ -5,9 +5,10 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import compression from 'compression';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
-import { GlobalExceptionFilter } from './common/exceptions/global.exception';
-import { InternalServerErrorExceptionFilter } from './common/exceptions/internal-server-error.exception';
-import { NotFoundExceptionFilter } from './common/exceptions/not-found.exception';
+import { ValidationException } from './common/exceptions/validation.exception';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { InternalServerErrorExceptionFilter } from './common/filters/internal-server-error-exception.filter';
+import { NotFoundExceptionFilter } from './common/filters/not-found-exception.filter';
 import { LoggerService } from './common/logger/logger.service';
 import { CustomConfigService } from './config/config.service';
 
@@ -62,9 +63,22 @@ async function bootstrap() {
     origin: true,
   });
   app.setGlobalPrefix('api');
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      exceptionFactory: (errors) => {
+        const errorMessages = {};
+        errors.forEach((error) => {
+          errorMessages[error.property] = Object.values(error.constraints)
+            .join('. ')
+            .trim();
+        });
+        return new ValidationException(errorMessages);
+      },
+    }),
+  );
   app.useGlobalFilters(
-    new GlobalExceptionFilter(),
+    new HttpExceptionFilter(),
     new InternalServerErrorExceptionFilter(configService),
     new NotFoundExceptionFilter(configService),
   );

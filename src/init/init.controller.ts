@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { GlobalExceptionFilter } from '../common/exceptions/global.exception';
+import { HttpExceptionFilter } from '../common/filters/http-exception.filter';
 import { GetInitDto } from './dto/get-init.dto';
 import { InitService } from './init.service';
 
@@ -25,7 +25,7 @@ export class InitController {
   @Get(':fileName')
   @ApiOperation({ summary: 'Resolves init configuration' })
   @ApiNotFoundResponse({ description: 'File not found.' })
-  @UseFilters(GlobalExceptionFilter)
+  @UseFilters(HttpExceptionFilter)
   async serveInitFile(
     @Param() params: GetInitDto,
     @Res() res: Response,

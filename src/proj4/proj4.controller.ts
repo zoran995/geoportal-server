@@ -1,12 +1,12 @@
 import { Controller, Get, Param, UseFilters } from '@nestjs/common';
-import { GlobalExceptionFilter } from 'src/common/exceptions/global.exception';
-import { Proj4Service } from './proj4.service';
 import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { HttpExceptionFilter } from '../common/filters/http-exception.filter';
+import { Proj4Service } from './proj4.service';
 
 @Controller('proj4def')
 @ApiTags('proj4')
@@ -17,7 +17,7 @@ export class Proj4Controller {
   @ApiOperation({ summary: 'Get the projection definition using EPSG code' })
   @ApiBadRequestResponse({ description: 'Projection code is not number' })
   @ApiNotFoundResponse({ description: 'Projection was not found' })
-  @UseFilters(GlobalExceptionFilter)
+  @UseFilters(HttpExceptionFilter)
   resolveCode(@Param('code') code: number) {
     return this.proj4Service.getDefinition(code);
   }

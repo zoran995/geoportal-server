@@ -18,6 +18,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
 import { GlobalExceptionFilter } from '../common/exceptions/global.exception';
 import { GetShareDto } from './dto/get-share.dto';
 import { SharePayloadLimitInterceptor } from './interceptor/share-payload-limit.interceptor';
@@ -62,7 +63,7 @@ export class ShareController {
   })
   @ApiNotFoundResponse({ description: 'Share configuration not found.' })
   @ApiBadRequestResponse({ description: 'Unknown prefix to resolve' })
-  @UseFilters(GlobalExceptionFilter)
+  @UseFilters(HttpExceptionFilter)
   async resolve(@Param() params: GetShareDto) {
     return await this.shareService.resolve(params.id);
   }
