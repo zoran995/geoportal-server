@@ -1,4 +1,10 @@
-import { Controller, Get, Param, UseFilters } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  UseFilters,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
@@ -18,7 +24,7 @@ export class Proj4Controller {
   @ApiBadRequestResponse({ description: 'Projection code is not number' })
   @ApiNotFoundResponse({ description: 'Projection was not found' })
   @UseFilters(HttpExceptionFilter)
-  resolveCode(@Param('code') code: number) {
+  resolveCode(@Param('code', ParseIntPipe) code: number) {
     return this.proj4Service.getDefinition(code);
   }
 }
