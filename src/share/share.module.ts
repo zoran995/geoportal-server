@@ -1,6 +1,7 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import Agent, { HttpsAgent } from 'agentkeepalive';
+import { POST_SIZE_LIMIT } from 'src/interceptor/payload-limit.interceptor';
 import { ShareConfigService } from './config/share-config.service';
 import { ShareServiceManager } from './share-service-manager.service';
 import { ShareController } from './share.controller';
@@ -21,6 +22,17 @@ const agentConfig: Agent.HttpOptions = {
     }),
   ],
   controllers: [ShareController],
-  providers: [ShareServiceManager, ShareService, ShareConfigService],
+  providers: [
+    ShareServiceManager,
+    ShareService,
+    ShareConfigService,
+    {
+      provide: POST_SIZE_LIMIT,
+      useFactory: (configService: ShareConfigService) => {
+        return configService.maxRequestSize;
+      },
+      inject: [ShareConfigService],
+    },
+  ],
 })
 export class ShareModule {}

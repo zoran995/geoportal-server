@@ -7,6 +7,7 @@ import {
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { of } from 'rxjs';
+import { POST_SIZE_LIMIT } from 'src/interceptor/payload-limit.interceptor';
 import { ShareConfigService } from './config/share-config.service';
 import { ShareConfigDto } from './dto/share.config.dto';
 import { ShareServiceManager } from './share-service-manager.service';
@@ -56,6 +57,10 @@ describe('ShareService', () => {
         {
           provide: HttpService,
           useClass: HttpServiceMock,
+        },
+        {
+          provide: POST_SIZE_LIMIT,
+          useValue: 102400,
         },
       ],
     }).compile();

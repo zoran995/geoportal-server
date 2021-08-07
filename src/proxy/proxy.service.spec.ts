@@ -8,6 +8,7 @@ import { when } from 'jest-when';
 import { of, throwError } from 'rxjs';
 import { ConfigModule } from 'src/config/config.module';
 import { HttpModule } from 'src/http/http.module';
+import { POST_SIZE_LIMIT } from 'src/interceptor/payload-limit.interceptor';
 import { ProxyConfigService } from './config/proxy-config.service';
 import { ProxyConfigDto } from './dto/proxy-config.dto';
 import { ProxyService } from './proxy.service';
@@ -70,6 +71,8 @@ describe('ProxyService', () => {
       .useValue(mockRequest)
       .overrideProvider(HttpService)
       .useValue(httpServiceMock)
+      .overrideProvider(POST_SIZE_LIMIT)
+      .useValue(102400)
       .compile();
 
     service = module.get<ProxyService>(ProxyService);

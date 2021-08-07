@@ -1,7 +1,7 @@
 import { createMock } from '@golevelup/ts-jest';
 import { ExecutionContext, PayloadTooLargeException } from '@nestjs/common';
 import { of } from 'rxjs';
-import { payloadLimitInterceptor } from './payload-limit.interceptor';
+import { PayloadLimitInterceptor } from './payload-limit.interceptor';
 
 const createExecutionContextMock = (max: number) => {
   return createMock<ExecutionContext>({
@@ -21,13 +21,19 @@ const next = {
   handle: () => of({ data: 'data' }),
 };
 
-describe('SizeLimitInterceptor', () => {
+describe('PayloadLimitInterceptor', () => {
   const sizeLimit = 100;
-
+  let interceptor: PayloadLimitInterceptor;
+  beforeEach(() => {
+    interceptor = new PayloadLimitInterceptor(sizeLimit);
+  });
+  it('should be defined', () => {
+    expect(interceptor).toBeDefined();
+  });
   it('should block request when limit exceeded', () => {
     const mockExecutionContext = createExecutionContextMock(150);
     try {
-      payloadLimitInterceptor(mockExecutionContext, next, sizeLimit);
+      interceptor.intercept(mockExecutionContext, next);
     } catch (err) {
       expect(err).toBeInstanceOf(PayloadTooLargeException);
     }
@@ -35,7 +41,7 @@ describe('SizeLimitInterceptor', () => {
 
   it('should return data', (done) => {
     const mockExecutionContext = createExecutionContextMock(60);
-    payloadLimitInterceptor(mockExecutionContext, next, sizeLimit).subscribe({
+    interceptor.intercept(mockExecutionContext, next).subscribe({
       next: (value) => {
         expect(value).toEqual(returnData);
       },
