@@ -12,7 +12,7 @@ export class LoggerService extends ConsoleLogger implements NestLoggerService {
   }
 
   error(message: any, trace?: string, context?: string) {
-    super.error(message, context);
+    super.error(message, trace, context);
   }
 
   warn(message: any, context?: string) {
