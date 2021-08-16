@@ -15,7 +15,7 @@ import { ServeStaticDto } from './config/dto/serve-static.dto';
 import { FeedbackModule } from './feedback/feedback.module';
 import { HttpModule } from './http/http.module';
 import { InitModule } from './init/init.module';
-import { HttpLoggerMiddleware } from './middleware/http-logger.middleware';
+import { HttpLoggerMiddleware } from './common/middleware/http-logger.middleware';
 import { ProxyModule } from './proxy/proxy.module';
 import { ShareModule } from './share/share.module';
 import { PingModule } from './ping/ping.module';
