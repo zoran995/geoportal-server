@@ -6,7 +6,6 @@ import { Response } from 'express';
 import { vol } from 'memfs';
 import * as path from 'path';
 import { LoggerModule } from 'src/common/logger/logger.module';
-import { ConfigModule } from 'src/config/config.module';
 import { InitController } from './init.controller';
 import { InitService } from './init.service';
 
@@ -30,7 +29,7 @@ describe('InitController', () => {
   let controller: InitController;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule, LoggerModule],
+      imports: [LoggerModule],
       controllers: [InitController],
       providers: [
         {

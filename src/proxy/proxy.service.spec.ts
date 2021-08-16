@@ -1,12 +1,11 @@
 import { createMock } from '@golevelup/ts-jest';
 import { HttpService } from '@nestjs/axios';
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { REQUEST } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { when } from 'jest-when';
 import { of, throwError } from 'rxjs';
-import { ConfigModule } from 'src/config/config.module';
 import { HttpModule } from 'src/http/http.module';
 import { POST_SIZE_LIMIT } from 'src/interceptor/payload-limit.interceptor';
 import { ProxyConfigService } from './config/proxy-config.service';
