@@ -182,6 +182,7 @@ describe('ProxyService', () => {
 
   describe('upstream proxy', () => {
     it('used when one is specified', async () => {
+      console.log('used when one is specified');
       const proxy = 'http://proxy/';
       const proxyConf = { ...defaultProxyConfig.proxy };
       proxyConf.upstreamProxy = proxy;
@@ -213,7 +214,8 @@ describe('ProxyService', () => {
       const proxy = 'http://proxy/';
       const proxyConf = { ...defaultProxyConfig.proxy };
       proxyConf.upstreamProxy = proxy;
-      proxyConf.bypassUpstreamProxyHosts = { 'example.com': true };
+      proxyConf.bypassUpstreamProxyHosts = new Map();
+      proxyConf.bypassUpstreamProxyHosts.set('example.com', true);
       when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
       await service.proxyRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledWith(
@@ -228,7 +230,8 @@ describe('ProxyService', () => {
       const proxy = 'http://proxy/';
       const proxyConf = { ...defaultProxyConfig.proxy };
       proxyConf.upstreamProxy = proxy;
-      proxyConf.bypassUpstreamProxyHosts = { 'example2.com': true };
+      proxyConf.bypassUpstreamProxyHosts = new Map();
+      proxyConf.bypassUpstreamProxyHosts.set('example2.com', true);
       when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
       await service.proxyRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledWith(
@@ -405,16 +408,15 @@ describe('ProxyService', () => {
     it('should append params for specified domain', async () => {
       const proxyUrl = 'example.com';
       const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.appendParamToQueryString = {
-        'example.com': [
-          {
-            regexPattern: '.',
-            params: {
-              foo: 'bar',
-            },
+      proxyConf.appendParamToQueryString = new Map<string, any>();
+      proxyConf.appendParamToQueryString.set('example.com', [
+        {
+          regexPattern: '.',
+          params: {
+            foo: 'bar',
           },
-        ],
-      };
+        },
+      ]);
 
       mockConfigGet.mockReturnValue(proxyConf);
       await service.proxyRequest(proxyUrl);
@@ -426,16 +428,15 @@ describe('ProxyService', () => {
     it('should append params for specified domain using specified regex', async () => {
       const proxyUrl = 'example.com/something/else';
       const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.appendParamToQueryString = {
-        'example.com': [
-          {
-            regexPattern: 'something',
-            params: {
-              foo: 'bar',
-            },
+      proxyConf.appendParamToQueryString = new Map<string, any>();
+      proxyConf.appendParamToQueryString.set('example.com', [
+        {
+          regexPattern: 'something',
+          params: {
+            foo: 'bar',
           },
-        ],
-      };
+        },
+      ]);
 
       mockConfigGet.mockReturnValue(proxyConf);
       await service.proxyRequest(proxyUrl);
@@ -447,16 +448,15 @@ describe('ProxyService', () => {
     it('no params appended when mismatch in regex', async () => {
       const proxyUrl = 'example.com/nothing/else';
       const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.appendParamToQueryString = {
-        'example.com': [
-          {
-            regexPattern: 'something',
-            params: {
-              foo: 'bar',
-            },
+      proxyConf.appendParamToQueryString = new Map<string, any>();
+      proxyConf.appendParamToQueryString.set('example.com', [
+        {
+          regexPattern: 'something',
+          params: {
+            foo: 'bar',
           },
-        ],
-      };
+        },
+      ]);
 
       mockConfigGet.mockReturnValue(proxyConf);
       await service.proxyRequest(proxyUrl);
@@ -468,22 +468,21 @@ describe('ProxyService', () => {
     it('propperly interpret regex when multiple params specified', async () => {
       const proxyUrl = 'example.com/nothing/else';
       const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.appendParamToQueryString = {
-        'example.com': [
-          {
-            regexPattern: 'something',
-            params: {
-              foo: 'bar',
-            },
+      proxyConf.appendParamToQueryString = new Map<string, any>();
+      proxyConf.appendParamToQueryString.set('example.com', [
+        {
+          regexPattern: 'something',
+          params: {
+            foo: 'bar',
           },
-          {
-            regexPattern: 'nothing',
-            params: {
-              yep: 'works',
-            },
+        },
+        {
+          regexPattern: 'nothing',
+          params: {
+            yep: 'works',
           },
-        ],
-      };
+        },
+      ]);
 
       mockConfigGet.mockReturnValue(proxyConf);
       await service.proxyRequest(proxyUrl);
@@ -496,17 +495,16 @@ describe('ProxyService', () => {
     it('propperly interpret regex when multiple params specified', async () => {
       const proxyUrl = 'example.com';
       const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.appendParamToQueryString = {
-        'example.com': [
-          {
-            regexPattern: '.',
-            params: {
-              foo: 'bar',
-              another: 'val',
-            },
+      proxyConf.appendParamToQueryString = new Map<string, any>();
+      proxyConf.appendParamToQueryString.set('example.com', [
+        {
+          regexPattern: '.',
+          params: {
+            foo: 'bar',
+            another: 'val',
           },
-        ],
-      };
+        },
+      ]);
 
       mockConfigGet.mockReturnValue(proxyConf);
       await service.proxyRequest(proxyUrl);
@@ -522,16 +520,15 @@ describe('ProxyService', () => {
         .mockImplementationOnce(() => query);
       const proxyUrl = `example.com${query}`;
       const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.appendParamToQueryString = {
-        'example.com': [
-          {
-            regexPattern: '.',
-            params: {
-              foo: 'bar',
-            },
+      proxyConf.appendParamToQueryString = new Map<string, any>();
+      proxyConf.appendParamToQueryString.set('example.com', [
+        {
+          regexPattern: '.',
+          params: {
+            foo: 'bar',
           },
-        ],
-      };
+        },
+      ]);
 
       mockConfigGet.mockReturnValue(proxyConf);
       await service.proxyRequest(proxyUrl);
@@ -543,16 +540,15 @@ describe('ProxyService', () => {
     it("doesn't append params to the querystring for other domains", async () => {
       const proxyUrl = 'example.com?already=here';
       const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.appendParamToQueryString = {
-        'example2.com': [
-          {
-            regexPattern: '.',
-            params: {
-              foo: 'bar',
-            },
+      proxyConf.appendParamToQueryString = new Map<string, any>();
+      proxyConf.appendParamToQueryString.set('example2.com', [
+        {
+          regexPattern: '.',
+          params: {
+            foo: 'bar',
           },
-        ],
-      };
+        },
+      ]);
 
       mockConfigGet.mockReturnValue(proxyConf);
       await service.proxyRequest(proxyUrl);

@@ -6,6 +6,7 @@ import {
   IsObject,
   IsString,
 } from 'class-validator';
+import { isFqdnOrIp } from 'src/common/validators/isFqdnOrIp.validator';
 import { NotNull } from '../../common/validators/not-null.validator';
 import { DEFAULT_BLACKLIST } from '../proxy.constants';
 
@@ -33,7 +34,7 @@ export class ProxyConfigDto {
    */
   @IsArray()
   @IsString({ each: true })
-  //@IsFQDN({ allow_underscores: true }, { each: true })
+  @isFqdnOrIp({ each: true })
   @NotNull()
   allowProxyFor: string[] = [];
 
@@ -77,7 +78,8 @@ export class ProxyConfigDto {
 
   @IsObject()
   @NotNull()
-  bypassUpstreamProxyHosts?: { [key: string]: boolean } = {};
+  @IsBoolean({ each: true })
+  bypassUpstreamProxyHosts?: Map<string, boolean>;
 
   /**
    * An array of options which you to inform which additional parameters are
@@ -85,12 +87,11 @@ export class ProxyConfigDto {
    */
   @IsObject()
   @NotNull()
-  appendParamToQueryString?: { [key: string]: AppendParamToQueryStringDto[] } =
-    {};
+  appendParamToQueryString?: Map<string, AppendParamToQueryStringDto[]>;
 
   @IsObject()
   @NotNull()
-  proxyAuth?: { [key: string]: any };
+  proxyAuth?: Record<string, any>;
 }
 
 export class AppendParamToQueryStringDto {
@@ -99,11 +100,11 @@ export class AppendParamToQueryStringDto {
    * '.' to match everything.
    */
   @IsString()
-  regexPattern: string;
+  regexPattern?: string;
 
   /**
    * Parameters that should be appended to the request.
    */
   @IsObject()
-  params: { [key: string]: string };
+  params?: Record<string, string>;
 }

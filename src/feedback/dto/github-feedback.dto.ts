@@ -8,12 +8,12 @@ export class GithubFeedbackDto extends BaseFeedbackDto {
   readonly service: FeedbackServiceType = 'github';
 
   @IsUrl()
-  issuesUrl: string;
+  issuesUrl!: string;
 
   @IsString()
   @IsNotEmpty()
-  accessToken: string;
+  accessToken!: string;
 
   @IsString()
-  userAgent?: string = 'TerriaJS-Bot';
+  userAgent = 'TerriaJS-Bot';
 }

@@ -5,7 +5,7 @@ export const DO_NOT_PROXY_REGEX =
 export const DEFAULT_MAX_AGE_SECONDS = 1209600;
 export const DEFAULT_MAX_SIZE = 102400;
 
-export const DURATION_UNITS = {
+export const DURATION_UNITS: Record<string, number> = {
   ms: 1.0 / 1000,
   s: 1.0,
   m: 60.0,

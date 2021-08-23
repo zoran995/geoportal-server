@@ -1,4 +1,5 @@
 import { LogLevel, ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -10,7 +11,6 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { InternalServerErrorExceptionFilter } from './common/filters/internal-server-error-exception.filter';
 import { NotFoundExceptionFilter } from './common/filters/not-found-exception.filter';
 import { LoggerService } from './common/logger/logger.service';
-import { CustomConfigService } from './config/config.service';
 
 /**
  *
@@ -40,16 +40,16 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
-  const configService = app.get(CustomConfigService);
+  const configService = app.get(ConfigService);
   const logger = await app.resolve(LoggerService);
   app.useLogger(logger);
   logger.setLogLevels(getLoggerLevelByEnvironment());
-  const compressResponse = configService.get('compressResponse');
+  const compressResponse = configService.get<boolean>('compressResponse');
   if (compressResponse) {
     app.use(compression());
   }
 
-  const trustProxy = configService.get('trustProxy');
+  const trustProxy = configService.get<boolean>('trustProxy');
   if (typeof trustProxy !== 'undefined' && trustProxy !== false) {
     app.set('trust proxy', trustProxy);
   }
@@ -67,11 +67,13 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true,
       exceptionFactory: (errors) => {
-        const errorMessages = {};
+        const errorMessages: Record<string, unknown> = {};
         errors.forEach((error) => {
-          errorMessages[error.property] = Object.values(error.constraints)
-            .join('. ')
-            .trim();
+          if (error.constraints) {
+            errorMessages[error.property] = Object.values(error.constraints)
+              .join('. ')
+              .trim();
+          }
         });
         return new ValidationException(errorMessages);
       },
@@ -93,7 +95,7 @@ async function bootstrap() {
   });
   SwaggerModule.setup('api/docs', app, document);
 
-  const port = configService.get('port' || 3001);
+  const port = configService.get<number>('port', 3001);
   await app.use(helmet()).listen(port);
   logger.log(`started listening on port: ${port}`);
 }

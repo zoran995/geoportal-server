@@ -1,5 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
+import { plainToClass } from 'class-transformer';
 import { HttpModule } from 'src/http/http.module';
 import { GithubFeedbackDto } from './dto/github-feedback.dto';
 import { MailFeedbackDto } from './dto/mail-feedback.dto';
@@ -9,27 +10,27 @@ import { GithubFeedbackService } from './providers/github-feedback.service';
 import { MailFeedbackService } from './providers/mail-feedback.service';
 import { RedmineFeedbackService } from './providers/redmine-feedback.service';
 
-const githubConf: GithubFeedbackDto = {
+const githubConf = plainToClass(GithubFeedbackDto, {
   service: 'github',
   id: 'test-git',
   accessToken: 'test',
   issuesUrl: 'https://example.com',
-};
-const mailConf: MailFeedbackDto = {
+});
+const mailConf = plainToClass(MailFeedbackDto, {
   service: 'mail',
   id: 'test-mail',
   smtpHost: 'test',
   smtpPort: 25,
   email: 'example@test.com',
-};
-const redmineConf: RedmineFeedbackDto = {
+});
+const redmineConf = plainToClass(RedmineFeedbackDto, {
   service: 'redmine',
   id: 'test-redmine',
   project_id: 12,
   issuesUrl: 'https://example.com',
   username: 'test',
   password: 'test',
-};
+});
 
 const unknownService = {
   service: 'test-unknown',

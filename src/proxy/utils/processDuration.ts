@@ -17,7 +17,8 @@ export const processDuration = (duration: string): number | never => {
   if (value !== value) {
     throw new BadRequestException('Invalid duration');
   }
-  const unitConversion = DURATION_UNITS[parsedMaxAge[2]];
+  const unit: any = parsedMaxAge[2];
+  const unitConversion = DURATION_UNITS[unit];
 
   if (!unitConversion) {
     throw new BadRequestException('Invalid duration unit ' + parsedMaxAge[2]);

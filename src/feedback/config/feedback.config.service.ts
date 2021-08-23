@@ -6,15 +6,15 @@ import { FeedbackConfigDto } from '../dto/feedback.config.dto';
 export class FeedbackConfigService {
   constructor(private readonly configService: ConfigService) {}
 
-  get primaryId(): string | undefined {
-    return this.feedbackConfig.primaryId;
+  get primaryId() {
+    return this.feedbackConfig?.primaryId;
   }
 
   get options() {
-    return this.feedbackConfig.options;
+    return this.feedbackConfig?.options;
   }
 
-  private get feedbackConfig(): FeedbackConfigDto {
-    return this.configService.get('feedback');
+  private get feedbackConfig() {
+    return this.configService.get<FeedbackConfigDto>('feedback');
   }
 }

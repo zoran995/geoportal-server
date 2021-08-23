@@ -1,4 +1,5 @@
 import { ValidationError } from 'class-validator';
+import { isDefined } from '../helpers/isDefined';
 
 export class ValidationErrorsFormatter {
   /**
@@ -8,17 +9,21 @@ export class ValidationErrorsFormatter {
   public static format(validationErrors: ValidationError[]): ValidationObject {
     return validationErrors.reduce(
       (p, c: ValidationError): ValidationObject => {
-        if (!c.children || !c.children.length) {
+        const { children, constraints } = c;
+        if (
+          (!isDefined(children) || !children.length) &&
+          isDefined(constraints)
+        ) {
           p[c.property] = {
             value: c.value,
-            constraints: Object.keys(c.constraints).map((key) => {
-              const obj = {};
-              obj[key] = c.constraints[key] + '.\u00a0';
+            constraints: Object.keys(constraints).map((key) => {
+              const obj: Record<string, string> = {};
+              obj[key] = constraints[key] + '.\u00a0';
               return obj;
             }),
           };
-        } else {
-          p[c.property] = ValidationErrorsFormatter.format(c.children);
+        } else if (isDefined(children)) {
+          p[c.property] = ValidationErrorsFormatter.format(children);
         }
         return p;
       },

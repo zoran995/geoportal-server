@@ -1,5 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
+import { plainToClass } from 'class-transformer';
 import { HttpModule } from 'src/http/http.module';
 import { ShareGistDto } from './dto/share-gist.dto';
 import { ShareS3Dto } from './dto/share-s3.dto';
@@ -7,19 +8,19 @@ import { GistShareService } from './providers/gist-share.service';
 import { S3ShareService } from './providers/s3-share.service';
 import { ShareServiceManager } from './share-service-manager.service';
 
-const gistConf: ShareGistDto = {
+const gistConf = plainToClass(ShareGistDto, {
   service: 'gist',
   prefix: 'test',
   apiUrl: '',
   accessToken: '',
-};
+});
 
-const s3Conf: ShareS3Dto = {
+const s3Conf = plainToClass(ShareS3Dto, {
   service: 's3',
   prefix: 's3test',
   region: '',
   bucket: '',
-};
+});
 
 const unknownService = {
   service: 'test-unknown',

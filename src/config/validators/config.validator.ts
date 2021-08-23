@@ -8,20 +8,15 @@ import { ConfigurationDto } from '../dto/configuration.dto';
   Test = 'test', Provision = 'provision',
 } */
 
-export type ConfigurationType =
-  | 'configFile'
-  | 'port'
-  | 'initPaths'
-  | 'feedback'
-  | 'share';
-
-export function validate(config: Record<string, unknown>) {
+export function validate(config: ConfigurationDto) {
   const logger = new Logger('Config validation');
   const validatedConfig = plainToClass(ConfigurationDto, config, {
     enableImplicitConversion: true,
   });
   const errors = validateSync(validatedConfig, {
     skipMissingProperties: false,
+    //whitelist: true,
+    //forbidNonWhitelisted: true,
   });
   if (errors.length > 0) {
     logger.error(ValidationErrorsFormatter.format(errors));

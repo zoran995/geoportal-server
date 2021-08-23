@@ -8,12 +8,12 @@ export class ShareDto {
   @IsString()
   @IsDefined()
   @IsIn(ShareTypeArr)
-  service: ShareType;
+  service!: ShareType;
 
   /**
    * Prefix for this service
    */
   @IsAlphanumeric()
   @IsDefined()
-  prefix: string;
+  prefix!: string;
 }

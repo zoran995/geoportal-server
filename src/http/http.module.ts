@@ -13,13 +13,13 @@ export class HttpModule implements OnModuleInit {
   public onModuleInit(): any {
     // Add request interceptor and response interceptor to log request infos
     const axios = this.httpService.axiosRef;
-    axios.interceptors.request.use(function (config) {
+    axios.interceptors.request.use(function (config: any) {
       config['metadata'] = { ...config['metadata'], startDate: new Date() };
       return config;
     });
     axios.interceptors.response.use(
       (response) => {
-        const { config } = response;
+        const { config }: any = response;
         config['metadata'] = { ...config['metadata'], endDate: new Date() };
         const duration =
           config['metadata'].endDate.getTime() -
@@ -27,7 +27,7 @@ export class HttpModule implements OnModuleInit {
 
         // Log some request infos.
         this.logger.verbose(
-          `${config.method.toUpperCase()} ${config.url} ${duration}ms`,
+          `${config.method?.toUpperCase()} ${config.url} ${duration}ms`,
         );
 
         return response;

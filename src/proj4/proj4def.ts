@@ -1,4 +1,4 @@
-export const proj4def = {
+export const proj4def: Record<number, string> = {
   3819: '+proj=longlat +ellps=bessel +towgs84=595.48,121.69,515.35,4.115,-2.9383,0.853,-3.408 +no_defs',
   3821: '+proj=longlat +ellps=aust_SA +no_defs',
   3824: '+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs',

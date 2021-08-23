@@ -50,11 +50,11 @@ export class ProxyService {
     // Copy the query string
     remoteUrl.search = this.getQuery();
 
-    if (this.proxyConfigService.appendParamToQueryString[remoteUrl.hostname]) {
-      this.appendParamToQuery(
-        this.proxyConfigService.appendParamToQueryString[remoteUrl.hostname],
-        remoteUrl,
+    if (this.proxyConfigService.appendParamToQueryString) {
+      const hostname = this.proxyConfigService.appendParamToQueryString.get(
+        remoteUrl.hostname,
       );
+      hostname && this.appendParamToQuery(hostname, remoteUrl);
     }
 
     if (!remoteUrl.protocol) {
@@ -64,7 +64,10 @@ export class ProxyService {
     let proxy;
     if (
       this.proxyConfigService.upstreamProxy &&
-      !this.proxyConfigService.bypassUpstreamProxyHosts[remoteUrl.hostname]
+      (!this.proxyConfigService.bypassUpstreamProxyHosts ||
+        !this.proxyConfigService.bypassUpstreamProxyHosts.get(
+          remoteUrl.hostname,
+        ))
     ) {
       proxy = this.proxyConfigService.upstreamProxy;
     }
@@ -87,13 +90,13 @@ export class ProxyService {
       this.deleteAuthorizationHeader(filteredReqHeaders);
     }
 
-    return this.performRequest(remoteUrl, filteredReqHeaders, proxy);
+    return this.performRequest(remoteUrl, filteredReqHeaders, <any>proxy);
   }
 
   private async performRequest(
     remoteUrl: URL,
     headers: Record<string, unknown>,
-    proxy: AxiosProxyConfig,
+    proxy?: AxiosProxyConfig,
     retryWithoutAuth = false,
     proxyAuthCredentials = false,
   ): Promise<any> | never {
@@ -109,7 +112,7 @@ export class ProxyService {
       }
       if (authRequired.headers) {
         // a mechanism to pass arbitrary headers.
-        authRequired.headers.forEach(function (header) {
+        authRequired.headers.forEach(function (header: any) {
           proxyHeaders[header.name] = header.value;
         });
       }
@@ -135,7 +138,7 @@ export class ProxyService {
           throw new InternalServerErrorException();
         },
         onHttpSocketEvent: (socket: NodeJS.Socket) => {
-          socket.once('lookup', function (err, address) {
+          socket.once('lookup', (err, address) => {
             if (this.proxyListService.addressBlacklisted(address)) {
               // ip address is blacklisted so emit an error to abort request
               socket.emit(
@@ -223,6 +226,9 @@ export class ProxyService {
     remoteUrl: URL,
   ) {
     for (const option of options) {
+      if (!option.regexPattern || !option.params) {
+        continue;
+      }
       const re = new RegExp(option.regexPattern, 'g');
       const params = option.params;
       if (re.test(remoteUrl.href)) {
@@ -280,7 +286,7 @@ export class ProxyService {
    * @param host - Host to be proxied
    * @throws {@link ForbiddenException} Host is not in list of allowed hosts
    */
-  private proxyAllowedHost(host): void | never {
+  private proxyAllowedHost(host: string): void | never {
     // Exclude hosts that are really IP addresses and are in our blacklist.
     if (this.proxyListService.addressBlacklisted(host)) {
       throw new ForbiddenException(
@@ -295,9 +301,13 @@ export class ProxyService {
     host = host.toLowerCase();
     const proxyDomains = this.proxyConfigService.proxyDomains;
     //check that host is from one of these domains
-    for (const proxyDomain of proxyDomains) {
-      if (host.indexOf(proxyDomain, host.length - proxyDomain.length) !== -1) {
-        return;
+    if (proxyDomains) {
+      for (const proxyDomain of proxyDomains) {
+        if (
+          host.indexOf(proxyDomain, host.length - proxyDomain.length) !== -1
+        ) {
+          return;
+        }
       }
     }
     throw new ForbiddenException(

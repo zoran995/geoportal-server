@@ -4,27 +4,31 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { existsSync } from 'fs';
 import { extname } from 'path';
 import { AppService } from './app.service';
+import { isDefined } from './common/helpers/isDefined';
 import { LoggerModule } from './common/logger/logger.module';
-import { ConfigModule } from './config/config.module';
-import { CustomConfigService } from './config/config.service';
+import { HttpLoggerMiddleware } from './common/middleware/http-logger.middleware';
+import { configurator, IConfigurationType } from './config/configuration';
 import { ServeStaticDto } from './config/dto/serve-static.dto';
 import { FeedbackModule } from './feedback/feedback.module';
 import { HttpModule } from './http/http.module';
 import { InitModule } from './init/init.module';
-import { HttpLoggerMiddleware } from './common/middleware/http-logger.middleware';
-import { ProxyModule } from './proxy/proxy.module';
-import { ShareModule } from './share/share.module';
 import { PingModule } from './ping/ping.module';
 import { Proj4Module } from './proj4/proj4.module';
+import { ProxyModule } from './proxy/proxy.module';
+import { ShareModule } from './share/share.module';
 
 @Module({
   imports: [
     LoggerModule,
-    ConfigModule,
+    ConfigModule.forRoot({
+      load: [configurator],
+      isGlobal: true,
+    }),
     HttpModule,
     InitModule,
     ShareModule,
@@ -32,18 +36,22 @@ import { Proj4Module } from './proj4/proj4.module';
     ProxyModule,
     ServeStaticModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: CustomConfigService) => {
+      useFactory: async (configService: ConfigService<IConfigurationType>) => {
         // set default wwwroot location
         let wwwroot = process.cwd() + '/wwwroot';
         // take the wwwroot location from config if defined
-        if (configService.get<string[]>('_').length > 0) {
-          wwwroot = configService.get<string[]>('_')[0];
+        const initYargs = configService.get<string[]>('_');
+        if (initYargs && initYargs.length > 0) {
+          wwwroot = initYargs[0];
         }
         // check if the index file actually exists so we can share. If the file
         // doesn't exist disable serve static, so we don't receive error on each
         // access.
         const serveStatic = configService.get<ServeStaticDto>('serveStatic');
-        if (!existsSync(wwwroot + serveStatic.resolvePathRelativeToWwwroot)) {
+        if (
+          !isDefined(serveStatic) ||
+          !existsSync(wwwroot + serveStatic.resolvePathRelativeToWwwroot)
+        ) {
           return [];
         }
         return [
@@ -67,7 +75,7 @@ import { Proj4Module } from './proj4/proj4.module';
           },
         ];
       },
-      inject: [CustomConfigService],
+      inject: [ConfigService],
     }),
     PingModule,
     Proj4Module,

@@ -43,8 +43,8 @@ export class GithubFeedbackService extends AbstractFeedbackService<GithubFeedbac
             title: feedback.title,
             body: formatBody(
               feedback,
-              this.options.additionalParameters,
               request,
+              this.options.additionalParameters,
             ),
           },
           { headers },

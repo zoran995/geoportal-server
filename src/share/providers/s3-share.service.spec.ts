@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { plainToClass } from 'class-transformer';
 import { ShareS3Dto } from '../dto/share-s3.dto';
 import { idToObject, S3ShareService, shortId } from './s3-share.service';
 
@@ -20,12 +22,12 @@ const share_body = { test: 'test' };
 const share_id = 'uTWsg2nu8NqYcGhTAmjRYuRIQpM';
 const share_idObject = 'u/T/uTWsg2nu8NqYcGhTAmjRYuRIQpM';
 
-const s3shareConfig: ShareS3Dto = {
+const s3shareConfig = plainToClass(ShareS3Dto, {
   service: 's3',
   prefix: 's3test',
   region: '',
   bucket: '',
-};
+});
 
 describe('GistShareService', () => {
   let service: S3ShareService;

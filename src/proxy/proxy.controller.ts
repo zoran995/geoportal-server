@@ -62,7 +62,7 @@ export class ProxyController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseInterceptors(new SetResponseHeaders())
-  async proxy(@Param('duration') duration: string, @Param() params) {
+  async proxy(@Param('duration') duration: string, @Param() params: any) {
     return this.proxyService.proxyRequest(params['0'], duration);
   }
 
@@ -77,7 +77,7 @@ export class ProxyController {
   @ApiInternalServerErrorResponse()
   @UseInterceptors(new SetResponseHeaders())
   @UseInterceptors(PayloadLimitInterceptor)
-  async proxyPost(@Param('duration') duration: string, @Param() params) {
+  async proxyPost(@Param('duration') duration: string, @Param() params: any) {
     return this.proxyService.proxyRequest(params['0'], duration);
   }
 
@@ -90,7 +90,7 @@ export class ProxyController {
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseInterceptors(new SetResponseHeaders())
-  async proxyDefault(@Param() params) {
+  async proxyDefault(@Param() params: any) {
     return this.proxyService.proxyRequest(params['0']);
   }
 
@@ -105,7 +105,7 @@ export class ProxyController {
   @ApiInternalServerErrorResponse()
   @UseInterceptors(new SetResponseHeaders())
   @UseInterceptors(PayloadLimitInterceptor)
-  async proxyDefaultPost(@Param() params) {
+  async proxyDefaultPost(@Param() params: any) {
     return this.proxyService.proxyRequest(params['0'], undefined);
   }
 }

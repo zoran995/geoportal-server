@@ -35,7 +35,7 @@ expected += `* Share URL: ${feedbackPayload.shareLink}\n`;
 
 describe('formatBody', () => {
   it('correctly formats the body', () => {
-    const result = formatBody(feedbackPayload, [], req as any);
+    const result = formatBody(feedbackPayload, req as any, []);
     expect(result).toBe(expected);
   });
 });

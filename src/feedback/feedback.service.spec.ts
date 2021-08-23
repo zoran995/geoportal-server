@@ -5,27 +5,27 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { plainToClass } from 'class-transformer';
 import { Observable, of } from 'rxjs';
 import { LoggerModule } from 'src/common/logger/logger.module';
 import { FeedbackConfigService } from './config/feedback.config.service';
+import { FeedbackConfigDto } from './dto/feedback.config.dto';
 import { FeedbackServiceManager } from './feedback-service-manager.service';
 import { FeedbackService } from './feedback.service';
 
-const feedbackConfig = {
-  feedback: {
-    primaryId: 'test',
-    options: [
-      {
-        service: 'github',
-        id: 'test',
-        accessToken: 'test',
-        issuesUrl: 'https://example.com',
-      },
-    ],
-  },
-};
+const feedbackConfig = plainToClass(FeedbackConfigDto, {
+  primaryId: 'test',
+  options: [
+    {
+      service: 'github',
+      id: 'test',
+      accessToken: 'test',
+      issuesUrl: 'https://example.com',
+    },
+  ],
+});
 
 const mockExecutionContext = createMock<ExecutionContext>({
   switchToHttp: () => ({
@@ -54,7 +54,7 @@ describe('FeedbackService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule, ConfigModule, LoggerModule],
+      imports: [HttpModule, LoggerModule],
       providers: [
         {
           provide: ConfigService,
@@ -95,7 +95,7 @@ describe('FeedbackService', () => {
   });
 
   it('should throw a NotFoundException when no primary key', async () => {
-    const feedbackConf = { ...feedbackConfig.feedback };
+    const feedbackConf = { ...feedbackConfig };
     feedbackConf.primaryId = undefined;
     configGet.mockReturnValue(feedbackConf);
     try {
@@ -106,7 +106,7 @@ describe('FeedbackService', () => {
   });
 
   it("should throw an InternalServerErrorException when corresponding feedback doesn't exist", async () => {
-    const feedbackConf = { ...feedbackConfig.feedback };
+    const feedbackConf = { ...feedbackConfig };
     feedbackConf.primaryId = 'test1';
     configGet.mockReturnValue(feedbackConf);
     try {
@@ -117,7 +117,7 @@ describe('FeedbackService', () => {
   });
 
   it('should reuse connection', async () => {
-    configGet.mockReturnValue(feedbackConfig.feedback);
+    configGet.mockReturnValue(feedbackConfig);
     const feedbackServiceSpy = jest.spyOn(service, 'create');
     const feedbackManagerHasSpy = jest.spyOn(feedbackServiceManager, 'has');
 
@@ -142,8 +142,8 @@ describe('FeedbackService', () => {
   });
 
   it('should throw InternalServerErrorException when unknown service', async () => {
-    const feedbackConf = { ...feedbackConfig.feedback };
-    feedbackConf.options[0].service = 'test';
+    const feedbackConf = { ...feedbackConfig };
+    (<any>feedbackConf.options)[0].service = 'test';
     configGet.mockReturnValue(feedbackConf);
     try {
       await service.create({}, req as any);

@@ -31,7 +31,7 @@ export class MailFeedbackService extends AbstractFeedbackService<MailFeedbackDto
         replyTo: feedback.email,
         to: this.options.email,
         subject: feedback.title,
-        text: formatBody(feedback, this.options.additionalParameters, request),
+        text: formatBody(feedback, request, this.options.additionalParameters),
       })
       .then((data) => data)
       .catch(() => {

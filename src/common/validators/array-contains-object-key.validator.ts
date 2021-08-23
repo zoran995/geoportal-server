@@ -20,6 +20,7 @@ export function arrayContainsObjectKey(
   return (
     typeof value === 'string' &&
     array &&
+    Array.isArray(array) &&
     array.some((prop) => prop[key] === value)
   ); // you can return a Promise<boolean> here as well, if you want to make async validation
 }

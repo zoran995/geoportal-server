@@ -4,9 +4,10 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
-import { ProxyConfigService } from '../config/proxy-config.service';
 import * as fs from 'fs';
 import { inRange } from 'range_check';
+import { isDefined } from 'src/common/helpers/isDefined';
+import { ProxyConfigService } from '../config/proxy-config.service';
 
 @Injectable()
 export class ProxyListService implements OnModuleInit, OnModuleDestroy {
@@ -40,7 +41,7 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
    * Check if address is blacklisted
    * @returns Whether address is blacklisted
    */
-  addressBlacklisted(address) {
+  addressBlacklisted(address: string) {
     return !!inRange(address, this.blacklist);
   }
 
@@ -48,7 +49,8 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
     const path = this.configService.blacklistPath;
     if (!path || !fs.existsSync(path)) {
       this.logger.log('using blacklist set in config;');
-      this.#blacklist.push(...this.configService.blacklist);
+      isDefined(this.configService.blacklist) &&
+        this.#blacklist.push(...this.configService.blacklist);
       return;
     }
     this.logger.log(`reading blacklist from ${path}`);
@@ -60,7 +62,8 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
     const path = this.configService.whitelistPath;
     if (!path || !fs.existsSync(path)) {
       this.logger.log('using whitelist set in config;');
-      this.#whitelist.push(...this.configService.proxyDomains);
+      isDefined(this.configService.proxyDomains) &&
+        this.#whitelist.push(...this.configService.proxyDomains);
       return;
     }
     this.logger.log(`reading whitelist from ${path}`);

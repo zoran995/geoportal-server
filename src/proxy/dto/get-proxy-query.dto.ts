@@ -5,8 +5,9 @@ export class GetProxyQueryDto {
   /**
    * Target to proxy to
    */
+  @IsString()
   @IsNotEmpty()
-  target: string;
+  target!: string;
 
   /**
    * Duration of the cache

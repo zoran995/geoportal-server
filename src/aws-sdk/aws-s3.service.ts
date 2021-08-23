@@ -38,7 +38,7 @@ export class AwsS3Service {
       .getObject(params)
       .promise()
       .then((fileData) => {
-        return fileData.Body.toString('utf-8');
+        return fileData.Body?.toString('utf-8') || '';
       })
       .catch((err: AWS.AWSError) => {
         this.logger.error(err.message, `error[S3]: ${JSON.stringify(err)}`);

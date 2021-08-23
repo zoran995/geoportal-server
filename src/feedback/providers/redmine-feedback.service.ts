@@ -34,8 +34,8 @@ export class RedmineFeedbackService extends AbstractFeedbackService<RedmineFeedb
               subject: feedback.title,
               description: formatBody(
                 feedback,
-                this.options.additionalParameters,
                 request,
+                this.options.additionalParameters,
               ),
             },
           },

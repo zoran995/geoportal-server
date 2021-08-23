@@ -4,8 +4,8 @@ import { CreateFeedbackDto } from '../dto/create-feedback.dto';
 
 export function formatBody(
   feedback: CreateFeedbackDto,
-  additionalParameters: AdditionalParametersDto[],
   req: Request,
+  additionalParameters: AdditionalParametersDto[] = [],
 ): string {
   let result = '';
   result += feedback.comment;
@@ -19,7 +19,7 @@ export function formatBody(
   if (additionalParameters) {
     additionalParameters.forEach((parameter) => {
       result += `* ${parameter.descriptiveLabel}: ${
-        feedback[parameter.name] || 'Nije unešeno'
+        (<any>feedback)[parameter.name] || 'Nije unešeno'
       }\n`;
     });
   }

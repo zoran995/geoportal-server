@@ -1,26 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ShareGistDto } from '../dto/share-gist.dto';
-import { ShareS3Dto } from '../dto/share-s3.dto';
+import { IConfigurationType } from 'src/config/configuration';
 import { ShareConfigDto } from '../dto/share.config.dto';
 
 @Injectable()
 export class ShareConfigService {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService<IConfigurationType>,
+  ) {}
 
-  get availablePrefixes(): (ShareGistDto | ShareS3Dto)[] {
-    return this.shareConfig.availablePrefixes;
+  get availablePrefixes() {
+    return this.shareConfig?.availablePrefixes;
   }
 
-  get newPrefix(): string {
-    return this.shareConfig.newPrefix;
+  get newPrefix() {
+    return this.shareConfig?.newPrefix;
   }
 
-  get maxRequestSize(): number {
-    return this.shareConfig.maxRequestSize;
+  get maxRequestSize() {
+    return this.shareConfig?.maxRequestSize;
   }
 
-  private get shareConfig(): ShareConfigDto {
-    return this.configService.get('share');
+  private get shareConfig() {
+    return this.configService.get<ShareConfigDto>('share');
   }
 }

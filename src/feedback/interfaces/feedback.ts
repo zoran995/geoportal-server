@@ -1,4 +1,4 @@
-export interface Feedback {
+export interface IFeedback {
   readonly name: string;
   readonly email: string;
   readonly shareLink: string;

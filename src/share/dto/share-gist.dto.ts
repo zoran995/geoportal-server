@@ -26,19 +26,19 @@ export class ShareGistDto extends ShareDto {
    * User agent HTTP Header to set
    */
   @IsString()
-  userAgent?: string = 'TerriaJS-Server';
+  userAgent = 'TerriaJS-Server';
 
   /**
    * The filename to give to the gist file
    */
   @IsString()
   @NotNull()
-  fileName?: string = 'usercatalog.json';
+  fileName = 'usercatalog.json';
 
   /**
    * The description attached to each Gist
    */
   @IsString()
   @NotNull()
-  description?: string = 'User-created catalog';
+  description = 'User-created catalog';
 }

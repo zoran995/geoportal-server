@@ -12,7 +12,7 @@ export function filterHeaders(
   headers: Record<string, unknown>,
   socket?: Socket,
 ) {
-  const result = {};
+  const result: Record<string, unknown> = {};
   // filter out headers that are listed in the regex
   Object.keys(headers).forEach(function (name) {
     if (!DO_NOT_PROXY_REGEX.test(name)) {

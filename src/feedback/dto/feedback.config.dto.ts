@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+  IsArray,
   IsDefined,
   IsNotEmpty,
   IsString,
@@ -19,12 +20,13 @@ export class FeedbackConfigDto {
    */
   @IsString()
   @IsNotEmpty()
-  primaryId: string;
+  primaryId?: string;
 
   /**
    * List of available feedback services.
    */
   @IsDefined()
+  @IsArray()
   @ArrayContainsObjectKey('primaryId', 'id')
   @ValidateNested({ each: true })
   @Type(() => BaseFeedbackDto, {
@@ -37,5 +39,5 @@ export class FeedbackConfigDto {
       ],
     },
   })
-  options: FeedbackServiceDtoType[];
+  options?: FeedbackServiceDtoType[];
 }

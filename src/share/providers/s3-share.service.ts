@@ -48,7 +48,7 @@ export class S3ShareService extends AbstractShareService<ShareS3Dto> {
     };
     return this.awsS3Service
       .save(params)
-      .then((response: AWS.S3.Types.PutObjectOutput) => {
+      .then((response: any) => {
         this.logger.verbose(
           `Saved key ${id} to S3 bucket ${params.Bucket}: ${params.Key}. Etag: ${response.ETag}`,
         );
@@ -75,7 +75,7 @@ export class S3ShareService extends AbstractShareService<ShareS3Dto> {
 
     return this.awsS3Service
       .resolveObject(params)
-      .then((data: string) => {
+      .then((data: any) => {
         return data;
       })
       .catch((err: AWS.AWSError) => {

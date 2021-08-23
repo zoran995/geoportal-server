@@ -6,9 +6,11 @@ import {
 } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { plainToClass } from 'class-transformer';
 import { of } from 'rxjs';
 import { POST_SIZE_LIMIT } from 'src/interceptor/payload-limit.interceptor';
 import { ShareConfigService } from './config/share-config.service';
+import { ShareGistDto } from './dto/share-gist.dto';
 import { ShareConfigDto } from './dto/share.config.dto';
 import { ShareServiceManager } from './share-service-manager.service';
 import { ShareService } from './share.service';
@@ -26,17 +28,17 @@ class HttpServiceMock {
   get = mockHttpGet;
 }
 
+const gistConfig = plainToClass(ShareGistDto, {
+  service: 'gist',
+  prefix: 'test',
+  apiUrl: 'http://example.co',
+  accessToken: '',
+});
+
 const shareConfig: ShareConfigDto = {
   newPrefix: 'test',
   maxRequestSize: 200,
-  availablePrefixes: [
-    {
-      service: 'gist',
-      prefix: 'test',
-      apiUrl: 'http://example.co',
-      accessToken: '',
-    },
-  ],
+  availablePrefixes: [gistConfig],
 };
 
 describe('ShareService', () => {
@@ -200,8 +202,10 @@ describe('ShareService', () => {
 
   it('should throw InternalServerErrorException when unknown service', async () => {
     const shareConf = { ...shareConfig };
-    (<any>shareConf.availablePrefixes[0]).service = 'test';
-    configGet.mockReturnValue(shareConf);
+    if (shareConf.availablePrefixes) {
+      (<any>shareConf.availablePrefixes[0]).service = 'test';
+      configGet.mockReturnValue(shareConf);
+    }
     try {
       await service.save({});
     } catch (err) {

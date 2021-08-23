@@ -13,7 +13,7 @@ import { filterHeaders } from './filterHeaders';
  * @returns The new headers object.
  */
 export function processHeaders(
-  headers,
+  headers: Record<string, unknown>,
   maxAgeSeconds: number | undefined = DEFAULT_MAX_AGE_SECONDS,
 ) {
   const result = filterHeaders(headers);

@@ -1,10 +1,33 @@
 import * as yargs from 'yargs';
-import { YargsConfigModuleSettings } from '../interfaces/yargs-config-module-settings.interface';
 
-export function loadYargs(
+type RemoveIndex<T> = {
+  [K in keyof T as string extends K
+    ? never
+    : number extends K
+    ? never
+    : K]: T[K];
+};
+type PromiseResolvedType<T> = T extends Promise<infer R> ? R : never;
+
+export type YargsConfigType = RemoveIndex<
+  PromiseResolvedType<ReturnType<typeof loadYargs>>
+>;
+
+export interface YargsConfigModuleSettings {
+  /**
+   * When multiple values for the same key are supplied yargs converts them into an array.
+   * When true replace arrays with the rightmost value. This matters when `npm run` has options
+   *  built into it, and the user wants to override them with `npm run -- --port 3005` or something.
+   * "npm run -- --option foo --option bar" will return `{ option: bar }` instead of `{ option: ["foo", "bar"] }`.
+   * @defaultValue true
+   */
+  returnLastValue: boolean;
+}
+
+export async function loadYargs(
   options: YargsConfigModuleSettings = { returnLastValue: true },
-): Record<string, any> {
-  yargs
+) {
+  const argv = yargs
     .usage('$0 [options] [path/to/wwwroot]')
     .strict()
     .option('port', {
@@ -12,22 +35,28 @@ export function loadYargs(
       description: 'Port to listen on. [default: 3001]',
       number: true,
     })
-    .option('public', {})
     .option('public', {
       type: 'boolean',
       description: 'Run a public server that listens on all interfaces.',
+      boolean: true,
     })
     .option('config-file', {
+      type: 'string',
       description:
-        'File containing settings such as allowed domains to proxy. See server-config.json.example',
+        'File containing settings such as allowed domains to proxy. See serverconfig.json.example',
+      default: './serverconfig.json',
     })
     .option('proxy-auth', {
+      type: 'string',
       description:
         'File containing auth information for proxied domains. See proxyauth.json.example',
+      default: './proxyauth.json',
     })
     .option('verbose', {
-      description: 'Produce more output and logging.',
       type: 'boolean',
+      description: 'Produce more output and logging.',
+      default: false,
+      boolean: true,
     })
     .help('h')
     .alias('h', 'help')
@@ -45,5 +74,6 @@ export function loadYargs(
       }
     });
   }
-  return yargs.argv;
+
+  return argv.parseAsync();
 }

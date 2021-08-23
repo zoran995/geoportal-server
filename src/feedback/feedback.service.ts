@@ -4,8 +4,8 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { isDefined } from 'class-validator';
 import { Request } from 'express';
+import { isDefined } from 'src/common/helpers/isDefined';
 import { arrayContainsObjectKey } from 'src/common/validators/array-contains-object-key.validator';
 import { FeedbackConfigService } from './config/feedback.config.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
@@ -40,6 +40,7 @@ export class FeedbackService {
         'Server is not configured to accept feedback.',
       );
     } else if (
+      !isDefined(this.feedbackConfigService.options) ||
       !arrayContainsObjectKey(
         this.feedbackConfigService.options,
         'id',
@@ -58,7 +59,11 @@ export class FeedbackService {
         (option) => option.id === primaryId,
       );
       try {
-        feedback = this.feedbackServiceManager.create(feedbackConfig);
+        if (feedbackConfig) {
+          feedback = this.feedbackServiceManager.create(feedbackConfig);
+        } else {
+          throw new InternalServerErrorException();
+        }
       } catch (err) {
         this.logger.error(
           `An error occurred while sending feedback`,

@@ -21,32 +21,6 @@
       }
     }
   },
-  "share": {
-    "maxRequestSize": 200,
-    "newPrefix": "s",
-    "availablePrefixes": [
-      {
-        "service": "gist",
-        "prefix": "g",
-        "accessToken": ""
-      },
-      {
-        "service": "gist",
-        "prefix": "g1",
-        "accessToken": ""
-      },
-      {
-        "service": "s3",
-        "prefix": "s",
-        "region": "eu-central-1",
-        "bucket": "geoportal-test",
-        "credentials": {
-          "accessKeyId": "",
-          "secretAccessKey": ""
-        }
-      }
-    ]
-  },
   "feedback": {
     "primaryId": "g1",
     "options": [

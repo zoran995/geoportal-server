@@ -5,7 +5,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { isDefined } from 'class-validator';
+import { isDefined } from 'src/common/helpers/isDefined';
 import { ShareConfigService } from './config/share-config.service';
 import { AbstractShareService } from './providers/abstract-share.service';
 import { ShareServiceManager } from './share-service-manager.service';
@@ -56,13 +56,19 @@ export class ShareService {
    * @returns Share data
    */
   async resolve(id: string): Promise<string> {
-    const prefix = id.match(splitPrefixRe)[2];
-    const shareId = id.match(splitPrefixRe)[3];
-    if (!isDefined(prefix) || !isDefined(shareId)) {
+    const idSplit = id.match(splitPrefixRe);
+    if (
+      !isDefined(idSplit) ||
+      idSplit.length < 3 ||
+      !idSplit[2] ||
+      !idSplit[3]
+    ) {
       throw new BadRequestException(
         'Share id is not properly formatted (prefix-id)',
       );
     }
+    const prefix = idSplit[2];
+    const shareId = idSplit[3];
 
     const shareService: AbstractShareService<ShareServiceDtoType> =
       this.createOrGetShareService(prefix);
@@ -73,7 +79,7 @@ export class ShareService {
   private createOrGetShareService(prefix: string) {
     if (!this.shareServiceManager.has(prefix)) {
       const availableConfigs = this.configService.availablePrefixes;
-      const shareConfig: ShareServiceDtoType = availableConfigs.find(
+      const shareConfig = availableConfigs?.find(
         (config) => prefix === config.prefix,
       );
 

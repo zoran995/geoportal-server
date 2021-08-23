@@ -13,14 +13,14 @@ export class BasicAuthenticationDto {
    */
   @IsAlphanumeric()
   @IsNotEmpty()
-  username: string;
+  username!: string;
 
   /**
    * Password of the user that is used for login.
    */
   @IsAlphanumeric()
   @IsNotEmpty()
-  password: string;
+  password!: string;
 
   /**
    * Rate limits basic authentication requests. Note that this uses simple

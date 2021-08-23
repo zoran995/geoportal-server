@@ -1,11 +1,12 @@
 import {
-  IsBoolean,
-  IsObject,
-  ValidateNested,
-  IsNumber,
-  IsPositive,
   IsArray,
+  IsBoolean,
+  IsNumber,
+  IsObject,
   IsString,
+  Max,
+  Min,
+  ValidateNested,
 } from 'class-validator';
 import { NotNull } from 'src/common/validators/not-null.validator';
 import { FeedbackConfigDto } from 'src/feedback/dto/feedback.config.dto';
@@ -37,7 +38,8 @@ export class ConfigurationDto {
    * Port to listen on. Overridden by the --port command line setting.
    */
   @IsNumber()
-  @IsPositive()
+  @Min(0)
+  @Max(65535)
   @NotNull()
   port = 3001;
 
@@ -84,7 +86,7 @@ export class ConfigurationDto {
   @IsObject()
   @NotNull()
   @ValidateNested()
-  proxy?: ProxyConfigDto = new ProxyConfigDto();
+  proxy: ProxyConfigDto = new ProxyConfigDto();
 
   /**
    * The value of the Express "trust proxy" application setting. Set this to
@@ -93,6 +95,7 @@ export class ConfigurationDto {
    * {@link http://expressjs.com/en/guide/behind-proxies.html | express behind proxies}
    * {@link http://expressjs.com/en/api.html#trust.proxy.options.table}
    */
+  @NotNull()
   trustProxy: boolean | string | string[] | number = false;
 
   /**

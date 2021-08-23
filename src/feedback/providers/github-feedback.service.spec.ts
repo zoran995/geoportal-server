@@ -1,5 +1,6 @@
 import { createMock } from '@golevelup/ts-jest';
 import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
+import { plainToClass } from 'class-transformer';
 import { of, throwError } from 'rxjs';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
 import { GithubFeedbackDto } from '../dto/github-feedback.dto';
@@ -23,12 +24,12 @@ const mockExecutionContext = createMock<ExecutionContext>({
 
 const req = mockExecutionContext.switchToHttp().getRequest();
 
-const githubFeedbackConfig: GithubFeedbackDto = {
+const githubFeedbackConfig = plainToClass(GithubFeedbackDto, {
   id: 'github',
   service: 'github',
   issuesUrl: 'http://example.co',
   accessToken: 'test',
-};
+});
 
 describe('GithubFeedbackService', () => {
   let service: GithubFeedbackService;
@@ -53,7 +54,7 @@ describe('GithubFeedbackService', () => {
       of({ ok: true, status_code: 200, message: 'Successful' }),
     );
     const headers = {
-      'User-Agent': undefined,
+      'User-Agent': 'TerriaJS-Bot',
       Accept: 'application/vnd.github.v3+json',
       Authorization: `Token ${githubFeedbackConfig.accessToken}`,
     };
@@ -76,7 +77,7 @@ describe('GithubFeedbackService', () => {
 
   it('should throw an InternalServerErrorException', async () => {
     const headers = {
-      'User-Agent': undefined,
+      'User-Agent': 'TerriaJS-Bot',
       Accept: 'application/vnd.github.v3+json',
       Authorization: `Token ${githubFeedbackConfig.accessToken}`,
     };

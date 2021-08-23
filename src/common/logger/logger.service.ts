@@ -1,6 +1,6 @@
 import {
-  Injectable,
   ConsoleLogger,
+  Injectable,
   LoggerService as NestLoggerService,
   Scope,
 } from '@nestjs/common';

@@ -2,6 +2,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { plainToClass } from 'class-transformer';
 import { of, throwError } from 'rxjs';
 import { ShareGistDto } from '../dto/share-gist.dto';
 import { GistShareService } from './gist-share.service';
@@ -13,12 +14,12 @@ const httpServiceMock = {
   post: mockHttpPost,
 };
 
-const gistShareConfig: ShareGistDto = {
+const gistShareConfig = plainToClass(ShareGistDto, {
   service: 'gist',
   prefix: 'test',
   apiUrl: 'http://example.co',
   accessToken: '',
-};
+});
 
 describe('GistShareService', () => {
   let service: GistShareService;
@@ -40,7 +41,7 @@ describe('GistShareService', () => {
       const responseData = { id: 'test' };
       mockHttpPost.mockReturnValue(of({ data: responseData }));
       const headers = {
-        'User-Agent': undefined,
+        'User-Agent': 'TerriaJS-Server',
         Accept: 'application/vnd.github.v3+json',
         Authorization: `Token ${gistShareConfig.accessToken}`,
       };
@@ -63,7 +64,7 @@ describe('GistShareService', () => {
       const responseData = { id: 'test' };
       mockHttpPost.mockReturnValue(of({ data: responseData }));
       const headers = {
-        'User-Agent': undefined,
+        'User-Agent': 'TerriaJS-Server',
         Accept: 'application/vnd.github.v3+json',
       };
       const payload = {
@@ -126,7 +127,7 @@ describe('GistShareService', () => {
       };
       mockHttpGet.mockReturnValue(of({ data: responseData }));
       const headers = {
-        'User-Agent': undefined,
+        'User-Agent': 'TerriaJS-Server',
         Accept: 'application/vnd.github.v3+json',
         Authorization: `Token ${gistShareConfig.accessToken}`,
       };
@@ -148,7 +149,7 @@ describe('GistShareService', () => {
       };
       mockHttpGet.mockReturnValue(of({ data: responseData }));
       const headers = {
-        'User-Agent': undefined,
+        'User-Agent': 'TerriaJS-Server',
         Accept: 'application/vnd.github.v3+json',
       };
       const id = 'test';

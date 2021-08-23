@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
 import {
   IsAlphanumeric,
+  IsArray,
   IsDefined,
   IsNotEmpty,
   IsNumber,
@@ -19,7 +20,7 @@ export class ShareConfigDto {
    */
   @IsAlphanumeric()
   @IsNotEmpty()
-  newPrefix: string;
+  newPrefix?: string;
 
   /**
    * Max payload size for share in kb.
@@ -32,6 +33,7 @@ export class ShareConfigDto {
    * List of available configurations for share urls.
    */
   @IsDefined()
+  @IsArray()
   @ArrayContainsObjectKey('newPrefix', 'prefix')
   @ValidateNested({ each: true })
   @Type(() => ShareDto, {
@@ -43,5 +45,5 @@ export class ShareConfigDto {
       ],
     },
   })
-  availablePrefixes: (ShareGistDto | ShareS3Dto)[];
+  availablePrefixes?: (ShareGistDto | ShareS3Dto)[];
 }

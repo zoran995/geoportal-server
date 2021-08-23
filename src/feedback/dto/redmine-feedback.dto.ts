@@ -8,16 +8,16 @@ export class RedmineFeedbackDto extends BaseFeedbackDto {
   readonly service: FeedbackServiceType = 'redmine';
 
   @IsNumber()
-  project_id: number;
+  project_id!: number;
 
   @IsUrl()
-  issuesUrl: string;
+  issuesUrl!: string;
 
   @IsString()
   @IsNotEmpty()
-  username: string;
+  username!: string;
 
   @IsString()
   @IsNotEmpty()
-  password: string;
+  password!: string;
 }

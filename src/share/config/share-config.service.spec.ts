@@ -1,9 +1,10 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { plainToClass } from 'class-transformer';
 import { ShareConfigDto } from '../dto/share.config.dto';
 import { ShareConfigService } from './share-config.service';
 
-const shareConfig: ShareConfigDto = {
+const shareConfig = plainToClass(ShareConfigDto, {
   newPrefix: 'test',
   maxRequestSize: 200,
   availablePrefixes: [
@@ -18,9 +19,10 @@ const shareConfig: ShareConfigDto = {
       prefix: 'test',
       region: '',
       bucket: '',
+      keyLength: 54,
     },
   ],
-};
+});
 
 const configGet = jest.fn(() => {
   return shareConfig;
@@ -72,11 +74,14 @@ describe('ShareConfigService', () => {
     const prefixes = service.availablePrefixes;
     expect(configGet).toBeCalledTimes(1);
     expect(prefixes).toHaveLength(2);
-    expect(prefixes.filter((option) => option.service === 'gist')).toHaveLength(
-      1,
-    );
-    expect(prefixes.filter((option) => option.service === 's3')).toHaveLength(
-      1,
-    );
+    expect(prefixes).toBeDefined();
+    if (prefixes) {
+      expect(
+        prefixes.filter((option) => option.service === 'gist'),
+      ).toHaveLength(1);
+      expect(prefixes.filter((option) => option.service === 's3')).toHaveLength(
+        1,
+      );
+    }
   });
 });

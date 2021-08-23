@@ -16,13 +16,13 @@ export class MailFeedbackAuth {
    */
   @IsString()
   @IsNotEmpty()
-  user: string;
+  user!: string;
   /**
    * Password of the user that will be used to connect to smtpServer.
    */
   @IsString()
   @IsNotEmpty()
-  pass: string;
+  pass!: string;
 }
 
 export class MailFeedbackDto extends BaseFeedbackDto {
@@ -35,22 +35,22 @@ export class MailFeedbackDto extends BaseFeedbackDto {
    */
   @IsString()
   @IsNotEmpty()
-  smtpHost: string;
+  smtpHost!: string;
 
   /**
    * Port of smtp server to connect to.
    */
   @IsNumber()
   @IsNotEmpty()
-  smtpPort: number;
+  smtpPort!: number;
 
   @IsBoolean()
-  secure?: boolean = false;
+  secure = false;
 
   //@ValidateIf((o: MailFeedbackDto) => o.secure)
   @NotNull()
   auth?: MailFeedbackAuth;
 
   @IsEmail()
-  email: string;
+  email!: string;
 }

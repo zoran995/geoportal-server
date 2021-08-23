@@ -1,4 +1,4 @@
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import fs from 'fs';
 import { when } from 'jest-when';
@@ -15,11 +15,11 @@ vol.fromJSON({
   './test/init/init2/init2.json': 'hello init 2',
 });
 
-const configGet = jest.fn((key: string) => {
+const configGet = jest.fn((key: string): string | string[] | undefined => {
   switch (key) {
     case 'initPaths':
       return ['test/init', 'test/init/init1'];
-    case 'configFile':
+    case 'config-file':
       return undefined;
   }
   return undefined;
@@ -29,7 +29,7 @@ describe('InitService', () => {
   let service: InitService;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule, LoggerModule],
+      imports: [LoggerModule],
       providers: [
         {
           provide: ConfigService,
@@ -74,8 +74,8 @@ describe('InitService', () => {
   });
 
   it('should properly use config location', async () => {
-    const configFile = 'test';
-    when(configGet).calledWith('configFile').mockReturnValueOnce(configFile);
+    const configFile = 'test/test.json';
+    when(configGet).calledWith('config-file').mockReturnValueOnce(configFile);
     when(configGet)
       .calledWith('initPaths')
       .mockReturnValueOnce(['init', 'init/init1']);

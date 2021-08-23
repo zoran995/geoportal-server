@@ -1,4 +1,4 @@
-import { Equals, IsString } from 'class-validator';
+import { Equals, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { NotNull } from 'src/common/validators/not-null.validator';
 import { ShareType } from '../types/share.type';
 import { ShareDto } from './share.dto';
@@ -11,13 +11,15 @@ export class ShareS3Dto extends ShareDto {
    * The AWS region
    */
   @IsString()
-  readonly region: string;
+  @IsNotEmpty()
+  readonly region!: string;
 
   /**
    * An existing S3 bucket in which to store objects
    */
   @IsString()
-  readonly bucket: string;
+  @IsNotEmpty()
+  readonly bucket!: string;
 
   /**
    * Credentials of a user with S3 getObject and putObject permission on the above bucket.
@@ -33,7 +35,7 @@ export class ShareS3Dto extends ShareDto {
   /**
    * The length of the random share key to generate (not including prefix), up to 54 characters. Defaults to the full length.
    */
-  @IsString()
+  @IsNumber()
   @NotNull()
-  readonly keyLength?: number;
+  readonly keyLength = 54;
 }
