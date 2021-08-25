@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { POST_SIZE_LIMIT } from 'src/interceptor/payload-limit.interceptor';
+import { POST_SIZE_LIMIT } from 'src/common/interceptor/payload-limit.interceptor';
 import { ShareConfigService } from './config/share-config.service';
 import { ShareController } from './share.controller';
 import { ShareService } from './share.service';

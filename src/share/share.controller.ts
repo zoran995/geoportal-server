@@ -19,7 +19,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
-import { PayloadLimitInterceptor } from 'src/interceptor/payload-limit.interceptor';
+import { PayloadLimitInterceptor } from 'src/common/interceptor/payload-limit.interceptor';
 import { GetShareDto } from './dto/get-share.dto';
 import { ShareService } from './share.service';
 

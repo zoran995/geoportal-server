@@ -13,7 +13,7 @@ import {
   ApiInternalServerErrorResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { PayloadLimitInterceptor } from 'src/interceptor/payload-limit.interceptor';
+import { PayloadLimitInterceptor } from 'src/common/interceptor/payload-limit.interceptor';
 import { GetProxyQueryDto } from './dto/get-proxy-query.dto';
 import { SetResponseHeaders } from './interceptors/SetResponseHeaders';
 import { ProxyService } from './proxy.service';
