@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import fs from 'fs';
 import * as path from 'path';
-import { IConfigurationType } from 'src/config/configuration';
+import { IConfigurationType } from 'src/config/configurator';
 
 @Injectable()
 export class InitService {

@@ -13,7 +13,7 @@ import { isDefined } from './common/helpers/isDefined';
 import { LoggerModule } from './common/logger/logger.module';
 import { HttpLoggerMiddleware } from './common/middleware/http-logger.middleware';
 import { AppConfigModule } from './config/app-config.module';
-import { IConfigurationType } from './config/configuration';
+import { IConfigurationType } from './config/configurator';
 import { ServeStaticDto } from './config/dto/serve-static.dto';
 import { FeedbackModule } from './feedback/feedback.module';
 import { HttpModule } from './http/http.module';

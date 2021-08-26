@@ -6,7 +6,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { existsSync } from 'fs';
-import { IConfigurationType } from 'src/config/configuration';
+import { IConfigurationType } from 'src/config/configurator';
 import { HttpExceptionFilter } from './http-exception.filter';
 
 @Catch(InternalServerErrorException)
