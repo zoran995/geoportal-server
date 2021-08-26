@@ -16,10 +16,10 @@ export function loadJsonConfig(
   for (const jsonFilePath of jsonFilePaths) {
     if (existsSync(jsonFilePath)) {
       config = Object.assign(
+        config,
         JSON.parse(
           readFileSync(jsonFilePath, options.encoding ?? 'utf-8').toString(),
         ),
-        config,
       );
     }
   }
