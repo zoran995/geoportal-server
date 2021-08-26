@@ -182,7 +182,6 @@ describe('ProxyService', () => {
 
   describe('upstream proxy', () => {
     it('used when one is specified', async () => {
-      console.log('used when one is specified');
       const proxy = 'http://proxy/';
       const proxyConf = { ...defaultProxyConfig.proxy };
       proxyConf.upstreamProxy = proxy;
