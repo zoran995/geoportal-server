@@ -1,5 +1,8 @@
 import * as yargs from 'yargs';
 
+export const DEFAULT_CONFIG_LOCATION = './serverconfig.json';
+export const DEFAULT_PROXY_AUTH_LOCATION = './proxyauth.json';
+
 type RemoveIndex<T> = {
   [K in keyof T as string extends K
     ? never
@@ -44,13 +47,13 @@ export async function loadYargs(
       type: 'string',
       description:
         'File containing settings such as allowed domains to proxy. See serverconfig.json.example',
-      default: './serverconfig.json',
+      default: DEFAULT_CONFIG_LOCATION,
     })
     .option('proxy-auth', {
       type: 'string',
       description:
         'File containing auth information for proxied domains. See proxyauth.json.example',
-      default: './proxyauth.json',
+      default: DEFAULT_PROXY_AUTH_LOCATION,
     })
     .option('verbose', {
       type: 'boolean',
