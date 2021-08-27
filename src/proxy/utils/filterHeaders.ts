@@ -25,8 +25,9 @@ export function filterHeaders(
   }
 
   if (result['x-forwarded-for']) {
-    result['x-forwarded-for'] =
-      result['x-forwarded-for'] + ', ' + socket.remoteAddress;
+    result[
+      'x-forwarded-for'
+    ] = `${result['x-forwarded-for']}, ${socket.remoteAddress}`;
   } else {
     result['x-forwarded-for'] = socket.remoteAddress;
   }
