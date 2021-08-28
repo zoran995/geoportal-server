@@ -50,9 +50,13 @@ export class GithubFeedbackService extends AbstractFeedbackService<GithubFeedbac
           { headers },
         )
         .pipe(
-          map((res) => res.data),
+          map(() => {
+            return {
+              result: 'SUCCESS',
+            };
+          }),
           catchError((e) => {
-            this.logger.error(`Creating feedback failed with: '${e.message}'`);
+            this.logger.error(`Creating feedback failed`, e);
             throw new InternalServerErrorException();
           }),
         ),
