@@ -17,8 +17,8 @@ const gistConf = plainToClass(ShareGistDto, {
 const s3Conf = plainToClass(ShareS3Dto, {
   service: 's3',
   prefix: 's3test',
-  region: '',
-  bucket: '',
+  region: 'test',
+  bucket: 'test',
 });
 
 const unknownService = {

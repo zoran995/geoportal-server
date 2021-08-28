@@ -1,10 +1,8 @@
+import { S3ClientConfig } from '@aws-sdk/client-s3';
 import { ModuleMetadata } from '@nestjs/common';
-import { ConfigurationOptions } from 'aws-sdk';
 
 export interface AwsS3ModuleAsyncOption
   extends Pick<ModuleMetadata, 'imports'> {
-  useFactory: (
-    ...args: any[]
-  ) => Promise<ConfigurationOptions> | ConfigurationOptions;
+  useFactory: (...args: any[]) => Promise<S3ClientConfig> | S3ClientConfig;
   inject?: any[];
 }

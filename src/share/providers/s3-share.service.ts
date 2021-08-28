@@ -1,3 +1,5 @@
+import { PutObjectCommandInput } from '@aws-sdk/client-s3';
+import { NodeHttpHandler } from '@aws-sdk/node-http-handler';
 import {
   Injectable,
   InternalServerErrorException,
@@ -11,7 +13,13 @@ import { LoggerService } from 'src/common/logger/logger.service';
 import { ShareS3Dto } from '../dto/share-s3.dto';
 import { AbstractShareService } from './abstract-share.service';
 
-const agentConfig: Agent.HttpOptions = {
+class S3Logger extends LoggerService {
+  info() {
+    return;
+  }
+}
+
+const agentConfig: Agent.HttpsOptions = {
   keepAlive: true,
   maxSockets: 2,
   maxFreeSockets: 2,
@@ -20,7 +28,7 @@ const agentConfig: Agent.HttpOptions = {
 
 @Injectable()
 export class S3ShareService extends AbstractShareService<ShareS3Dto> {
-  private readonly logger = new LoggerService(S3ShareService.name);
+  private readonly logger = new S3Logger(S3ShareService.name);
   private readonly awsS3Service: AwsS3Service;
 
   constructor(protected readonly config: ShareS3Dto) {
@@ -28,9 +36,9 @@ export class S3ShareService extends AbstractShareService<ShareS3Dto> {
     this.awsS3Service = new AwsS3Service({
       credentials: config.credentials,
       region: config.region,
-      httpOptions: {
-        agent: new HttpsAgent(agentConfig),
-      },
+      requestHandler: new NodeHttpHandler({
+        httpsAgent: new HttpsAgent(agentConfig),
+      }),
       logger: this.logger,
     });
   }
@@ -41,7 +49,7 @@ export class S3ShareService extends AbstractShareService<ShareS3Dto> {
    */
   async save(data: any): Promise<string> {
     const id = shortId(data, this.config.keyLength);
-    const params: AWS.S3.PutObjectRequest = {
+    const params: PutObjectCommandInput = {
       Bucket: this.config.bucket,
       Key: idToObject(id),
       Body: JSON.stringify(data),
@@ -54,7 +62,7 @@ export class S3ShareService extends AbstractShareService<ShareS3Dto> {
         );
         return id;
       })
-      .catch((err: AWS.AWSError) => {
+      .catch((err) => {
         this.logger.error(
           `An error occurred while saving to S3 Bucket ${params.Bucket}: ${err.message}`,
           `[S3Share]: ${JSON.stringify(err.message)}`,
@@ -78,7 +86,7 @@ export class S3ShareService extends AbstractShareService<ShareS3Dto> {
       .then((data: any) => {
         return data;
       })
-      .catch((err: AWS.AWSError) => {
+      .catch((err) => {
         this.logger.error(err.message, `error[S3]: ${JSON.stringify(err)}`);
         throw new NotFoundException();
       });
