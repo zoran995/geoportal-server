@@ -1,11 +1,12 @@
-import { Inject, Injectable, Logger, Optional } from '@nestjs/common';
+import { Inject, Injectable, Optional } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
+import { LoggerService } from 'src/common/logger/logger.service';
 import { AWS_CONFIG_OPTIONS } from './aws-s3.contants';
 
 @Injectable()
 export class AwsS3Service {
   private readonly _s3: AWS.S3;
-  private readonly logger = new Logger(AwsS3Service.name);
+  private readonly logger = new LoggerService(AwsS3Service.name);
 
   constructor(
     @Optional()
@@ -26,7 +27,10 @@ export class AwsS3Service {
         return info;
       })
       .catch((err: AWS.AWSError) => {
-        this.logger.error(err.message, `error[S3]: ${JSON.stringify(err)}`);
+        this.logger.error(
+          'An error occured while saving to S3',
+          JSON.stringify(err),
+        );
         throw err;
       });
   }
@@ -41,7 +45,10 @@ export class AwsS3Service {
         return fileData.Body?.toString('utf-8') || '';
       })
       .catch((err: AWS.AWSError) => {
-        this.logger.error(err.message, `error[S3]: ${JSON.stringify(err)}`);
+        this.logger.error(
+          'An error occured while resolving from S3',
+          JSON.stringify(err),
+        );
         throw err;
       });
   }

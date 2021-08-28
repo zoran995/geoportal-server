@@ -1,12 +1,9 @@
 import { HttpService } from '@nestjs/axios';
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Request } from 'express';
 import { lastValueFrom } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { LoggerService } from 'src/common/logger/logger.service';
 import { formatBody } from '../common/formatBody';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
 import { RedmineFeedbackDto } from '../dto/redmine-feedback.dto';
@@ -14,7 +11,7 @@ import { AbstractFeedbackService } from './abstract-feedback.service';
 
 @Injectable()
 export class RedmineFeedbackService extends AbstractFeedbackService<RedmineFeedbackDto> {
-  logger = new Logger(RedmineFeedbackService.name);
+  logger = new LoggerService(RedmineFeedbackService.name);
 
   constructor(
     protected readonly options: RedmineFeedbackDto,
@@ -49,7 +46,7 @@ export class RedmineFeedbackService extends AbstractFeedbackService<RedmineFeedb
         .pipe(
           map((res) => res.data),
           catchError((e) => {
-            this.logger.error(`Creating feedback failed with: '${e.message}'`);
+            this.logger.error(`Creating feedback failed`, e);
             throw new InternalServerErrorException();
           }),
         ),

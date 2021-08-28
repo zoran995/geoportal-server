@@ -16,7 +16,7 @@ import { AppConfigModule } from './config/app-config.module';
 import { IConfigurationType } from './config/configurator';
 import { ServeStaticDto } from './config/dto/serve-static.dto';
 import { FeedbackModule } from './feedback/feedback.module';
-import { HttpModule } from './http/http.module';
+import { CustomHttpModule } from './http/custom-http.module';
 import { InitModule } from './init/init.module';
 import { PingModule } from './ping/ping.module';
 import { Proj4Module } from './proj4/proj4.module';
@@ -26,8 +26,8 @@ import { ShareModule } from './share/share.module';
 @Module({
   imports: [
     LoggerModule,
+    CustomHttpModule,
     AppConfigModule,
-    HttpModule,
     InitModule,
     ShareModule,
     FeedbackModule,

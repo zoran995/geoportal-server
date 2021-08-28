@@ -7,7 +7,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { when } from 'jest-when';
 import { of, throwError } from 'rxjs';
 import { POST_SIZE_LIMIT } from 'src/common/interceptor/payload-limit.interceptor';
-import { HttpModule } from 'src/http/http.module';
 import { ProxyConfigService } from './config/proxy-config.service';
 import { ProxyConfigDto } from './dto/proxy-config.dto';
 import { ProxyService } from './proxy.service';
@@ -61,15 +60,18 @@ describe('ProxyService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule, ConfigModule],
-      providers: [ProxyConfigService, ProxyListService, ProxyService],
+      imports: [ConfigModule],
+      providers: [
+        ProxyConfigService,
+        ProxyListService,
+        ProxyService,
+        { provide: HttpService, useValue: httpServiceMock },
+      ],
     })
       .overrideProvider(ConfigService)
       .useClass(ConfigServiceMock)
       .overrideProvider(REQUEST)
       .useValue(mockRequest)
-      .overrideProvider(HttpService)
-      .useValue(httpServiceMock)
       .overrideProvider(POST_SIZE_LIMIT)
       .useValue(102400)
       .compile();

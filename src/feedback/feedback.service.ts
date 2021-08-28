@@ -1,11 +1,11 @@
 import {
   Injectable,
   InternalServerErrorException,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { isDefined } from 'src/common/helpers/isDefined';
+import { LoggerService } from 'src/common/logger/logger.service';
 import { arrayContainsObjectKey } from 'src/common/validators/array-contains-object-key.validator';
 import { FeedbackConfigService } from './config/feedback.config.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
@@ -15,7 +15,7 @@ import { FeedbackServiceDtoType } from './types/feedback-service.type';
 
 @Injectable()
 export class FeedbackService {
-  private readonly logger = new Logger(FeedbackService.name);
+  private readonly logger = new LoggerService(FeedbackService.name);
   constructor(
     private readonly feedbackServiceManager: FeedbackServiceManager,
     private readonly feedbackConfigService: FeedbackConfigService,
@@ -65,10 +65,7 @@ export class FeedbackService {
           throw new InternalServerErrorException();
         }
       } catch (err) {
-        this.logger.error(
-          `An error occurred while sending feedback`,
-          JSON.stringify(err),
-        );
+        this.logger.error(`An error occurred while sending feedback`, err);
         throw new InternalServerErrorException();
       }
     } else {

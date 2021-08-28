@@ -1,7 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
 import { plainToClass } from 'class-transformer';
-import { HttpModule } from 'src/http/http.module';
 import { ShareGistDto } from './dto/share-gist.dto';
 import { ShareS3Dto } from './dto/share-s3.dto';
 import { GistShareService } from './providers/gist-share.service';
@@ -34,7 +33,6 @@ describe('ShareServiceManager', () => {
   let httpService: HttpService;
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
       providers: [
         {
           provide: HttpService,

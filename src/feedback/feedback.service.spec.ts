@@ -1,5 +1,5 @@
 import { createMock } from '@golevelup/ts-jest';
-import { HttpModule, HttpService } from '@nestjs/axios';
+import { HttpService } from '@nestjs/axios';
 import {
   ExecutionContext,
   InternalServerErrorException,
@@ -54,7 +54,7 @@ describe('FeedbackService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule, LoggerModule],
+      imports: [LoggerModule],
       providers: [
         {
           provide: ConfigService,

@@ -7,12 +7,12 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
-  Logger,
 } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { AxiosProxyConfig } from 'axios';
 import { Request } from 'express';
 import { lastValueFrom } from 'rxjs';
+import { LoggerService } from 'src/common/logger/logger.service';
 import { format, URL } from 'url';
 import { ProxyConfigService } from './config/proxy-config.service';
 import { AppendParamToQueryStringDto } from './dto/proxy-config.dto';
@@ -24,7 +24,7 @@ import { urlValidator } from './utils/urlValidator';
 
 @Injectable()
 export class ProxyService {
-  logger = new Logger(ProxyService.name);
+  logger = new LoggerService(ProxyService.name);
 
   constructor(
     @Inject(REQUEST) private readonly request: Request,

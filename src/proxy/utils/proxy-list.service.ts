@@ -1,17 +1,13 @@
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import * as fs from 'fs';
 import { inRange } from 'range_check';
 import { isDefined } from 'src/common/helpers/isDefined';
+import { LoggerService } from 'src/common/logger/logger.service';
 import { ProxyConfigService } from '../config/proxy-config.service';
 
 @Injectable()
 export class ProxyListService implements OnModuleInit, OnModuleDestroy {
-  private readonly logger = new Logger(ProxyListService.name);
+  private readonly logger = new LoggerService(ProxyListService.name);
   #blacklist: string[] = [];
   #whitelist: string[] = [];
   private whitelistWatcher: fs.FSWatcher | undefined;

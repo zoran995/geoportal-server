@@ -1,13 +1,13 @@
 import {
   Injectable,
   InternalServerErrorException,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import Agent, { HttpsAgent } from 'agentkeepalive';
 import baseX from 'base-x';
 import * as crypto from 'crypto';
 import { AwsS3Service } from 'src/aws-sdk/aws-s3.service';
+import { LoggerService } from 'src/common/logger/logger.service';
 import { ShareS3Dto } from '../dto/share-s3.dto';
 import { AbstractShareService } from './abstract-share.service';
 
@@ -20,7 +20,7 @@ const agentConfig: Agent.HttpOptions = {
 
 @Injectable()
 export class S3ShareService extends AbstractShareService<ShareS3Dto> {
-  private readonly logger = new Logger(S3ShareService.name);
+  private readonly logger = new LoggerService(S3ShareService.name);
   private readonly awsS3Service: AwsS3Service;
 
   constructor(protected readonly config: ShareS3Dto) {

@@ -1,7 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
 import { plainToClass } from 'class-transformer';
-import { HttpModule } from 'src/http/http.module';
 import { GithubFeedbackDto } from './dto/github-feedback.dto';
 import { MailFeedbackDto } from './dto/mail-feedback.dto';
 import { RedmineFeedbackDto } from './dto/redmine-feedback.dto';
@@ -44,7 +43,6 @@ describe('FeedbackServiceManager', () => {
   let httpService: HttpService;
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
       providers: [
         {
           provide: HttpService,
