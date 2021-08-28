@@ -7,22 +7,22 @@ import {
 
 @Injectable({ scope: Scope.TRANSIENT })
 export class LoggerService extends ConsoleLogger implements NestLoggerService {
-  log(message: any, context?: string) {
-    super.log(message, context);
+  log(message: any) {
+    super.log(message);
   }
 
-  error(message: any, trace?: string, context?: string) {
-    super.error(message, trace, context);
+  error(message: any, trace?: string) {
+    super.error(message, trace);
   }
 
-  warn(message: any, context?: string) {
-    super.warn(message, context);
+  warn(message: any) {
+    super.warn(message);
   }
 
-  debug(message: any, context?: string) {
-    super.debug(message, context);
+  debug(message: any) {
+    super.debug(message);
   }
-  verbose(message: any, context?: string) {
-    super.verbose(message, context);
+  verbose(message: any) {
+    super.verbose(message);
   }
 }
