@@ -1,5 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import {
+  BadGatewayException,
   BadRequestException,
   ForbiddenException,
   HttpException,
@@ -192,6 +193,8 @@ export class ProxyService {
               response: { value: err.getResponse().toString() },
             });
           }
+        } else if (err.code === 'ECONNREFUSED') {
+          throw new BadGatewayException();
         }
 
         if ((err.response?.status || err.response?.statusCode) && err.message) {
