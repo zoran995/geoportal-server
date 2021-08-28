@@ -67,7 +67,7 @@ describe('ShareConfigService', () => {
   it('properly resolve max request size', () => {
     const maxRequestSize = service.maxRequestSize;
     expect(configGet).toBeCalledTimes(1);
-    expect(maxRequestSize).toEqual(200);
+    expect(maxRequestSize).toEqual(200 * 1024);
   });
 
   it('properly resolves availablePrefixes', () => {

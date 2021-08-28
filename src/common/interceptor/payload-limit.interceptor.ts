@@ -17,7 +17,7 @@ export const POST_SIZE_LIMIT = 'POST_SIZE_LIMIT';
 @Injectable()
 export class PayloadLimitInterceptor implements NestInterceptor {
   constructor(
-    @Inject('POST_SIZE_LIMIT') private readonly postSizeLimit: number,
+    @Inject(POST_SIZE_LIMIT) private readonly postSizeLimit: number,
   ) {}
 
   intercept(
