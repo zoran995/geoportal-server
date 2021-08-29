@@ -5,9 +5,10 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import Agent, { HttpsAgent } from 'agentkeepalive';
 import baseX from 'base-x';
 import * as crypto from 'crypto';
+import http from 'http';
+import https from 'https';
 import { AwsS3Service } from 'src/aws-sdk/aws-s3.service';
 import { LoggerService } from 'src/common/logger/logger.service';
 import { ShareS3Dto } from '../dto/share-s3.dto';
@@ -19,7 +20,7 @@ class S3Logger extends LoggerService {
   }
 }
 
-const agentConfig: Agent.HttpsOptions = {
+const agentConfig: https.AgentOptions = {
   keepAlive: true,
   maxSockets: 2,
   maxFreeSockets: 2,
@@ -37,7 +38,8 @@ export class S3ShareService extends AbstractShareService<ShareS3Dto> {
       credentials: config.credentials,
       region: config.region,
       requestHandler: new NodeHttpHandler({
-        httpsAgent: new HttpsAgent(agentConfig),
+        httpsAgent: new https.Agent(agentConfig),
+        httpAgent: new http.Agent(agentConfig),
       }),
       logger: this.logger,
     });

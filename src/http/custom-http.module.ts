@@ -1,9 +1,10 @@
 import { HttpModule as BaseHttpModule } from '@nestjs/axios';
 import { Global, Module } from '@nestjs/common';
-import Agent, { HttpsAgent } from 'agentkeepalive';
+import http from 'http';
+import https from 'https';
 import { AxiosLogInterceptor } from './axios-log-interceptors';
 
-const agentConfig: Agent.HttpOptions = {
+const agentConfig: https.AgentOptions = {
   keepAlive: true,
   maxSockets: 2,
   maxFreeSockets: 2,
@@ -14,8 +15,8 @@ const agentConfig: Agent.HttpOptions = {
 @Module({
   imports: [
     BaseHttpModule.register({
-      httpAgent: new Agent(agentConfig),
-      httpsAgent: new HttpsAgent(agentConfig),
+      httpAgent: new http.Agent(agentConfig),
+      httpsAgent: new https.Agent(agentConfig),
     }),
   ],
   providers: [AxiosLogInterceptor],
