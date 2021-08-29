@@ -99,7 +99,7 @@ describe('FeedbackServiceManager', () => {
       try {
         const feedback = service.get(githubConf.id);
         expect(feedback).toBeUndefined();
-      } catch (err) {
+      } catch (err: any) {
         expect(err).toBeDefined();
         expect(JSON.stringify(err.message)).toContain(githubConf.id);
       }
@@ -135,7 +135,7 @@ describe('FeedbackServiceManager', () => {
     try {
       const feedback = service.create(unknownService as any);
       expect(feedback).toBeUndefined();
-    } catch (err) {
+    } catch (err: any) {
       expect(err).toBeDefined();
       expect(JSON.stringify(err.message)).toContain(unknownService.service);
     }

@@ -64,7 +64,7 @@ export class FeedbackService {
         } else {
           throw new InternalServerErrorException();
         }
-      } catch (err) {
+      } catch (err: any) {
         this.logger.error(`An error occurred while sending feedback`, err);
         throw new InternalServerErrorException();
       }

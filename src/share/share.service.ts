@@ -90,7 +90,7 @@ export class ShareService {
       }
       try {
         return this.shareServiceManager.create(shareConfig);
-      } catch (err) {
+      } catch (err: any) {
         this.logger.error(
           `An error occurred while getting share configuration`,
           err,

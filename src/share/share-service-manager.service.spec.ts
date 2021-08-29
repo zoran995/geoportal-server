@@ -107,7 +107,7 @@ describe('ShareServiceManager', () => {
     try {
       const share = service.get(gistConf.prefix);
       expect(share).toBeUndefined();
-    } catch (err) {
+    } catch (err: any) {
       expect(err).toBeDefined();
       expect(JSON.stringify(err.message)).toContain(gistConf.prefix);
     }
@@ -117,7 +117,7 @@ describe('ShareServiceManager', () => {
     try {
       const share = service.create(unknownService as any);
       expect(share).toBeUndefined();
-    } catch (err) {
+    } catch (err: any) {
       expect(err).toBeDefined();
       expect(JSON.stringify(err.message)).toContain(unknownService.service);
     }
