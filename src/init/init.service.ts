@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import fs from 'fs';
 import * as path from 'path';
+import { WWWROOT_TOKEN } from 'src/config/app-config.module';
 import { IConfigurationType } from 'src/config/configurator';
 
 @Injectable()
@@ -9,7 +10,15 @@ export class InitService {
   private readonly initPaths: string[] = [];
   constructor(
     private readonly configService: ConfigService<IConfigurationType>,
-  ) {}
+    @Inject(WWWROOT_TOKEN) private readonly wwwroot: string,
+  ) {
+    const initPaths = this.configService.get<string[]>('initPaths');
+    const initPath = path.join(this.wwwroot, 'init');
+
+    if (!initPaths?.some((iPath) => iPath === initPath.replace(/\\/g, '/'))) {
+      initPaths?.push(initPath);
+    }
+  }
 
   /**
    * Gets the path to the requested file
@@ -31,16 +40,5 @@ export class InitService {
       }
     });
     return filePath;
-  }
-}
-
-export function addWwwrootInit(
-  configService: ConfigService<IConfigurationType>,
-  wwwroot: string,
-) {
-  const initPaths = configService.get<string[]>('initPaths');
-  const initPath = path.join(wwwroot, 'init');
-  if (initPaths?.some((iPath) => iPath === initPath)) {
-    initPaths?.push(initPath);
   }
 }

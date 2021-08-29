@@ -5,6 +5,7 @@ import { when } from 'jest-when';
 import { vol } from 'memfs';
 import * as path from 'path';
 import { LoggerModule } from 'src/common/logger/logger.module';
+import { WWWROOT_TOKEN } from 'src/config/app-config.module';
 import { InitService } from './init.service';
 
 jest.mock('fs');
@@ -31,6 +32,7 @@ describe('InitService', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [LoggerModule],
       providers: [
+        { provide: WWWROOT_TOKEN, useValue: 'test' },
         {
           provide: ConfigService,
           useValue: {
@@ -73,7 +75,7 @@ describe('InitService', () => {
     expect(existsSyncSpy).toHaveBeenCalledTimes(2);
   });
 
-  it('should properly use config location', async () => {
+  it('should properly add WWWROOT_TOKEN init location and use it as a config location', async () => {
     const configFile = 'test/test.json';
     when(configGet).calledWith('config-file').mockReturnValueOnce(configFile);
     when(configGet)
@@ -81,7 +83,7 @@ describe('InitService', () => {
       .mockReturnValueOnce(['init', 'init/init1']);
     const existsSyncSpy = jest.spyOn(fs, 'existsSync');
     const filePath = service.getFilePath('init.json');
-    expect(configGet).toBeCalledTimes(2);
+    expect(configGet).toBeCalledTimes(3);
 
     expect(filePath).toBeDefined();
     expect(filePath).toBe(path.resolve('.', 'test/init/init.json'));

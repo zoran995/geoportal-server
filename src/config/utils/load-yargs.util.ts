@@ -31,7 +31,12 @@ export async function loadYargs(
   options: YargsConfigModuleSettings = { returnLastValue: true },
 ) {
   const argv = yargs
-    .usage('$0 [options] [path/to/wwwroot]')
+    .usage('$0 [wwwroot]', true, (y) => {
+      return y.positional('wwwroot', {
+        describe: 'path/to/wwwroot',
+        type: 'string',
+      });
+    })
     .strict()
     .option('port', {
       type: 'number',
@@ -69,11 +74,15 @@ export async function loadYargs(
     // Yargs unhelpfully turns "--option foo --option bar" into { option: ["foo", "bar"] }.
     // Hence replace arrays with the rightmost value. This matters when `npm run` has options
     // built into it, and the user wants to override them with `npm run -- --port 3005` or something.
-    yargs.coerce(Object.keys(yargs.argv), (opt) => {
-      if (Array.isArray(opt) && opt.length > 0) {
-        return opt[opt.length - 1];
-      } else {
-        return opt;
+    Object.keys(yargs.argv).forEach((key: string) => {
+      if (key !== '_') {
+        yargs.coerce(key, (opt) => {
+          if (Array.isArray(opt) && opt.length > 0) {
+            return opt[opt.length - 1];
+          } else {
+            return opt;
+          }
+        });
       }
     });
   }

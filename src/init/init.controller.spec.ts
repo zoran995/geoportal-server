@@ -6,6 +6,7 @@ import { Response } from 'express';
 import { vol } from 'memfs';
 import * as path from 'path';
 import { LoggerModule } from 'src/common/logger/logger.module';
+import { WWWROOT_TOKEN } from 'src/config/app-config.module';
 import { InitController } from './init.controller';
 import { InitService } from './init.service';
 
@@ -32,6 +33,7 @@ describe('InitController', () => {
       imports: [LoggerModule],
       controllers: [InitController],
       providers: [
+        { provide: WWWROOT_TOKEN, useValue: 'test' },
         {
           provide: ConfigService,
           useClass: ConfigServiceMock,
