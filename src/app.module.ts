@@ -18,6 +18,7 @@ import { ServeStaticDto } from './config/dto/serve-static.dto';
 import { FeedbackModule } from './feedback/feedback.module';
 import { CustomHttpModule } from './http/custom-http.module';
 import { InitModule } from './init/init.module';
+import { addWwwrootInit } from './init/init.service';
 import { PingModule } from './ping/ping.module';
 import { Proj4Module } from './proj4/proj4.module';
 import { ProxyModule } from './proxy/proxy.module';
@@ -52,6 +53,7 @@ import { ShareModule } from './share/share.module';
         ) {
           return [];
         }
+        addWwwrootInit(configService, wwwroot);
         return [
           {
             rootPath: wwwroot,

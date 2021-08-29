@@ -6,6 +6,7 @@ import { IConfigurationType } from 'src/config/configurator';
 
 @Injectable()
 export class InitService {
+  private readonly initPaths: string[] = [];
   constructor(
     private readonly configService: ConfigService<IConfigurationType>,
   ) {}
@@ -30,5 +31,16 @@ export class InitService {
       }
     });
     return filePath;
+  }
+}
+
+export function addWwwrootInit(
+  configService: ConfigService<IConfigurationType>,
+  wwwroot: string,
+) {
+  const initPaths = configService.get<string[]>('initPaths');
+  const initPath = path.join(wwwroot, 'init');
+  if (initPaths?.some((iPath) => iPath === initPath)) {
+    initPaths?.push(initPath);
   }
 }
