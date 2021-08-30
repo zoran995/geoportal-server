@@ -37,7 +37,6 @@
     "class-validator": "^0.13.1",
     "compression": "^1.7.4",
     "helmet": "^4.6.0",
-    "lodash.get": "^4.4.2",
     "nodemailer": "^6.6.3",
     "range_check": "^2.0.4",
     "reflect-metadata": "^0.1.13",
