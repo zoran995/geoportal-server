@@ -13,7 +13,7 @@ import { AxiosProxyConfig } from 'axios';
 import { Request } from 'express';
 import { lastValueFrom } from 'rxjs';
 import { LoggerService } from 'src/common/logger/logger.service';
-import { format, URL } from 'url';
+import { URL } from 'url';
 import { ProxyConfigService } from './config/proxy-config.service';
 import { AppendParamToQueryStringDto } from './dto/proxy-config.dto';
 import { PROTOCOL_REGEX } from './proxy.constants';
@@ -52,10 +52,10 @@ export class ProxyService {
     remoteUrl.search = this.getQuery();
 
     if (this.proxyConfigService.appendParamToQueryString) {
-      const hostname = this.proxyConfigService.appendParamToQueryString.get(
-        remoteUrl.hostname,
+      const host = this.proxyConfigService.appendParamToQueryString.get(
+        remoteUrl.host,
       );
-      hostname && this.appendParamToQuery(hostname, remoteUrl);
+      host && this.appendParamToQuery(host, remoteUrl);
     }
 
     if (!remoteUrl.protocol) {
@@ -66,15 +66,13 @@ export class ProxyService {
     if (
       this.proxyConfigService.upstreamProxy &&
       (!this.proxyConfigService.bypassUpstreamProxyHosts ||
-        !this.proxyConfigService.bypassUpstreamProxyHosts.get(
-          remoteUrl.hostname,
-        ))
+        !this.proxyConfigService.bypassUpstreamProxyHosts.get(remoteUrl.host))
     ) {
       proxy = this.proxyConfigService.upstreamProxy;
     }
 
     // Are we allowed to proxy for this host?
-    this.proxyAllowedHost(remoteUrl.hostname);
+    this.proxyAllowedHost(remoteUrl.host);
     const filteredReqHeaders = filterHeaders(
       this.request.headers,
       this.request.socket,
@@ -103,7 +101,7 @@ export class ProxyService {
   ): Promise<any> | never {
     const proxyHeaders = { ...headers };
     const proxyAuth = this.proxyConfigService.proxyAuth;
-    const authRequired = proxyAuth[remoteUrl.hostname];
+    const authRequired = proxyAuth[remoteUrl.host];
     if (!retryWithoutAuth && authRequired && !headers['authorization']) {
       // identify that we tried using proxy auth headers
       proxyAuthCredentials = true;
@@ -122,7 +120,7 @@ export class ProxyService {
     return lastValueFrom(
       this.httpService.request({
         method: this.request.method === 'POST' ? 'POST' : 'GET',
-        url: format(remoteUrl),
+        url: remoteUrl.href,
         headers: proxyHeaders,
         //responseType: 'arraybuffer', //encoding: null,
         proxy,
@@ -133,7 +131,10 @@ export class ProxyService {
           const location = headers.location;
           if (location && location.length > 0) {
             const url = new URL(location);
-            return this.proxyAllowedHost(url.hostname);
+            // location header can be a relative URL with no host name. In that case, we default to the remote url host.
+            const redirectHost =
+              typeof url.host === 'string' ? url.host : remoteUrl.host;
+            return this.proxyAllowedHost(redirectHost);
           }
           // redirect could not be completed
           throw new InternalServerErrorException();
@@ -214,7 +215,7 @@ export class ProxyService {
    */
   private getQuery() {
     const baseURL =
-      this.request.protocol + '://' + this.request.headers.hostname + '/';
+      this.request.protocol + '://' + this.request.headers.host + '/';
     const reqUrl = new URL(this.request.url, baseURL);
     return reqUrl.search;
   }
