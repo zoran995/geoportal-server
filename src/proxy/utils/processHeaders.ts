@@ -1,4 +1,3 @@
-import { DEFAULT_MAX_AGE_SECONDS } from '../proxy.constants';
 import { filterHeaders } from './filterHeaders';
 
 /**
@@ -14,7 +13,7 @@ import { filterHeaders } from './filterHeaders';
  */
 export function processHeaders(
   headers: Record<string, unknown>,
-  maxAgeSeconds: number | undefined = DEFAULT_MAX_AGE_SECONDS,
+  maxAgeSeconds: number | undefined,
 ) {
   const result = filterHeaders(headers);
 
