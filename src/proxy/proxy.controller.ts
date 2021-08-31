@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Post,
-  Query,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller, Get, Param, Post, UseInterceptors } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -14,44 +7,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { PayloadLimitInterceptor } from 'src/common/interceptor/payload-limit.interceptor';
-import { GetProxyQueryDto } from './dto/get-proxy-query.dto';
-import { SetResponseHeaders } from './interceptors/SetResponseHeaders';
 import { ProxyService } from './proxy.service';
 
 @Controller('proxy')
 @ApiTags('proxy')
 export class ProxyController {
   constructor(private readonly proxyService: ProxyService) {}
-
-  /**
-   * Proxy request where target and duration are passed as query params
-   * @param queryParams
-   */
-  @Get()
-  @ApiBadRequestResponse()
-  @ApiForbiddenResponse()
-  @ApiInternalServerErrorResponse()
-  @UseInterceptors(new SetResponseHeaders())
-  async proxyQuery(@Query() queryParams: GetProxyQueryDto) {
-    return this.proxyService.proxyRequest(
-      queryParams.target,
-      queryParams.duration,
-    );
-  }
-
-  @Post()
-  @ApiBody({ schema: {} })
-  @ApiBadRequestResponse()
-  @ApiForbiddenResponse()
-  @ApiInternalServerErrorResponse()
-  @UseInterceptors(new SetResponseHeaders())
-  @UseInterceptors(PayloadLimitInterceptor)
-  async proxyQueryPost(@Query() queryParams: GetProxyQueryDto) {
-    return this.proxyService.proxyRequest(
-      queryParams.target,
-      queryParams.duration,
-    );
-  }
 
   /**
    * Proxy request where target and duration are passed as params
@@ -61,7 +22,6 @@ export class ProxyController {
   @ApiBadRequestResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseInterceptors(new SetResponseHeaders())
   async proxy(@Param('duration') duration: string, @Param() params: any) {
     return this.proxyService.proxyRequest(params['0'], duration);
   }
@@ -75,7 +35,6 @@ export class ProxyController {
   @ApiBadRequestResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseInterceptors(new SetResponseHeaders())
   @UseInterceptors(PayloadLimitInterceptor)
   async proxyPost(@Param('duration') duration: string, @Param() params: any) {
     return this.proxyService.proxyRequest(params['0'], duration);
@@ -89,7 +48,6 @@ export class ProxyController {
   @ApiBadRequestResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseInterceptors(new SetResponseHeaders())
   async proxyDefault(@Param() params: any) {
     return this.proxyService.proxyRequest(params['0']);
   }
@@ -103,9 +61,8 @@ export class ProxyController {
   @ApiBadRequestResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  @UseInterceptors(new SetResponseHeaders())
   @UseInterceptors(PayloadLimitInterceptor)
   async proxyDefaultPost(@Param() params: any) {
-    return this.proxyService.proxyRequest(params['0'], undefined);
+    return this.proxyService.proxyRequest(params['0']);
   }
 }
