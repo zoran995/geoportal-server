@@ -4,12 +4,9 @@ import { LoggerService } from 'src/common/logger/logger.service';
 
 @Injectable()
 export class AxiosLogInterceptor implements OnModuleInit {
-  constructor(
-    private readonly httpService: HttpService,
-    private readonly logger: LoggerService,
-  ) {
-    this.logger.setContext('Axios');
-  }
+  private readonly logger: LoggerService = new LoggerService('Axios');
+
+  constructor(private readonly httpService: HttpService) {}
 
   public onModuleInit() {
     this.registerInterceptors();

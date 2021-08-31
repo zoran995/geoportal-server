@@ -7,24 +7,27 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  Scope,
 } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { AxiosProxyConfig } from 'axios';
 import { Request } from 'express';
 import { lastValueFrom } from 'rxjs';
+import { isDefined } from 'src/common/helpers/isDefined';
 import { LoggerService } from 'src/common/logger/logger.service';
 import { URL } from 'url';
 import { ProxyConfigService } from './config/proxy-config.service';
 import { AppendParamToQueryStringDto } from './dto/proxy-config.dto';
-import { PROTOCOL_REGEX } from './proxy.constants';
+import { DEFAULT_MAX_AGE_SECONDS, PROTOCOL_REGEX } from './proxy.constants';
 import { filterHeaders } from './utils/filterHeaders';
 import { processDuration } from './utils/processDuration';
+import { processHeaders } from './utils/processHeaders';
 import { ProxyListService } from './utils/proxy-list.service';
 import { urlValidator } from './utils/urlValidator';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class ProxyService {
-  logger = new LoggerService(ProxyService.name);
+  private readonly logger = new LoggerService(ProxyService.name);
 
   constructor(
     @Inject(REQUEST) private readonly request: Request,
@@ -42,9 +45,9 @@ export class ProxyService {
   async proxyRequest(target: string, duration?: string) {
     target = this.processTargetUrl(target);
 
-    //store maxAge in request so we can access it in interceptor and assign to
-    //response
-    (this.request as any).maxAge = duration && processDuration(duration);
+    const maxAge = isDefined(duration)
+      ? processDuration(duration)
+      : DEFAULT_MAX_AGE_SECONDS;
 
     const remoteUrl = new URL(target);
 
@@ -89,12 +92,18 @@ export class ProxyService {
       this.deleteAuthorizationHeader(filteredReqHeaders);
     }
 
-    return this.performRequest(remoteUrl, filteredReqHeaders, <any>proxy);
+    return this.performRequest(
+      remoteUrl,
+      filteredReqHeaders,
+      maxAge,
+      <any>proxy,
+    );
   }
 
   private async performRequest(
     remoteUrl: URL,
     headers: Record<string, unknown>,
+    maxAge: number,
     proxy?: AxiosProxyConfig,
     retryWithoutAuth = false,
     proxyAuthCredentials = false,
@@ -122,7 +131,7 @@ export class ProxyService {
         method: this.request.method === 'POST' ? 'POST' : 'GET',
         url: remoteUrl.href,
         headers: proxyHeaders,
-        //responseType: 'arraybuffer', //encoding: null,
+        responseType: 'arraybuffer',
         proxy,
         data: this.request.body,
         maxBodyLength: this.proxyConfigService.postSizeLimit,
@@ -153,12 +162,21 @@ export class ProxyService {
       }),
     )
       .then((response) => {
-        return response.data;
+        const maxAgeSeconds = response.status >= 400 ? undefined : maxAge;
+        this.request.res?.writeHead(
+          response.status,
+          <any>processHeaders(response.headers, maxAgeSeconds),
+        );
+
+        // have to go this way since express will add charset Content-Type which
+        // will make some responses not working (image/png)
+        this.request.res?.status(response.status);
+        this.request.res?.write(response.data);
       })
       .catch((err: any) => {
         // before redirect may throw BadRequestException we catch it here and
         // throw instance of it
-        this.logger.verbose(JSON.stringify(err.message || err));
+        this.logger.error('An error occurred', err);
         if (
           !retryWithoutAuth &&
           (err.status === 403 ||
@@ -175,14 +193,21 @@ export class ProxyService {
             // this resource. We have credentials for this host specified in
             // proxy auth so try again with them.
             this.deleteAuthorizationHeader(headers);
-            return this.performRequest(remoteUrl, headers, proxy, false, true);
+            return this.performRequest(
+              remoteUrl,
+              headers,
+              maxAge,
+              proxy,
+              false,
+              true,
+            );
           } else {
             // We automatically added an authentication header to this request
             // (e.g. from proxyauth.json), but got back a 403, indicating our
             // credentials didn't authorize access to this resource. Try again
             // without credentials.
             this.deleteAuthorizationHeader(headers);
-            return this.performRequest(remoteUrl, headers, proxy, true);
+            return this.performRequest(remoteUrl, headers, maxAge, proxy, true);
           }
         }
         if (err instanceof HttpException) {

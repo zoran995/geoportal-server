@@ -76,7 +76,7 @@ describe('ProxyService', () => {
       .useValue(102400)
       .compile();
 
-    service = module.get<ProxyService>(ProxyService);
+    service = await module.resolve<ProxyService>(ProxyService);
 
     when(mockConfigGet)
       .calledWith('proxy')
@@ -96,7 +96,7 @@ describe('ProxyService', () => {
 
   it('should proxy and properly use defaults', async () => {
     mockQuery();
-    const response = await service.proxyRequest(url);
+    await service.proxyRequest(url);
     expect(mockHttpRequest).toHaveBeenCalledWith(
       expect.objectContaining({
         method: 'GET',
@@ -109,12 +109,6 @@ describe('ProxyService', () => {
         onHttpSocketEvent: expect.any(Function),
       }),
     );
-    expect(response).toEqual(data);
-  });
-
-  it('propperly set duration', async () => {
-    await service.proxyRequest(url, '2d');
-    expect((mockRequest as any).maxAge).toBe(172800);
   });
 
   it('blocks a domain not on allowedProxy list ', async () => {
@@ -128,7 +122,6 @@ describe('ProxyService', () => {
 
   it('should not block a domain if proxyAllDomains is true', async () => {
     const proxyConf = { ...defaultProxyConfig.proxy };
-    const data = 'success';
     proxyConf.proxyAllDomains = true;
     proxyConf.allowProxyFor = ['example.com'];
     mockConfigGet.mockReturnValue(proxyConf);
@@ -136,9 +129,8 @@ describe('ProxyService', () => {
       .spyOn(service as any, 'getQuery')
       .mockImplementationOnce(() => 'query=value&otherQuery=otherValue');
     (filterHeaders as any).mockImplementation(() => ({}));
-    mockHttpRequest.mockReturnValue(of({ data }));
-    const response = await service.proxyRequest(url);
-    expect(response).toEqual(data);
+    await service.proxyRequest(url);
+    expect(mockHttpRequest).toHaveBeenCalledTimes(1);
   });
 
   it('should fix target url', async () => {
@@ -147,6 +139,18 @@ describe('ProxyService', () => {
     const badUrl = `https:${url}`;
     const fixedUrl = `https:/${url}`;
     await service.proxyRequest(badUrl);
+    expect(mockHttpRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: fixedUrl,
+      }),
+    );
+  });
+
+  it("should add http if it isn't provided", async () => {
+    mockQuery();
+    const url = 'example.com/blah?query=value&otherQuery=otherValue';
+    const fixedUrl = `http://${url}`;
+    await service.proxyRequest(url);
     expect(mockHttpRequest).toHaveBeenCalledWith(
       expect.objectContaining({
         url: fixedUrl,
@@ -290,7 +294,9 @@ describe('ProxyService', () => {
         'example.com': auth,
       };
       when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
-      mockHttpRequest.mockReturnValueOnce(throwError(new ForbiddenException()));
+      mockHttpRequest.mockReturnValueOnce(
+        throwError(() => new ForbiddenException()),
+      );
       await service.proxyRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledTimes(2);
       expect(mockHttpRequest).toHaveBeenCalledWith(
@@ -311,8 +317,8 @@ describe('ProxyService', () => {
           'example.com': auth,
         };
         mockHttpRequest
-          .mockReturnValueOnce(throwError(new ForbiddenException()))
-          .mockReturnValueOnce(throwError(new ForbiddenException()));
+          .mockReturnValueOnce(throwError(() => new ForbiddenException()))
+          .mockReturnValueOnce(throwError(() => new ForbiddenException()));
         when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
         await service.proxyRequest(url);
 
