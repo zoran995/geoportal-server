@@ -1,8 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ProxyListService } from '../proxy/utils/proxy-list.service';
+import { ProxyListService } from 'src/proxy/utils/proxy-list.service';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { version } = require('../../package.json');
 
 export interface ISafeSettings {
   version?: string;
@@ -30,9 +29,7 @@ export class ServerConfigController {
     if (!proxyAllDomains) {
       safeSettings.allowProxyFor = allowProxyFor;
     }
-    if (version) {
-      safeSettings.version = version;
-    }
+    safeSettings.version = process.env.npm_package_version;
     return safeSettings;
   }
 }
