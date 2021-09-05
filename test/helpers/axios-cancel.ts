@@ -15,11 +15,10 @@ type Canceler = (message?: string) => void;
  */
 export class CancelToken {
   public static source() {
-    let cancel: Canceler;
+    let cancel: Canceler | undefined;
     const token = new CancelToken((c) => (cancel = c));
 
     return {
-      //@ts-ignore
       cancel,
       token,
     };
