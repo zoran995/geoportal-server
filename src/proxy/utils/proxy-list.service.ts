@@ -38,7 +38,12 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
    * @returns Whether address is blacklisted
    */
   addressBlacklisted(address: string) {
-    return !!inRange(address, this.blacklist);
+    const split = address.split(':');
+    let hostname = address;
+    if (split.length === 2) {
+      hostname = split[0];
+    }
+    return !!inRange(hostname, this.blacklist);
   }
 
   private setBlacklist() {

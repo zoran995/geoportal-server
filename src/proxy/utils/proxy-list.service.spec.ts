@@ -132,4 +132,33 @@ describe('ProxyListService', () => {
     expect(service.blacklist).toEqual(['blacklistedAddresses']);
     service.onModuleDestroy();
   });
+
+  describe('addressBlacklisted', () => {
+    it('should return true for blacklisted address', () => {
+      const proxyConf = { ...defaultProxyConfig.proxy };
+      proxyConf.blacklistedAddresses = ['192.163.0.1'];
+      mockConfigGet.mockReturnValue(proxyConf);
+      service.onModuleInit();
+      const result = service.addressBlacklisted('192.163.0.1:8080');
+      expect(result).toBe(true);
+    });
+
+    it('should return false for non blacklisted address', () => {
+      const proxyConf = { ...defaultProxyConfig.proxy };
+      proxyConf.blacklistedAddresses = ['192.163.0.1'];
+      mockConfigGet.mockReturnValue(proxyConf);
+      service.onModuleInit();
+      const result = service.addressBlacklisted('192.163.0.2');
+      expect(result).toBe(false);
+    });
+
+    it('should not use port when checking blacklisted address', () => {
+      const proxyConf = { ...defaultProxyConfig.proxy };
+      proxyConf.blacklistedAddresses = ['192.163.0.1'];
+      mockConfigGet.mockReturnValue(proxyConf);
+      service.onModuleInit();
+      const result = service.addressBlacklisted('192.163.0.1:8080');
+      expect(result).toBe(true);
+    });
+  });
 });
