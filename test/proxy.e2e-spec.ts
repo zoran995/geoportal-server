@@ -1,10 +1,12 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const yargs = require('yargs');
-import { INestApplication } from '@nestjs/common';
+import { Controller, Get, INestApplication, Res } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { Response } from 'express';
 import { DirectoryJSON, vol } from 'memfs';
 import { LoggerService } from 'src/common/logger/logger.service';
+import { ProxyConfigDto } from 'src/proxy/dto/proxy-config.dto';
 import supertest, { SuperAgentTest } from 'supertest';
 import { AppModule } from './../src/app.module';
 import { Cancel, CancelToken } from './helpers/axios-cancel';
@@ -13,6 +15,7 @@ import { NoopLoggerService } from './noop-logger.service';
 // mock our logger service so there is no logs when testing
 jest.mock('src/common/logger/logger.service');
 jest.mock('axios');
+jest.mock('fs');
 const data = 'success';
 const requestHeaders = {
   fakeheader: 'fakevalue',
@@ -37,21 +40,49 @@ axiosRequest.mockImplementation(
   },
 );
 
-const openProxyConfig = {
+const openProxyConfig: Partial<ProxyConfigDto> = {
   proxyAllDomains: true,
 };
 
 const volJson: DirectoryJSON = {
   './serverconfig.json': JSON.stringify({ proxy: openProxyConfig }),
+  './redirect.json': JSON.stringify({
+    proxy: { proxyAllDomains: true, blacklistedAddresses: ['202.168.1.1'] },
+  }),
+  './redirect2.json': JSON.stringify({
+    proxy: {
+      allowProxyFor: ['127.0.0.1'],
+      blacklistedAddresses: ['202.168.1.1'],
+    },
+  }),
 };
 
 vol.fromJSON(volJson);
+
+@Controller('test')
+export class TestRedirectController {
+  @Get('redirect')
+  redirect(@Res() res: Response) {
+    return res.redirect('/test/response');
+  }
+
+  @Get('redirect2')
+  redirect2(@Res() res: Response) {
+    return res.redirect('http://202.168.1.1/test');
+  }
+
+  @Get('response')
+  getHello(): string {
+    return 'test-redirect';
+  }
+}
 
 async function buildApp(configFile: string) {
   yargs(`--config-file ${configFile}`);
 
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
+    controllers: [TestRedirectController],
   })
     .overrideProvider(LoggerService)
     .useClass(NoopLoggerService)
@@ -69,6 +100,24 @@ async function buildApp(configFile: string) {
 describe('Proxy (e2e)', () => {
   describe('/ (GET)', () => {
     doCommonTest('GET');
+
+    describe('before redirect', () => {
+      it('should follow redirect', async () => {
+        const { app, agent } = await buildApp('./redirect.json');
+        const { url } = agent.get('/');
+        await agent.get(`/proxy/${url}test/redirect`).expect(200);
+
+        app.close();
+      });
+
+      it('should block redirect to blacklisted host', async () => {
+        const { app, agent } = await buildApp('./redirect2.json');
+        const { url } = agent.get('/');
+        await agent.get(`/proxy/${url}test/redirect2`).expect(403);
+
+        app.close();
+      });
+    });
   });
 
   describe('/ (POST)', () => {
