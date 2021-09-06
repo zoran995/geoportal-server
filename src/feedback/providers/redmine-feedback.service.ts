@@ -22,7 +22,7 @@ export class RedmineFeedbackService extends AbstractFeedbackService<RedmineFeedb
 
   async post(feedback: CreateFeedbackDto, request: Request): Promise<any> {
     return lastValueFrom(
-      await this.httpService
+      this.httpService
         .post(
           this.options.issuesUrl,
           {
