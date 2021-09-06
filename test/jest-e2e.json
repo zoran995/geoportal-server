@@ -4,13 +4,31 @@
     "json",
     "ts"
   ],
-  "rootDir": ".",
+  "rootDir": "..",
   "testEnvironment": "node",
-  "testRegex": ".e2e-spec.ts$",
+  "testMatch": [
+    "**/*.e2e-spec.ts"
+  ],
+  "testPathIgnorePatterns": [
+    "/node_modules/",
+    "/src/"
+  ],
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "moduleNameMapper": {
-    "^src/(.*)$": "<rootDir>/../src/$1"
-  }
+    "^src/(.*)$": "<rootDir>/src/$1"
+  },
+  "coverageReporters": [
+    "json",
+    "lcov"
+  ],
+  "coverageDirectory": "coverage/e2e",
+  "collectCoverageFrom": [
+    "src/**"
+  ],
+  "coveragePathIgnorePatterns": [
+    ".module.ts$",
+    ".spec.ts$"
+  ]
 }
