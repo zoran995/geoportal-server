@@ -1,9 +1,13 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const yargs = require('yargs');
 import { INestApplication } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DirectoryJSON, fs, vol } from 'memfs';
 import { AppModule } from 'src/app.module';
+import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
+import { InternalServerErrorExceptionFilter } from 'src/common/filters/internal-server-error-exception.filter';
+import { NotFoundExceptionFilter } from 'src/common/filters/not-found-exception.filter';
 import { ServeStaticDto } from 'src/serve-static/dto/serve-static.dto';
 import supertest, { SuperAgentTest } from 'supertest';
 jest.mock('fs');
@@ -47,6 +51,12 @@ async function buildApp(configFile: string, wwwrootPath?: string) {
   }).compile();
 
   const app = moduleFixture.createNestApplication();
+  const configService = app.get(ConfigService);
+  app.useGlobalFilters(
+    new HttpExceptionFilter(),
+    new InternalServerErrorExceptionFilter(configService),
+    new NotFoundExceptionFilter(configService),
+  );
   await app.init();
 
   const agent = supertest.agent(app.getHttpServer());

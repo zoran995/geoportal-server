@@ -1,10 +1,14 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const yargs = require('yargs');
 import { Controller, Get, INestApplication, Res } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Response } from 'express';
 import { DirectoryJSON, vol } from 'memfs';
+import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
+import { InternalServerErrorExceptionFilter } from 'src/common/filters/internal-server-error-exception.filter';
+import { NotFoundExceptionFilter } from 'src/common/filters/not-found-exception.filter';
 import { LoggerService } from 'src/common/logger/logger.service';
 import { ProxyConfigDto } from 'src/proxy/dto/proxy-config.dto';
 import supertest, { SuperAgentTest } from 'supertest';
@@ -89,6 +93,12 @@ async function buildApp(configFile: string) {
     .compile();
 
   const app = moduleFixture.createNestApplication();
+  const configService = app.get(ConfigService);
+  app.useGlobalFilters(
+    new HttpExceptionFilter(),
+    new InternalServerErrorExceptionFilter(configService),
+    new NotFoundExceptionFilter(configService),
+  );
   await app.init();
 
   const agent = supertest.agent(app.getHttpServer());
