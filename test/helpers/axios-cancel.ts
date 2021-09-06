@@ -15,7 +15,7 @@ type Canceler = (message?: string) => void;
  */
 export class CancelToken {
   public static source() {
-    let cancel: Canceler | undefined;
+    let cancel!: Canceler;
     const token = new CancelToken((c) => (cancel = c));
 
     return {
