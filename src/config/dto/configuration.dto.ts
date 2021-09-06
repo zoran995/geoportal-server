@@ -11,8 +11,8 @@ import {
 import { NotNull } from 'src/common/validators/not-null.validator';
 import { FeedbackConfigDto } from 'src/feedback/dto/feedback.config.dto';
 import { ProxyConfigDto } from 'src/proxy/dto/proxy-config.dto';
+import { ServeStaticDto } from 'src/serve-static/dto/serve-static.dto';
 import { ShareConfigDto } from 'src/share/dto/share.config.dto';
-import { ServeStaticDto } from '../../serve-static/dto/serve-static.dto';
 import { BasicAuthenticationDto } from './basic-authentication.dto';
 
 export class ConfigurationDto {
