@@ -45,11 +45,14 @@ export class ProxyService {
   async proxyRequest(target: string, duration?: string) {
     target = this.processTargetUrl(target);
 
+    const remoteUrl = new URL(target);
+
+    // Are we allowed to proxy for this host?
+    this.proxyAllowedHost(remoteUrl.host);
+
     const maxAge = isDefined(duration)
       ? processDuration(duration)
       : DEFAULT_MAX_AGE_SECONDS;
-
-    const remoteUrl = new URL(target);
 
     // Copy the query string
     remoteUrl.search = this.getQuery();
@@ -61,10 +64,6 @@ export class ProxyService {
       host && this.appendParamToQuery(host, remoteUrl);
     }
 
-    if (!remoteUrl.protocol) {
-      remoteUrl.protocol = 'http:';
-    }
-
     let proxy;
     if (
       this.proxyConfigService.upstreamProxy &&
@@ -74,8 +73,6 @@ export class ProxyService {
       proxy = this.proxyConfigService.upstreamProxy;
     }
 
-    // Are we allowed to proxy for this host?
-    this.proxyAllowedHost(remoteUrl.host);
     const filteredReqHeaders = filterHeaders(
       this.request.headers,
       this.request.socket,
@@ -92,7 +89,7 @@ export class ProxyService {
       this.deleteAuthorizationHeader(filteredReqHeaders);
     }
 
-    return this.performRequest(
+    return this.#performRequest(
       remoteUrl,
       filteredReqHeaders,
       maxAge,
@@ -100,7 +97,7 @@ export class ProxyService {
     );
   }
 
-  private async performRequest(
+  async #performRequest(
     remoteUrl: URL,
     headers: Record<string, unknown>,
     maxAge: number,
@@ -193,7 +190,7 @@ export class ProxyService {
             // this resource. We have credentials for this host specified in
             // proxy auth so try again with them.
             this.deleteAuthorizationHeader(headers);
-            return this.performRequest(
+            return this.#performRequest(
               remoteUrl,
               headers,
               maxAge,
@@ -207,7 +204,13 @@ export class ProxyService {
             // credentials didn't authorize access to this resource. Try again
             // without credentials.
             this.deleteAuthorizationHeader(headers);
-            return this.performRequest(remoteUrl, headers, maxAge, proxy, true);
+            return this.#performRequest(
+              remoteUrl,
+              headers,
+              maxAge,
+              proxy,
+              true,
+            );
           }
         }
         if (err instanceof HttpException) {
