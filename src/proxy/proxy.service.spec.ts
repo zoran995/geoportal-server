@@ -1,19 +1,21 @@
-import { createMock } from '@golevelup/ts-jest';
 import { HttpService } from '@nestjs/axios';
-import { ExecutionContext, ForbiddenException } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import {
+  BadGatewayException,
+  ForbiddenException,
+  HttpException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { REQUEST } from '@nestjs/core';
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { when } from 'jest-when';
 import { of, throwError } from 'rxjs';
 import { POST_SIZE_LIMIT } from 'src/common/interceptor/payload-limit.interceptor';
 import { ProxyConfigService } from './config/proxy-config.service';
 import { ProxyConfigDto } from './dto/proxy-config.dto';
 import { ProxyService } from './proxy.service';
-import { filterHeaders } from './utils/filterHeaders';
 import { ProxyListService } from './utils/proxy-list.service';
-
-jest.mock('./utils/filterHeaders');
 
 const requestData: any = {
   method: 'GET',
@@ -24,6 +26,7 @@ const defaultProxyConfig: { proxy: ProxyConfigDto } = {
   proxy: new ProxyConfigDto(),
 };
 defaultProxyConfig.proxy.allowProxyFor = ['example.com'];
+defaultProxyConfig.proxy.blacklistedAddresses = ['192.163.0.1'];
 const mockHttpRequest = jest.fn();
 const mockHttpGet = jest.fn();
 const mockHttpPost = jest.fn();
@@ -40,68 +43,68 @@ const httpServiceMock = {
   post: mockHttpPost,
 };
 
-const mockExecutionContext = createMock<ExecutionContext>({
-  switchToHttp: () => ({
-    getRequest: () => requestData,
-  }),
-});
-const mockRequest: any = mockExecutionContext.switchToHttp().getRequest();
+async function initService(request: Record<string, any> = requestData) {
+  const module = await Test.createTestingModule({
+    providers: [
+      { provide: ConfigService, useClass: ConfigServiceMock },
+      { provide: POST_SIZE_LIMIT, useValue: 102400 },
+      { provide: REQUEST, useValue: request },
+      ProxyConfigService,
+      ProxyListService,
+      ProxyService,
+      { provide: HttpService, useValue: httpServiceMock },
+    ],
+  }).compile();
+  return module.resolve(ProxyService);
+}
+
+async function prepareRequest(
+  url: string,
+  params?: {
+    duration?: string;
+    headers: Record<string, any>;
+  },
+) {
+  const reqData = { ...requestData };
+  reqData.headers = { ...reqData.headers, ...params?.headers };
+  reqData.url = url;
+  return initService(reqData);
+}
+
+async function sendRequest(
+  url: string,
+  params?: {
+    duration?: string;
+    headers: Record<string, any>;
+  },
+) {
+  const service = await prepareRequest(url, params);
+  await service.proxyRequest(url, params?.duration);
+}
 
 describe('ProxyService', () => {
-  const data = 'success';
   const url = 'https://example.com/blah?query=value&otherQuery=otherValue';
-  let service: ProxyService;
-
-  const mockQuery = () => {
-    jest
-      .spyOn(service as any, 'getQuery')
-      .mockImplementationOnce(() => 'query=value&otherQuery=otherValue');
-  };
-
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule],
-      providers: [
-        ProxyConfigService,
-        ProxyListService,
-        ProxyService,
-        { provide: HttpService, useValue: httpServiceMock },
-      ],
-    })
-      .overrideProvider(ConfigService)
-      .useClass(ConfigServiceMock)
-      .overrideProvider(REQUEST)
-      .useValue(mockRequest)
-      .overrideProvider(POST_SIZE_LIMIT)
-      .useValue(102400)
-      .compile();
-
-    service = await module.resolve<ProxyService>(ProxyService);
-
     when(mockConfigGet)
       .calledWith('proxy')
       .mockReturnValue(defaultProxyConfig.proxy);
-
-    (filterHeaders as any).mockImplementation(() => ({}));
-    mockHttpRequest.mockReturnValue(of({ data }));
   });
-
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should be defined', () => {
+  it('should properly initialize service', async () => {
+    const service = await initService();
     expect(service).toBeDefined();
   });
 
   it('should proxy and properly use defaults', async () => {
-    mockQuery();
-    await service.proxyRequest(url);
+    mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+    await sendRequest(url);
     expect(mockHttpRequest).toHaveBeenCalledWith(
       expect.objectContaining({
         method: 'GET',
         url,
-        headers: {},
         proxy: undefined,
         data: undefined,
         maxBodyLength: 102400,
@@ -111,88 +114,128 @@ describe('ProxyService', () => {
     );
   });
 
-  it('blocks a domain not on allowedProxy list ', async () => {
-    try {
-      (filterHeaders as any).mockImplementation(() => ({}));
-      await service.proxyRequest(url);
-    } catch (err) {
-      expect(err).toBeInstanceOf(ForbiddenException);
-    }
-  });
-
-  it('should not block a domain if proxyAllDomains is true', async () => {
-    const proxyConf = { ...defaultProxyConfig.proxy };
-    proxyConf.proxyAllDomains = true;
-    proxyConf.allowProxyFor = ['example.com'];
-    mockConfigGet.mockReturnValue(proxyConf);
-    jest
-      .spyOn(service as any, 'getQuery')
-      .mockImplementationOnce(() => 'query=value&otherQuery=otherValue');
-    (filterHeaders as any).mockImplementation(() => ({}));
-    await service.proxyRequest(url);
-    expect(mockHttpRequest).toHaveBeenCalledTimes(1);
-  });
-
   it('should fix target url', async () => {
-    mockQuery();
-    const url = '/example.com/blah?query=value&otherQuery=otherValue';
+    const url = '/example.com/';
     const badUrl = `https:${url}`;
-    const fixedUrl = `https:/${url}`;
-    await service.proxyRequest(badUrl);
+    mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+    await sendRequest(badUrl);
     expect(mockHttpRequest).toHaveBeenCalledWith(
       expect.objectContaining({
-        url: fixedUrl,
+        url: `https:/${url}`,
       }),
     );
   });
 
   it("should add http if it isn't provided", async () => {
-    mockQuery();
-    const url = 'example.com/blah?query=value&otherQuery=otherValue';
-    const fixedUrl = `http://${url}`;
-    await service.proxyRequest(url);
+    const url = 'example.com/';
+    mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+    await sendRequest(url);
     expect(mockHttpRequest).toHaveBeenCalledWith(
       expect.objectContaining({
-        url: fixedUrl,
+        url: `http://${url}`,
       }),
     );
   });
 
-  it('should call delete authorization header when using basic auth on server', async () => {
-    const authorizationHeader = {
-      username: 'test',
-      password: 'test',
-    };
-    when(mockConfigGet)
-      .calledWith('basicAuthentication')
-      .mockReturnValue(authorizationHeader);
-    const spyDeleteAuthorizationHeader = jest.spyOn(
-      service as any,
-      'deleteAuthorizationHeader',
+  it("should add a trailing slash if it isn't provided", async () => {
+    const url = 'example.com';
+    mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+    await sendRequest(url);
+    expect(mockHttpRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: `http://${url}/`,
+      }),
     );
-    await service.proxyRequest(url);
-    expect(spyDeleteAuthorizationHeader).toHaveBeenCalledTimes(1);
   });
 
-  it('should not call delete authorization header', async () => {
-    when(mockConfigGet)
-      .calledWith('basicAuthentication')
-      .mockReturnValue(undefined);
-    const spyDeleteAuthorizationHeader = jest.spyOn(
-      service as any,
-      'deleteAuthorizationHeader',
-    );
-    await service.proxyRequest(url);
-    expect(spyDeleteAuthorizationHeader).not.toHaveBeenCalled();
+  it('blocks a domain not on allowedProxy list ', async () => {
+    try {
+      await sendRequest('http://example2.com');
+    } catch (err) {
+      expect(err).toBeInstanceOf(ForbiddenException);
+    }
+    expect(mockHttpRequest).toHaveBeenCalledTimes(0);
+  });
+
+  it('should not block a domain if proxyAllDomains is true', async () => {
+    const proxyConf = { ...defaultProxyConfig.proxy };
+    proxyConf.proxyAllDomains = true;
+    proxyConf.allowProxyFor = ['example2.com'];
+    when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
+    mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+    await sendRequest(url);
+    expect(mockHttpRequest).toHaveBeenCalledTimes(1);
+  });
+
+  it('should block address on blacklist', async () => {
+    try {
+      await sendRequest('http://192.163.0.1:8080/test');
+    } catch (err) {
+      expect(err).toBeInstanceOf(ForbiddenException);
+      expect(mockHttpRequest).toHaveBeenCalledTimes(0);
+    }
+  });
+
+  it('should block address on blacklist even when proxyAllDomains is true', async () => {
+    try {
+      await sendRequest('http://192.163.0.1:8080/test');
+    } catch (err) {
+      expect(err).toBeInstanceOf(ForbiddenException);
+      expect(mockHttpRequest).toHaveBeenCalledTimes(0);
+    }
+  });
+
+  describe('authorization header', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    it('should delete authorization header when using basic auth on server', async () => {
+      const authorizationHeader = {
+        username: 'test',
+        password: 'test',
+      };
+      when(mockConfigGet)
+        .calledWith('basicAuthentication')
+        .mockReturnValue(authorizationHeader);
+      const service = await prepareRequest(url);
+      const spyDeleteAuthorizationHeader = jest.spyOn(
+        service as any,
+        'deleteAuthorizationHeader',
+      );
+      mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+      await service.proxyRequest(url);
+      expect(mockHttpRequest).toHaveBeenCalledTimes(1);
+      expect(spyDeleteAuthorizationHeader).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not call delete authorization header', async () => {
+      when(mockConfigGet)
+        .calledWith('basicAuthentication')
+        .mockReturnValue(undefined);
+      const service = await prepareRequest(url);
+      const spyDeleteAuthorizationHeader = jest.spyOn(
+        service as any,
+        'deleteAuthorizationHeader',
+      );
+      mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+      await service.proxyRequest(url);
+      expect(mockHttpRequest).toHaveBeenCalledTimes(1);
+      expect(spyDeleteAuthorizationHeader).not.toHaveBeenCalled();
+    });
   });
 
   describe('upstream proxy', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
     it('used when one is specified', async () => {
       const proxy = 'http://proxy/';
       const proxyConf = { ...defaultProxyConfig.proxy };
       proxyConf.upstreamProxy = proxy;
+      mockConfigGet.mockClear();
       when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
-      await service.proxyRequest(url);
+      mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+      await sendRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
           proxy: proxy,
@@ -206,7 +249,8 @@ describe('ProxyService', () => {
       const proxyConf = { ...defaultProxyConfig.proxy };
       proxyConf.upstreamProxy = proxy;
       when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
-      await service.proxyRequest(url);
+      mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+      await sendRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
           proxy: undefined,
@@ -222,7 +266,8 @@ describe('ProxyService', () => {
       proxyConf.bypassUpstreamProxyHosts = new Map();
       proxyConf.bypassUpstreamProxyHosts.set('example.com', true);
       when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
-      await service.proxyRequest(url);
+      mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+      await sendRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
           proxy: undefined,
@@ -238,7 +283,8 @@ describe('ProxyService', () => {
       proxyConf.bypassUpstreamProxyHosts = new Map();
       proxyConf.bypassUpstreamProxyHosts.set('example2.com', true);
       when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
-      await service.proxyRequest(url);
+      mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+      await sendRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
           proxy: proxy,
@@ -258,10 +304,11 @@ describe('ProxyService', () => {
         'example.com': auth,
       };
       when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
-      await service.proxyRequest(url);
+      mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+      await sendRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
-          headers: auth,
+          headers: expect.objectContaining(auth),
           method: 'GET',
         }),
       );
@@ -276,16 +323,17 @@ describe('ProxyService', () => {
         'example2.com': auth,
       };
       when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
-      await service.proxyRequest(url);
+      mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+      await sendRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
-          headers: {},
+          headers: expect.not.objectContaining(auth),
           method: 'GET',
         }),
       );
     });
 
-    it('should set auth header for that domain', async () => {
+    it('should try again without auth when ForbiddenException', async () => {
       const auth = {
         authorization: 'testauth',
       };
@@ -293,21 +341,29 @@ describe('ProxyService', () => {
       proxyConf.proxyAuth = {
         'example.com': auth,
       };
+      mockHttpRequest
+        .mockReturnValueOnce(throwError(() => new ForbiddenException()))
+        .mockReturnValueOnce(of({ data: 'success' }));
       when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
-      mockHttpRequest.mockReturnValueOnce(
-        throwError(() => new ForbiddenException()),
-      );
-      await service.proxyRequest(url);
+      await sendRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledTimes(2);
-      expect(mockHttpRequest).toHaveBeenCalledWith(
+      expect(mockHttpRequest).toHaveBeenNthCalledWith(
+        1,
         expect.objectContaining({
-          headers: auth,
+          headers: { ...requestData.headers, ...auth },
+          method: 'GET',
+        }),
+      );
+      expect(mockHttpRequest).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          headers: { ...requestData.headers },
           method: 'GET',
         }),
       );
     });
 
-    it('should propperly interpret error', async () => {
+    it('should not try again without auth when another exception', async () => {
       const auth = {
         authorization: 'testauth',
       };
@@ -316,34 +372,104 @@ describe('ProxyService', () => {
         proxyConf.proxyAuth = {
           'example.com': auth,
         };
-        mockHttpRequest
-          .mockReturnValueOnce(throwError(() => new ForbiddenException()))
-          .mockReturnValueOnce(throwError(() => new ForbiddenException()));
-        when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
-        await service.proxyRequest(url);
-
-        expect(mockHttpRequest).toHaveBeenCalledTimes(2);
-      } catch (err) {
-        expect(err).toBeInstanceOf(ForbiddenException);
-        expect(mockHttpRequest).toHaveBeenNthCalledWith(
-          1,
-          expect.objectContaining({
-            headers: auth,
-            method: 'GET',
-          }),
+        mockHttpRequest.mockReturnValueOnce(
+          throwError(() => new NotFoundException()),
         );
-        expect(mockHttpRequest).toHaveBeenNthCalledWith(
-          2,
+        when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
+        await sendRequest(url);
+
+        expect(mockHttpRequest).toHaveBeenCalledTimes(1);
+      } catch (err) {
+        expect(err).toBeInstanceOf(NotFoundException);
+        expect(mockHttpRequest).toHaveBeenCalledWith(
           expect.objectContaining({
-            headers: {},
+            headers: { ...requestData.headers, ...auth },
             method: 'GET',
           }),
         );
       }
     });
+
+    it('should first try with auth specified in request', async () => {
+      mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+      const reqHeaders = {
+        authorization: 'request-auth',
+      };
+      await sendRequest(url, { headers: reqHeaders });
+      expect(mockHttpRequest).toHaveBeenCalledTimes(1);
+      expect(mockHttpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          headers: { ...requestData.headers, ...reqHeaders },
+          method: 'GET',
+        }),
+      );
+    });
+
+    it('should first try with auth specified in request and then proxy auth', async () => {
+      const auth = {
+        authorization: 'testauth',
+      };
+      const proxyConf = { ...defaultProxyConfig.proxy };
+      proxyConf.proxyAuth = {
+        'example.com': auth,
+      };
+      when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
+      mockHttpRequest
+        .mockReturnValueOnce(throwError(() => new ForbiddenException()))
+        .mockReturnValueOnce(of({ data: 'success' }));
+      const reqHeaders = {
+        authorization: 'request-auth',
+      };
+      await sendRequest(url, { headers: reqHeaders });
+      expect(mockHttpRequest).toHaveBeenCalledTimes(2);
+      expect(mockHttpRequest).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          headers: { ...requestData.headers, ...auth },
+          method: 'GET',
+        }),
+      );
+    });
+
+    it('should first try with auth specified in request and then proxy auth and then without auth', async () => {
+      const auth = {
+        authorization: 'testauth',
+      };
+      const proxyConf = { ...defaultProxyConfig.proxy };
+      proxyConf.proxyAuth = {
+        'example.com': auth,
+      };
+      when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
+      mockHttpRequest
+        .mockReturnValueOnce(throwError(() => new ForbiddenException()))
+        .mockReturnValueOnce(throwError(() => new ForbiddenException()))
+        .mockReturnValueOnce(of({ data: 'success' }));
+      const reqHeaders = {
+        authorization: 'request-auth',
+      };
+      await sendRequest(url, { headers: reqHeaders });
+      expect(mockHttpRequest).toHaveBeenCalledTimes(3);
+      expect(mockHttpRequest).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          headers: { ...requestData.headers, ...auth },
+          method: 'GET',
+        }),
+      );
+      expect(mockHttpRequest).toHaveBeenNthCalledWith(
+        3,
+        expect.objectContaining({
+          headers: { ...requestData.headers },
+          method: 'GET',
+        }),
+      );
+    });
   });
 
   describe('when domain has other headers specified', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
     it('should set the header for that domain', async () => {
       const headers = [
         {
@@ -361,17 +487,17 @@ describe('ProxyService', () => {
           headers: headers,
         },
       };
-
       when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
-      await service.proxyRequest(url);
+      mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
 
+      await sendRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledTimes(1);
       expect(mockHttpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
-          headers: {
+          headers: expect.objectContaining({
             'Secret-Key': 'ABCDE12345',
             'Another-Header': 'XYZ',
-          },
+          }),
           method: 'GET',
         }),
       );
@@ -395,23 +521,23 @@ describe('ProxyService', () => {
         },
       };
       when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
-      await service.proxyRequest(url);
+      mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
 
+      await sendRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledTimes(1);
       expect(mockHttpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
-          headers: {},
+          headers: expect.not.objectContaining(headers),
           method: 'GET',
         }),
       );
     });
   });
 
-  describe('append param to querry', () => {
-    beforeEach(() => {
-      jest.spyOn(service as any, 'getQuery').mockImplementation(() => '');
+  describe('append param to query', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
     });
-
     it('should append params for specified domain', async () => {
       const proxyUrl = 'example.com';
       const proxyConf = { ...defaultProxyConfig.proxy };
@@ -424,9 +550,10 @@ describe('ProxyService', () => {
           },
         },
       ]);
-
       mockConfigGet.mockReturnValue(proxyConf);
-      await service.proxyRequest(proxyUrl);
+      mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+
+      await sendRequest(proxyUrl);
       expect(mockHttpRequest).toHaveBeenCalledTimes(1);
       const hitUrl = new URL(mockHttpRequest.mock.calls[0][0].url);
       expect(hitUrl.searchParams.get('foo')).toBe('bar');
@@ -444,9 +571,10 @@ describe('ProxyService', () => {
           },
         },
       ]);
-
       mockConfigGet.mockReturnValue(proxyConf);
-      await service.proxyRequest(proxyUrl);
+      mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+
+      await sendRequest(proxyUrl);
       expect(mockHttpRequest).toHaveBeenCalledTimes(1);
       const hitUrl = new URL(mockHttpRequest.mock.calls[0][0].url);
       expect(hitUrl.searchParams.get('foo')).toBe('bar');
@@ -466,7 +594,9 @@ describe('ProxyService', () => {
       ]);
 
       mockConfigGet.mockReturnValue(proxyConf);
-      await service.proxyRequest(proxyUrl);
+      mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+
+      await sendRequest(proxyUrl);
       expect(mockHttpRequest).toHaveBeenCalledTimes(1);
       const hitUrl = new URL(mockHttpRequest.mock.calls[0][0].url);
       expect(hitUrl.searchParams.get('foo')).toBeNull();
@@ -492,7 +622,9 @@ describe('ProxyService', () => {
       ]);
 
       mockConfigGet.mockReturnValue(proxyConf);
-      await service.proxyRequest(proxyUrl);
+      mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+
+      await sendRequest(proxyUrl);
       expect(mockHttpRequest).toHaveBeenCalledTimes(1);
       const hitUrl = new URL(mockHttpRequest.mock.calls[0][0].url);
       expect(hitUrl.searchParams.get('foo')).toBeNull();
@@ -514,7 +646,9 @@ describe('ProxyService', () => {
       ]);
 
       mockConfigGet.mockReturnValue(proxyConf);
-      await service.proxyRequest(proxyUrl);
+      mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+
+      await sendRequest(proxyUrl);
       expect(mockHttpRequest).toHaveBeenCalledTimes(1);
       const hitUrl = new URL(mockHttpRequest.mock.calls[0][0].url);
       expect(hitUrl.search).toBe('?foo=bar&another=val');
@@ -522,9 +656,6 @@ describe('ProxyService', () => {
 
     it('should combine with existing query', async () => {
       const query = '?already=here';
-      jest
-        .spyOn(service as any, 'getQuery')
-        .mockImplementationOnce(() => query);
       const proxyUrl = `example.com${query}`;
       const proxyConf = { ...defaultProxyConfig.proxy };
       proxyConf.appendParamToQueryString = new Map<string, any>();
@@ -538,7 +669,9 @@ describe('ProxyService', () => {
       ]);
 
       mockConfigGet.mockReturnValue(proxyConf);
-      await service.proxyRequest(proxyUrl);
+      mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+
+      await sendRequest(proxyUrl);
       expect(mockHttpRequest).toHaveBeenCalledTimes(1);
       const hitUrl = new URL(mockHttpRequest.mock.calls[0][0].url);
       expect(hitUrl.search).toBe(`${query}&foo=bar`);
@@ -558,10 +691,110 @@ describe('ProxyService', () => {
       ]);
 
       mockConfigGet.mockReturnValue(proxyConf);
-      await service.proxyRequest(proxyUrl);
+      mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
+
+      await sendRequest(proxyUrl);
       expect(mockHttpRequest).toHaveBeenCalledTimes(1);
       const hitUrl = new URL(mockHttpRequest.mock.calls[0][0].url);
-      expect(hitUrl.search).toBe('');
+      expect(hitUrl.search).toBe('?already=here');
+    });
+  });
+
+  describe('properly handle error responses from requests', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    it('interpret NotFoundException exception', async () => {
+      mockHttpRequest.mockReturnValueOnce(
+        throwError(() => new NotFoundException()),
+      );
+      try {
+        await sendRequest(url);
+      } catch (err) {
+        expect(err).toBeInstanceOf(NotFoundException);
+      }
+    });
+
+    it('catch ECONNREFUSED', async () => {
+      mockHttpRequest.mockReturnValueOnce(
+        throwError(() => ({
+          code: 'ECONNREFUSED',
+          message: 'ECONNREFUSED',
+        })),
+      );
+      try {
+        await sendRequest(url);
+      } catch (err) {
+        expect(mockHttpRequest).toHaveBeenCalledTimes(1);
+        expect(err).toBeInstanceOf(BadGatewayException);
+      }
+    });
+
+    it('catch error status and message', async () => {
+      mockHttpRequest.mockReturnValueOnce(
+        throwError(() => ({
+          response: {
+            status: 400,
+          },
+          message: 'test-BadRequest-status',
+        })),
+      );
+      try {
+        await sendRequest(url);
+      } catch (err: any) {
+        expect(err).toBeInstanceOf(HttpException);
+        expect(err.getStatus()).toBe(400);
+        expect(err.message).toBe('test-BadRequest-status');
+      }
+      expect(mockHttpRequest).toHaveBeenCalledTimes(1);
+    });
+
+    it('catch error statusCode and message', async () => {
+      mockHttpRequest.mockReturnValueOnce(
+        throwError(() => ({
+          response: {
+            statusCode: 400,
+          },
+          message: 'test-BadRequest-statusCode',
+        })),
+      );
+      try {
+        await sendRequest(url);
+      } catch (err: any) {
+        expect(err).toBeInstanceOf(HttpException);
+        expect(err.getStatus()).toBe(400);
+        expect(err.message).toBe('test-BadRequest-statusCode');
+      }
+      expect(mockHttpRequest).toHaveBeenCalledTimes(1);
+    });
+
+    it('should skip when status code is incorrect', async () => {
+      mockHttpRequest.mockReturnValueOnce(
+        throwError(() => ({
+          response: {
+            statusCode: 450,
+          },
+          message: 'test-badStatusCode',
+        })),
+      );
+      try {
+        await sendRequest(url);
+      } catch (err: any) {
+        expect(err).toBeInstanceOf(InternalServerErrorException);
+      }
+      expect(mockHttpRequest).toHaveBeenCalledTimes(1);
+    });
+
+    it('should throw InternalServerErrorException on general error', async () => {
+      mockHttpRequest.mockReturnValueOnce(
+        throwError(() => new Error('error-proxy-test')),
+      );
+      try {
+        await sendRequest(url);
+      } catch (err: any) {
+        expect(err).toBeInstanceOf(InternalServerErrorException);
+      }
+      expect(mockHttpRequest).toHaveBeenCalledTimes(1);
     });
   });
 });
