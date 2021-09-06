@@ -4,6 +4,7 @@ import {
   BadRequestException,
   ForbiddenException,
   HttpException,
+  HttpStatus,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -12,7 +13,7 @@ import {
 import { REQUEST } from '@nestjs/core';
 import { AxiosProxyConfig } from 'axios';
 import { Request } from 'express';
-import { lastValueFrom } from 'rxjs';
+import { catchError, lastValueFrom, map } from 'rxjs';
 import { isDefined } from 'src/common/helpers/isDefined';
 import { LoggerService } from 'src/common/logger/logger.service';
 import { URL } from 'url';
@@ -124,117 +125,127 @@ export class ProxyService {
     }
 
     return lastValueFrom(
-      this.httpService.request({
-        method: this.request.method === 'POST' ? 'POST' : 'GET',
-        url: remoteUrl.href,
-        headers: proxyHeaders,
-        responseType: 'arraybuffer',
-        proxy,
-        data: this.request.body,
-        maxBodyLength: this.proxyConfigService.postSizeLimit,
-        beforeRedirect: (options, { headers }) => {
-          // Before redirect check if we are allowed to proxy that host
-          const location = headers.location;
-          if (location && location.length > 0) {
-            const url = new URL(location);
-            // location header can be a relative URL with no host name. In that case, we default to the remote url host.
-            const redirectHost =
-              typeof url.host === 'string' ? url.host : remoteUrl.host;
-            return this.proxyAllowedHost(redirectHost);
-          }
-          // redirect could not be completed
-          throw new InternalServerErrorException();
-        },
-        onHttpSocketEvent: (socket: NodeJS.Socket) => {
-          socket.once('lookup', (err, address) => {
-            if (this.proxyListService.addressBlacklisted(address)) {
-              // ip address is blacklisted so emit an error to abort request
-              socket.emit(
-                'error',
-                new ForbiddenException(`IP address is not allowed: ${address}`),
+      this.httpService
+        .request({
+          method: this.request.method === 'POST' ? 'POST' : 'GET',
+          url: remoteUrl.href,
+          headers: proxyHeaders,
+          responseType: 'arraybuffer',
+          proxy,
+          data: this.request.body,
+          maxBodyLength: this.proxyConfigService.postSizeLimit,
+          beforeRedirect: (options, { headers }) => {
+            // Before redirect check if we are allowed to proxy that host
+            const location = headers.location;
+            if (location && location.length > 0) {
+              const url = new URL(location);
+              // location header can be a relative URL with no host name. In that case, we default to the remote url host.
+              const redirectHost =
+                typeof url.host === 'string' ? url.host : remoteUrl.host;
+              return this.proxyAllowedHost(redirectHost);
+            }
+            // redirect could not be completed
+            throw new InternalServerErrorException();
+          },
+          onHttpSocketEvent: (socket: NodeJS.Socket) => {
+            socket.once('lookup', (err, address) => {
+              if (this.proxyListService.addressBlacklisted(address)) {
+                // ip address is blacklisted so emit an error to abort request
+                socket.emit(
+                  'error',
+                  new ForbiddenException(
+                    `IP address is not allowed: ${address}`,
+                  ),
+                );
+              }
+            });
+          },
+        })
+        .pipe(
+          map((response) => {
+            const maxAgeSeconds = response.status >= 400 ? undefined : maxAge;
+            this.request.res?.writeHead(
+              response.status,
+              <any>processHeaders(response.headers, maxAgeSeconds),
+            );
+
+            // have to go this way since express will add charset Content-Type which
+            // will make some responses not working (image/png)
+            this.request.res?.status(response.status);
+            this.request.res?.write(response.data);
+          }),
+          catchError((err) => {
+            // before redirect may throw BadRequestException we catch it here and
+            // throw instance of it
+            this.logger.error('An error occurred', err);
+            if (
+              !retryWithoutAuth &&
+              (err.status === 403 ||
+                err.response?.status === 403 ||
+                err.response?.statusCode === 403)
+            ) {
+              if (
+                authRequired &&
+                headers['authorization'] &&
+                !proxyAuthCredentials
+              ) {
+                // User specified an authentication header to this request which
+                // failed with 403, indicating credentials didn't authorize access to
+                // this resource. We have credentials for this host specified in
+                // proxy auth so try again with them.
+                this.deleteAuthorizationHeader(headers);
+                return this.#performRequest(
+                  remoteUrl,
+                  headers,
+                  maxAge,
+                  proxy,
+                  false,
+                  true,
+                );
+              } else {
+                // We automatically added an authentication header to this request
+                // (e.g. from proxyauth.json), but got back a 403, indicating our
+                // credentials didn't authorize access to this resource. Try again
+                // without credentials.
+                this.deleteAuthorizationHeader(headers);
+                return this.#performRequest(
+                  remoteUrl,
+                  headers,
+                  maxAge,
+                  proxy,
+                  true,
+                );
+              }
+            }
+            if (err instanceof HttpException) {
+              if ((err as any).toJSON) {
+                const errJson = (err as any).toJSON();
+                throw Object.create(err, {
+                  response: { value: errJson.message },
+                });
+              } else if (err.getResponse) {
+                throw Object.create(err, {
+                  response: { value: err.getResponse().toString() },
+                });
+              }
+            } else if (err.code === 'ECONNREFUSED') {
+              throw new BadGatewayException();
+            }
+            if (
+              (err.response?.status in HttpStatus ||
+                err.response?.statusCode in HttpStatus) &&
+              err.message
+            ) {
+              throw new HttpException(
+                err.message,
+                err.response?.status || err.response?.statusCode,
               );
             }
-          });
-        },
-      }),
-    )
-      .then((response) => {
-        const maxAgeSeconds = response.status >= 400 ? undefined : maxAge;
-        this.request.res?.writeHead(
-          response.status,
-          <any>processHeaders(response.headers, maxAgeSeconds),
-        );
-
-        // have to go this way since express will add charset Content-Type which
-        // will make some responses not working (image/png)
-        this.request.res?.status(response.status);
-        this.request.res?.write(response.data);
-      })
-      .catch((err: any) => {
-        // before redirect may throw BadRequestException we catch it here and
-        // throw instance of it
-        this.logger.error('An error occurred', err);
-        if (
-          !retryWithoutAuth &&
-          (err.status === 403 ||
-            err.response?.status === 403 ||
-            err.response?.statusCode === 403)
-        ) {
-          if (
-            authRequired &&
-            headers['authorization'] &&
-            !proxyAuthCredentials
-          ) {
-            // User specified an authentication header to this request which
-            // failed with 403, indicating credentials didn't authorize access to
-            // this resource. We have credentials for this host specified in
-            // proxy auth so try again with them.
-            this.deleteAuthorizationHeader(headers);
-            return this.#performRequest(
-              remoteUrl,
-              headers,
-              maxAge,
-              proxy,
-              false,
-              true,
-            );
-          } else {
-            // We automatically added an authentication header to this request
-            // (e.g. from proxyauth.json), but got back a 403, indicating our
-            // credentials didn't authorize access to this resource. Try again
-            // without credentials.
-            this.deleteAuthorizationHeader(headers);
-            return this.#performRequest(
-              remoteUrl,
-              headers,
-              maxAge,
-              proxy,
-              true,
-            );
-          }
-        }
-        if (err instanceof HttpException) {
-          if ((err as any).toJSON) {
-            const errJson = (err as any).toJSON();
-            throw Object.create(err, { response: { value: errJson.message } });
-          } else if (err.getResponse) {
-            throw Object.create(err, {
-              response: { value: err.getResponse().toString() },
-            });
-          }
-        } else if (err.code === 'ECONNREFUSED') {
-          throw new BadGatewayException();
-        }
-
-        if ((err.response?.status || err.response?.statusCode) && err.message) {
-          throw new HttpException(
-            err.message,
-            err.response?.status || err.response?.statusCode,
-          );
-        }
-        //throw err;
-        throw new InternalServerErrorException('Proxy error');
-      });
+            //throw err;
+            throw new InternalServerErrorException('Proxy error');
+          }),
+        ),
+    );
   }
 
   /**
