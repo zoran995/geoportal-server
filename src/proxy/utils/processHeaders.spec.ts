@@ -1,4 +1,3 @@
-import { DEFAULT_MAX_AGE_SECONDS } from '../proxy.constants';
 import { processHeaders } from './processHeaders';
 
 describe('proxy processHeaders', () => {
@@ -15,18 +14,16 @@ describe('proxy processHeaders', () => {
     expect(result['Access-Control-Allow-Origin']).toBe('*');
   });
 
-  it('properly set default max age', () => {
+  it("don't set duration when undefined", () => {
     const headers = {
       'Proxy-Connection': 'delete me!',
       unfilteredheader: "don't delete me!",
     };
 
-    const result = processHeaders(headers);
+    const result = processHeaders(headers, undefined);
     expect(result['Proxy-Connection']).toBeUndefined();
     expect(result['unfilteredheader']).toBe(headers.unfilteredheader);
-    expect(result['Cache-Control']).toBe(
-      `public,max-age=${DEFAULT_MAX_AGE_SECONDS}`,
-    );
+    expect(result['Cache-Control']).toBeUndefined();
     expect(result['Access-Control-Allow-Origin']).toBe('*');
   });
 });

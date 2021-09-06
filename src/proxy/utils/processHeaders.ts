@@ -2,7 +2,7 @@ import { filterHeaders } from './filterHeaders';
 
 /**
  * Filters out headers that shouldn't be proxied, overrides caching so files are
- * retained for {@link DEFAULT_MAX_AGE_SECONDS}, and sets CORS headers to allow all
+ * retained for `maxAgeSeconds`, and sets CORS headers to allow all
  * origins
  *
  * @param headers The original object of headers. This is not mutated.
