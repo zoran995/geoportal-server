@@ -9,6 +9,7 @@ import { LoggerModule } from 'src/common/logger/logger.module';
 import { WWWROOT_TOKEN } from 'src/config/app-config.module';
 import { InitController } from './init.controller';
 import { InitService } from './init.service';
+jest.mock('fs');
 
 vol.fromJSON({
   './test/init/init.json': 'hello init',
