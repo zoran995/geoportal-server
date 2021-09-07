@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing';
 import { plainToClass } from 'class-transformer';
 import { when } from 'jest-when';
 import { vol } from 'memfs';
+import path from 'path';
 import { WWWROOT_TOKEN } from 'src/config/app-config.module';
 import { AppServeStatic } from './app-serve-static';
 import { ServeStaticDto } from './dto/serve-static.dto';
@@ -76,7 +77,7 @@ describe('AppServeStatic', () => {
     expect(Array.isArray(options)).toBe(true);
     expect(options.length).toBe(1);
     expect(options[0]).toMatchObject({
-      rootPath: 'testwwwroot',
+      rootPath: path.resolve('testwwwroot'),
       renderPath: '/',
       serveStaticOptions: expect.anything(),
     });
