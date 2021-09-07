@@ -17,7 +17,9 @@ import { NotFoundExceptionFilter } from 'src/common/filters/not-found-exception.
 import { WWWROOT_TOKEN } from 'src/config/app-config.module';
 import { ServeStaticDto } from 'src/serve-static/dto/serve-static.dto';
 import supertest, { SuperAgentTest } from 'supertest';
+import { NoopLoggerService } from './noop-logger.service';
 jest.mock('fs');
+jest.mock('src/common/logger/logger.service');
 
 const routingOff: Partial<ServeStaticDto> = {
   serveStatic: true,
@@ -78,6 +80,7 @@ async function buildApp(configFile: string, wwwrootPath?: string) {
     new InternalServerErrorExceptionFilter(wwwroot),
     new NotFoundExceptionFilter(configService, wwwroot),
   );
+  app.useLogger(new NoopLoggerService());
   await app.init();
 
   const agent = supertest.agent(app.getHttpServer());

@@ -2,6 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from './../src/app.module';
+import { NoopLoggerService } from './noop-logger.service';
 
 jest.mock('src/common/logger/logger.service');
 
@@ -14,6 +15,7 @@ describe('AppController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useLogger(new NoopLoggerService());
     await app.init();
   });
 

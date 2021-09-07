@@ -101,6 +101,7 @@ async function buildApp(configFile: string) {
     new InternalServerErrorExceptionFilter(wwwroot),
     new NotFoundExceptionFilter(configService, wwwroot),
   );
+  app.useLogger(new NoopLoggerService());
   await app.init();
 
   const agent = supertest.agent(app.getHttpServer());
