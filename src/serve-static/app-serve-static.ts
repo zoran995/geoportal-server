@@ -5,7 +5,7 @@ import {
   ServeStaticModuleOptionsFactory,
 } from '@nestjs/serve-static';
 import { existsSync } from 'fs';
-import { extname } from 'path';
+import path, { extname } from 'path';
 import { isDefined } from 'src/common/helpers/isDefined';
 import { WWWROOT_TOKEN } from 'src/config/app-config.module';
 import { IConfigurationType } from 'src/config/configurator';
@@ -30,10 +30,16 @@ export class AppServeStatic implements ServeStaticModuleOptionsFactory {
     ) {
       return [];
     }
+    let wwwroot;
+    try {
+      wwwroot = path.resolve(this.wwwroot);
+    } catch (err) {
+      wwwroot = this.wwwroot;
+    }
 
     return [
       {
-        rootPath: this.wwwroot,
+        rootPath: wwwroot,
         renderPath: serveStatic.resolveUnmatchedPathsWithIndexHtml ? '*' : '/',
         serveStaticOptions: {
           dotfiles: 'ignore',

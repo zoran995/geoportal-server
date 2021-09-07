@@ -10,6 +10,7 @@ import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
 import { InternalServerErrorExceptionFilter } from 'src/common/filters/internal-server-error-exception.filter';
 import { NotFoundExceptionFilter } from 'src/common/filters/not-found-exception.filter';
 import { LoggerService } from 'src/common/logger/logger.service';
+import { WWWROOT_TOKEN } from 'src/config/app-config.module';
 import { ProxyConfigDto } from 'src/proxy/dto/proxy-config.dto';
 import supertest, { SuperAgentTest } from 'supertest';
 import { AppModule } from './../src/app.module';
@@ -94,10 +95,11 @@ async function buildApp(configFile: string) {
 
   const app = moduleFixture.createNestApplication();
   const configService = app.get(ConfigService);
+  const wwwroot = app.get(WWWROOT_TOKEN);
   app.useGlobalFilters(
     new HttpExceptionFilter(),
-    new InternalServerErrorExceptionFilter(configService),
-    new NotFoundExceptionFilter(configService),
+    new InternalServerErrorExceptionFilter(wwwroot),
+    new NotFoundExceptionFilter(configService, wwwroot),
   );
   await app.init();
 

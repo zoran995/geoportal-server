@@ -1,13 +1,20 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const yargs = require('yargs');
-import { INestApplication } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  INestApplication,
+  InternalServerErrorException,
+  Module,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Test, TestingModule } from '@nestjs/testing';
+import { NestFactory } from '@nestjs/core';
 import { DirectoryJSON, fs, vol } from 'memfs';
 import { AppModule } from 'src/app.module';
 import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
 import { InternalServerErrorExceptionFilter } from 'src/common/filters/internal-server-error-exception.filter';
 import { NotFoundExceptionFilter } from 'src/common/filters/not-found-exception.filter';
+import { WWWROOT_TOKEN } from 'src/config/app-config.module';
 import { ServeStaticDto } from 'src/serve-static/dto/serve-static.dto';
 import supertest, { SuperAgentTest } from 'supertest';
 jest.mock('fs');
@@ -28,10 +35,12 @@ const routingBadPath = {
 };
 
 const volJson: DirectoryJSON = {
-  './mockwwwroot/index.html': '<body>mock index html</body>',
-  './mockwwwroot/404.html': '404!',
-  './mockwwwroot/actual-json.json': JSON.stringify({}),
-  './mockwwwroot/actual-html-file.html': '<body>an actual html file</body>',
+  './test/mockwwwroot/index.html': '<body>mock index html</body>',
+  './test/mockwwwroot/404.html': '404!',
+  './test/mockwwwroot/500.html': '500!',
+  './test/mockwwwroot/actual-json.json': JSON.stringify({}),
+  './test/mockwwwroot/actual-html-file.html':
+    '<body>an actual html file</body>',
   './routingOffConfig': JSON.stringify({ serveStatic: routingOff }),
   './routingOnConfig': JSON.stringify({ serveStatic: routingOn }),
   './routingBadPathConfig': JSON.stringify({ serveStatic: routingBadPath }),
@@ -40,22 +49,34 @@ const volJson: DirectoryJSON = {
 
 vol.fromJSON(volJson);
 
+@Controller('test')
+export class TestController {
+  @Get('response500')
+  redirect() {
+    throw new InternalServerErrorException();
+  }
+}
+
+@Module({
+  imports: [AppModule],
+  controllers: [TestController],
+})
+class TestModule {}
+
 async function buildApp(configFile: string, wwwrootPath?: string) {
   if (wwwrootPath) {
     yargs(`--config-file ${configFile} ${wwwrootPath}`);
   } else {
     yargs(`--config-file ${configFile}`);
   }
-  const moduleFixture: TestingModule = await Test.createTestingModule({
-    imports: [AppModule],
-  }).compile();
 
-  const app = moduleFixture.createNestApplication();
+  const app = await NestFactory.create(TestModule);
   const configService = app.get(ConfigService);
+  const wwwroot = app.get(WWWROOT_TOKEN);
   app.useGlobalFilters(
     new HttpExceptionFilter(),
-    new InternalServerErrorExceptionFilter(configService),
-    new NotFoundExceptionFilter(configService),
+    new InternalServerErrorExceptionFilter(wwwroot),
+    new NotFoundExceptionFilter(configService, wwwroot),
   );
   await app.init();
 
@@ -63,7 +84,7 @@ async function buildApp(configFile: string, wwwrootPath?: string) {
   return { app, agent };
 }
 
-describe('AppController (e2e)', () => {
+describe('Serve static (e2e)', () => {
   let app: INestApplication;
   let agent: SuperAgentTest;
 
@@ -73,51 +94,63 @@ describe('AppController (e2e)', () => {
         './routingOffConfig',
         './nonexistentwwwroot',
       ));
-      agent.get('/blah2').expect(404);
+      await agent.get('/blah2').expect(404);
     });
 
     it('with good wwwroot, specifying invalid path', async () => {
       ({ app, agent } = await buildApp(
         './routingBadPathConfig',
-        './mockwwwroot',
+        './test/mockwwwroot',
       ));
-      agent.get('/blah2').expect(404);
+      await agent.get('/blah2').expect(404);
     });
 
     it('when serve static off', async () => {
-      ({ app, agent } = await buildApp('./serveStaticOff', './mockwwwroot'));
-      agent.get('/blah2').expect(404);
+      ({ app, agent } = await buildApp(
+        './serveStaticOff',
+        './test/mockwwwroot',
+      ));
+      await agent.get('/blah2').expect(404);
     });
   });
 
   describe('with routing off', () => {
     it('should return 404', async () => {
-      ({ app, agent } = await buildApp('./routingOffConfig', './mockwwwroot'));
-      agent.get('/blah2').expect(404);
+      ({ app, agent } = await buildApp(
+        './routingOffConfig',
+        './test/mockwwwroot',
+      ));
+      await agent.get('/blah2').expect(404);
     });
 
     it('should return an actual html file', async () => {
-      ({ app, agent } = await buildApp('./routingOffConfig', './mockwwwroot'));
-      agent
+      ({ app, agent } = await buildApp(
+        './routingOffConfig',
+        './test/mockwwwroot',
+      ));
+      await agent
         .get('/actual-html-file.html')
         .expect(200)
         .expect('Content-Type', /html/)
         .then((response) => {
           expect(response.text).toBe(
-            fs.readFileSync('./mockwwwroot/actual-html-file.html', 'utf8'),
+            fs.readFileSync('./test/mockwwwroot/actual-html-file.html', 'utf8'),
           );
         });
     });
 
-    it('should return an actual json  file', async () => {
-      ({ app, agent } = await buildApp('./routingOffConfig', './mockwwwroot'));
-      agent
+    it('should return an actual json file', async () => {
+      ({ app, agent } = await buildApp(
+        './routingOffConfig',
+        './test/mockwwwroot',
+      ));
+      await agent
         .get('/actual-json.json')
         .expect(200)
         .expect('Content-Type', /json/)
         .then((response) => {
           expect(response.text).toBe(
-            fs.readFileSync('./mockwwwroot/actual-json.json', 'utf8'),
+            fs.readFileSync('./test/mockwwwroot/actual-json.json', 'utf8'),
           );
         });
     });
@@ -125,46 +158,66 @@ describe('AppController (e2e)', () => {
 
   describe('with routing on', () => {
     it('should return 404', async () => {
-      ({ app, agent } = await buildApp('./routingOnConfig', './mockwwwroot'));
-      agent
+      ({ app, agent } = await buildApp(
+        './routingOnConfig',
+        './test/mockwwwroot',
+      ));
+      await agent
         .get('/blah2')
-        .expect(200)
+        .expect(404)
         .expect('Content-Type', /html/)
         .then((response) => {
           expect(response.text).toBe(
-            fs.readFileSync('./mockwwwroot/index.html', 'utf8'),
+            fs.readFileSync('./test/mockwwwroot/404.html', 'utf8'),
           );
         });
     });
 
     it('should return an actual html file', async () => {
-      ({ app, agent } = await buildApp('./routingOnConfig', './mockwwwroot'));
-      agent
+      ({ app, agent } = await buildApp(
+        './routingOnConfig',
+        './test/mockwwwroot',
+      ));
+      const response = await agent
         .get('/actual-html-file.html')
         .expect(200)
-        .expect('Content-Type', /html/)
-        .then((response) => {
-          expect(response.text).toBe(
-            fs.readFileSync('./mockwwwroot/actual-html-file.html', 'utf8'),
-          );
-        });
+        .expect('Content-Type', /html/);
+      expect(response.text).toBe(
+        fs.readFileSync('./test/mockwwwroot/actual-html-file.html', 'utf8'),
+      );
     });
 
-    it('should return an actual json  file', async () => {
-      ({ app, agent } = await buildApp('./routingOnConfig', './mockwwwroot'));
-      agent
+    it('should return an actual json file', async () => {
+      ({ app, agent } = await buildApp(
+        './routingOnConfig',
+        './test/mockwwwroot',
+      ));
+      const response = await agent
         .get('/actual-json.json')
         .expect(200)
-        .expect('Content-Type', /json/)
-        .then((response) => {
-          expect(response.text).toBe(
-            fs.readFileSync('./mockwwwroot/actual-json.json', 'utf8'),
-          );
-        });
+        .expect('Content-Type', /json/);
+      expect(response.text).toBe(
+        fs.readFileSync('./test/mockwwwroot/actual-json.json', 'utf8'),
+      );
+    });
+
+    it('should return 500', async () => {
+      ({ app, agent } = await buildApp(
+        './routingOnConfig',
+        './test/mockwwwroot',
+      ));
+      const response = await agent
+        .get('/test/response500')
+        .expect(500)
+        .expect('Content-Type', /html/);
+      expect(response.text).toBe(
+        fs.readFileSync('./test/mockwwwroot/500.html', 'utf8'),
+      );
     });
   });
 
   afterEach(async () => {
+    jest.clearAllMocks();
     await app?.close();
   });
 });
