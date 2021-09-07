@@ -2,6 +2,7 @@ import { ArgumentsHost, Catch, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { existsSync } from 'fs';
+import path from 'path';
 import { IConfigurationType } from 'src/config/configurator';
 import { ServeStaticDto } from 'src/serve-static/dto/serve-static.dto';
 import { HttpExceptionFilter } from './http-exception.filter';
@@ -10,24 +11,22 @@ import { HttpExceptionFilter } from './http-exception.filter';
 export class NotFoundExceptionFilter extends HttpExceptionFilter {
   constructor(
     private readonly configService: ConfigService<IConfigurationType>,
+    private readonly wwwroot: string,
   ) {
     super();
   }
   catch(exception: NotFoundException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    let wwwroot = process.cwd() + '/wwwroot';
-    const initYargs = this.configService.get<string[]>('_');
-    // take the wwwroot location from config if defined
-    if (initYargs && initYargs.length > 0) {
-      wwwroot = initYargs[0];
-    }
     const serveStatic = this.configService.get<ServeStaticDto>('serveStatic');
-    if (existsSync(wwwroot + '/404.html')) {
-      response.sendFile(wwwroot + '/404.html');
+    const file404 = path.resolve(path.join(this.wwwroot, '/404.html'));
+
+    if (existsSync(file404)) {
+      response.status(404);
+      response.sendFile(file404);
     } else if (
-      serveStatic &&
-      existsSync(wwwroot + serveStatic.resolvePathRelativeToWwwroot)
+      serveStatic?.serveStatic &&
+      existsSync(this.wwwroot + serveStatic.resolvePathRelativeToWwwroot)
     ) {
       response.redirect(303, '/');
     } else {

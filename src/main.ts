@@ -11,6 +11,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { InternalServerErrorExceptionFilter } from './common/filters/internal-server-error-exception.filter';
 import { NotFoundExceptionFilter } from './common/filters/not-found-exception.filter';
 import { LoggerService } from './common/logger/logger.service';
+import { WWWROOT_TOKEN } from './config/app-config.module';
 
 /**
  *
@@ -79,10 +80,11 @@ async function bootstrap() {
       },
     }),
   );
+  const wwwroot = app.get<string>(WWWROOT_TOKEN);
   app.useGlobalFilters(
     new HttpExceptionFilter(),
-    new InternalServerErrorExceptionFilter(configService),
-    new NotFoundExceptionFilter(configService),
+    new InternalServerErrorExceptionFilter(wwwroot),
+    new NotFoundExceptionFilter(configService, wwwroot),
   );
 
   const openApiConfig = new DocumentBuilder()

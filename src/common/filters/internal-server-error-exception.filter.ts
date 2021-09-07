@@ -1,31 +1,28 @@
 import {
   ArgumentsHost,
   Catch,
+  Inject,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { existsSync } from 'fs';
-import { IConfigurationType } from 'src/config/configurator';
+import path from 'path';
+import { WWWROOT_TOKEN } from 'src/config/app-config.module';
 import { HttpExceptionFilter } from './http-exception.filter';
 
 @Catch(InternalServerErrorException)
 export class InternalServerErrorExceptionFilter extends HttpExceptionFilter {
-  constructor(
-    private readonly configService: ConfigService<IConfigurationType>,
-  ) {
+  constructor(@Inject(WWWROOT_TOKEN) private readonly wwwroot: string) {
     super();
   }
   catch(exception: InternalServerErrorException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    let wwwroot = process.cwd() + '/wwwroot';
-    // take the wwwroot location from config if defined
-    if (this.configService.get('_').length > 0) {
-      wwwroot = this.configService.get('_')[0];
-    }
-    if (existsSync(wwwroot + '/500.html')) {
-      response.sendFile(wwwroot + '/500.html');
+    const file500 = path.resolve(path.join(this.wwwroot, '/500.html'));
+
+    if (existsSync(file500)) {
+      response.status(500);
+      response.sendFile(file500);
     } else {
       super.catch(exception, host);
     }
