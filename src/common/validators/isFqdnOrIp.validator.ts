@@ -14,15 +14,15 @@ interface IsFQDNOptions {
   /**
    * @default true
    */
-  require_tld?: boolean | undefined;
+  require_tld: boolean | undefined;
   /**
    * @default false
    */
-  allow_underscores?: boolean | undefined;
+  allow_underscores: boolean | undefined;
   /**
    * @default false
    */
-  allow_trailing_dot?: boolean | undefined;
+  allow_trailing_dot: boolean | undefined;
 }
 
 export function isFqdnOrIp(
@@ -35,8 +35,8 @@ export function isFqdnOrIp(
       name: IS_FQDN_OR_IP,
       validator: {
         validate: (value): boolean => {
-          if (value.indexOf(':') > 1) {
-            const split = value.split(':');
+          const split = value?.split(':');
+          if (split?.length === 2) {
             value = split.shift();
             const portStr = split[0];
             if (!isPort(portStr)) {
