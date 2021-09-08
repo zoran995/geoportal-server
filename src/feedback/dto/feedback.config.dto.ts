@@ -6,7 +6,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { ArrayContainsObjectKey } from 'src/common/validators/array-contains-object-key.validator';
+import { ArrayContainsObjectKey } from '../../common/validators/array-contains-object-key.validator';
 import { FeedbackServiceDtoType } from '../types/feedback-service.type';
 import { BaseFeedbackDto } from './base-feedback.dto';
 import { GithubFeedbackDto } from './github-feedback.dto';

@@ -4,7 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import fs from 'fs';
 import { when } from 'jest-when';
 import * as path from 'path';
-import { LoggerModule } from 'src/common/logger/logger.module';
+import { LoggerModule } from '../common/logger/logger.module';
 import { InitService } from './init.service';
 jest.mock('path');
 jest.mock('fs');

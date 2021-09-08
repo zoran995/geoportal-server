@@ -13,8 +13,8 @@ import {
   InternalServerErrorException,
   Optional,
 } from '@nestjs/common';
-import { LoggerService } from 'src/common/logger/logger.service';
 import { Readable } from 'stream';
+import { LoggerService } from '../common/logger/logger.service';
 import { AWS_CONFIG_OPTIONS } from './aws-s3.contants';
 import { streamToString } from './stream-to-string';
 

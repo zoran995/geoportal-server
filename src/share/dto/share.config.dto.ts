@@ -7,8 +7,8 @@ import {
   IsNumber,
   ValidateNested,
 } from 'class-validator';
-import { ArrayContainsObjectKey } from 'src/common/validators/array-contains-object-key.validator';
-import { NotNull } from 'src/common/validators/not-null.validator';
+import { ArrayContainsObjectKey } from '../../common/validators/array-contains-object-key.validator';
+import { NotNull } from '../../common/validators/not-null.validator';
 import { ShareGistDto } from './share-gist.dto';
 import { ShareS3Dto } from './share-s3.dto';
 import { ShareDto } from './share.dto';

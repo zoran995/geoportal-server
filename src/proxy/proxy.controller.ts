@@ -6,7 +6,7 @@ import {
   ApiInternalServerErrorResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { PayloadLimitInterceptor } from 'src/common/interceptor/payload-limit.interceptor';
+import { PayloadLimitInterceptor } from '../common/interceptor/payload-limit.interceptor';
 import { ProxyService } from './proxy.service';
 
 @Controller('proxy')

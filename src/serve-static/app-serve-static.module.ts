@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { WWWROOT_TOKEN } from 'src/config/app-config.module';
+import { WWWROOT_TOKEN } from '../config/app-config.module';
 import { AppServeStatic } from './app-serve-static';
 
 @Module({

@@ -6,10 +6,10 @@ import {
 } from '@nestjs/serve-static';
 import { existsSync } from 'fs';
 import path, { extname } from 'path';
-import { isDefined } from 'src/common/helpers/isDefined';
-import { WWWROOT_TOKEN } from 'src/config/app-config.module';
-import { IConfigurationType } from 'src/config/configurator';
-import { ServeStaticDto } from 'src/serve-static/dto/serve-static.dto';
+import { isDefined } from '../common/helpers/isDefined';
+import { WWWROOT_TOKEN } from '../config/app-config.module';
+import { IConfigurationType } from '../config/configurator';
+import { ServeStaticDto } from '../serve-static/dto/serve-static.dto';
 
 @Injectable()
 export class AppServeStatic implements ServeStaticModuleOptionsFactory {

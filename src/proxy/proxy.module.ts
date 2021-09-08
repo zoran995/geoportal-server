@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { POST_SIZE_LIMIT } from 'src/common/interceptor/payload-limit.interceptor';
+import { POST_SIZE_LIMIT } from '../common/interceptor/payload-limit.interceptor';
 import { ProxyConfigService } from './config/proxy-config.service';
 import { ProxyController } from './proxy.controller';
 import { ProxyService } from './proxy.service';

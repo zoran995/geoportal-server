@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ProxyListService } from 'src/proxy/utils/proxy-list.service';
+import { ProxyListService } from '../proxy/utils/proxy-list.service';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 
 export interface ISafeSettings {

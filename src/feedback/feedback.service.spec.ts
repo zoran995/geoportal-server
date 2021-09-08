@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { plainToClass } from 'class-transformer';
 import { Observable, of } from 'rxjs';
-import { LoggerModule } from 'src/common/logger/logger.module';
+import { LoggerModule } from '../common/logger/logger.module';
 import { FeedbackConfigService } from './config/feedback.config.service';
 import { FeedbackConfigDto } from './dto/feedback.config.dto';
 import { FeedbackServiceManager } from './feedback-service-manager.service';

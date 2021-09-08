@@ -2,8 +2,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import fs from 'fs';
 import * as path from 'path';
-import { WWWROOT_TOKEN } from 'src/config/app-config.module';
-import { IConfigurationType } from 'src/config/configurator';
+import { WWWROOT_TOKEN } from '../config/app-config.module';
+import { IConfigurationType } from '../config/configurator';
 
 @Injectable()
 export class InitService {

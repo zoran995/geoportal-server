@@ -4,9 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { isDefined } from 'src/common/helpers/isDefined';
-import { LoggerService } from 'src/common/logger/logger.service';
-import { arrayContainsObjectKey } from 'src/common/validators/array-contains-object-key.validator';
+import { isDefined } from '../common/helpers/isDefined';
+import { LoggerService } from '../common/logger/logger.service';
+import { arrayContainsObjectKey } from '../common/validators/array-contains-object-key.validator';
 import { FeedbackConfigService } from './config/feedback.config.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { FeedbackServiceManager } from './feedback-service-manager.service';

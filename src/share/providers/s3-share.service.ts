@@ -9,8 +9,8 @@ import baseX from 'base-x';
 import * as crypto from 'crypto';
 import http from 'http';
 import https from 'https';
-import { AwsS3Service } from 'src/aws-sdk/aws-s3.service';
-import { LoggerService } from 'src/common/logger/logger.service';
+import { AwsS3Service } from '../../aws-sdk/aws-s3.service';
+import { LoggerService } from '../../common/logger/logger.service';
 import { ShareS3Dto } from '../dto/share-s3.dto';
 import { AbstractShareService } from './abstract-share.service';
 

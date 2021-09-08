@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { existsSync } from 'fs';
 import path from 'path';
-import { IConfigurationType } from 'src/config/configurator';
-import { ServeStaticDto } from 'src/serve-static/dto/serve-static.dto';
+import { IConfigurationType } from '../../config/configurator';
+import { ServeStaticDto } from '../../serve-static/dto/serve-static.dto';
 import { HttpExceptionFilter } from './http-exception.filter';
 
 @Catch(NotFoundException)

@@ -11,7 +11,7 @@ import { REQUEST } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 import { when } from 'jest-when';
 import { of, throwError } from 'rxjs';
-import { POST_SIZE_LIMIT } from 'src/common/interceptor/payload-limit.interceptor';
+import { POST_SIZE_LIMIT } from '../common/interceptor/payload-limit.interceptor';
 import { ProxyConfigService } from './config/proxy-config.service';
 import { ProxyConfigDto } from './dto/proxy-config.dto';
 import { ProxyService } from './proxy.service';

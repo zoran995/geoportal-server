@@ -1,6 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ProxyModule } from 'src/proxy/proxy.module';
+import { ProxyModule } from '../proxy/proxy.module';
 import { configurator } from './configurator';
 import { ServerConfigController } from './server-config.controller';
 

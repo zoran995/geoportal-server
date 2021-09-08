@@ -10,16 +10,16 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DirectoryJSON, fs, vol } from 'memfs';
-import { AppModule } from 'src/app.module';
-import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
-import { InternalServerErrorExceptionFilter } from 'src/common/filters/internal-server-error-exception.filter';
-import { NotFoundExceptionFilter } from 'src/common/filters/not-found-exception.filter';
-import { WWWROOT_TOKEN } from 'src/config/app-config.module';
-import { ServeStaticDto } from 'src/serve-static/dto/serve-static.dto';
 import supertest, { SuperAgentTest } from 'supertest';
+import { AppModule } from '../src/app.module';
+import { HttpExceptionFilter } from '../src/common/filters/http-exception.filter';
+import { InternalServerErrorExceptionFilter } from '../src/common/filters/internal-server-error-exception.filter';
+import { NotFoundExceptionFilter } from '../src/common/filters/not-found-exception.filter';
+import { WWWROOT_TOKEN } from '../src/config/app-config.module';
+import { ServeStaticDto } from '../src/serve-static/dto/serve-static.dto';
 import { NoopLoggerService } from './noop-logger.service';
 jest.mock('fs');
-jest.mock('src/common/logger/logger.service');
+jest.mock('../src/common/logger/logger.service');
 
 const routingOff: Partial<ServeStaticDto> = {
   serveStatic: true,

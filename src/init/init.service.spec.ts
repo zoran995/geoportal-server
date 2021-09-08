@@ -4,8 +4,8 @@ import fs from 'fs';
 import { when } from 'jest-when';
 import { vol } from 'memfs';
 import * as path from 'path';
-import { LoggerModule } from 'src/common/logger/logger.module';
-import { WWWROOT_TOKEN } from 'src/config/app-config.module';
+import { LoggerModule } from '../common/logger/logger.module';
+import { WWWROOT_TOKEN } from '../config/app-config.module';
 import { InitService } from './init.service';
 
 jest.mock('fs');

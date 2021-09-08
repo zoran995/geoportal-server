@@ -1,9 +1,9 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { plainToClass } from 'class-transformer';
-import { ProxyConfigService } from 'src/proxy/config/proxy-config.service';
-import { ProxyListService } from 'src/proxy/utils/proxy-list.service';
-import { ShareConfigDto } from 'src/share/dto/share.config.dto';
+import { ProxyConfigService } from '../proxy/config/proxy-config.service';
+import { ProxyListService } from '../proxy/utils/proxy-list.service';
+import { ShareConfigDto } from '../share/dto/share.config.dto';
 import { ConfigurationDto } from './dto/configuration.dto';
 import {
   ISafeSettings,

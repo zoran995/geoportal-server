@@ -4,8 +4,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { isDefined } from 'src/common/helpers/isDefined';
-import { LoggerService } from 'src/common/logger/logger.service';
+import { isDefined } from '../common/helpers/isDefined';
+import { LoggerService } from '../common/logger/logger.service';
 import { ShareConfigService } from './config/share-config.service';
 import { AbstractShareService } from './providers/abstract-share.service';
 import { ShareServiceManager } from './share-service-manager.service';
