@@ -50,8 +50,10 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
     const path = this.configService.blacklistPath;
     if (!path || !fs.existsSync(path)) {
       this.logger.log('using blacklist set in config;');
-      isDefined(this.configService.blacklist) &&
+      if (isDefined(this.configService.blacklist)) {
+        this.#blacklist.length = 0;
         this.#blacklist.push(...this.configService.blacklist);
+      }
       return;
     }
     this.logger.log(`reading blacklist from ${path}`);
@@ -63,8 +65,10 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
     const path = this.configService.whitelistPath;
     if (!path || !fs.existsSync(path)) {
       this.logger.log('using whitelist set in config;');
-      isDefined(this.configService.proxyDomains) &&
+      if (isDefined(this.configService.proxyDomains)) {
+        this.#whitelist.length = 0;
         this.#whitelist.push(...this.configService.proxyDomains);
+      }
       return;
     }
     this.logger.log(`reading whitelist from ${path}`);

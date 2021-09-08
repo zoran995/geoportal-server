@@ -206,9 +206,31 @@ describe('ProxyListService', () => {
       expect(service.blacklist).toEqual(['test replace']);
       service.onModuleDestroy();
     });
+
+    it('should reinit on file delete', async () => {
+      const proxyConf = { ...defaultProxyConfig.proxy };
+      proxyConf.whitelistPath = './test/whitelist';
+      proxyConf.allowProxyFor = ['allowProxyFor'];
+      mockConfigGet.mockReturnValue(proxyConf);
+      const watchSpy = jest.spyOn(fs, 'watch');
+      replaceInFile(proxyConf.whitelistPath, 'whitelist');
+      service.onModuleInit();
+      expect(watchSpy).toHaveBeenCalledTimes(1);
+      expect(service.whitelist).toEqual(['whitelist']);
+
+      deleteFile(proxyConf.whitelistPath);
+      //expect(watchSpy).toHaveBeenCalledTimes(1);
+      await new Promise((r) => setTimeout(r, 3000));
+      expect(service.whitelist).toEqual(['allowProxyFor']);
+      service.onModuleDestroy();
+    });
   });
 });
 
 function replaceInFile(filePath: string, content: string) {
   fs.writeFileSync(filePath, content);
+}
+
+function deleteFile(filePath: string) {
+  fs.unlinkSync(filePath);
 }
