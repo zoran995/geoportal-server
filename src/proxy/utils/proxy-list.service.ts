@@ -74,13 +74,20 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
 
   private watchFileChanges(filePath: string, storage: string[]) {
     let fsWait: boolean | NodeJS.Timeout = false;
-    return fs.watch(filePath, function (event, filename) {
-      if (filename) {
-        if (fsWait) return;
-        fsWait = setTimeout(() => {
-          fsWait = false;
-        }, 1000);
-        storage.push(...readFileWithoutComments(filePath));
+    return fs.watch(filePath, (event, filename) => {
+      if (event === 'change') {
+        if (filename) {
+          if (fsWait) return;
+          fsWait = setTimeout(() => {
+            fsWait = false;
+            const content = [...readFileWithoutComments(filePath)];
+            storage.length = 0;
+            storage.push(...content);
+          }, 1000);
+        }
+      } else if (event === 'rename') {
+        this.onModuleDestroy();
+        this.onModuleInit();
       }
     });
   }
@@ -88,11 +95,11 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
 
 function readFileWithoutComments(filePath: string) {
   return fs
-    .readFileSync(filePath)
-    .toString('utf-8')
+    .readFileSync(filePath, 'utf-8')
+    .toString()
     .split(/\n|\r\n/g)
-    .filter((rx) => !rx.startsWith('//'))
     .map((rx) => {
-      return rx;
-    });
+      return rx.trim();
+    })
+    .filter((rx) => !rx.startsWith('//') && rx !== '');
 }
