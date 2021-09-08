@@ -43,6 +43,9 @@ const volJson: DirectoryJSON = {
   './test/mockwwwroot/actual-json.json': JSON.stringify({}),
   './test/mockwwwroot/actual-html-file.html':
     '<body>an actual html file</body>',
+  './test/mockwwwroot/test.geojson': JSON.stringify({ test: 'geojson' }),
+  './test/mockwwwroot/test.czml': JSON.stringify({ test: 'czml' }),
+  './test/mockwwwroot/test.glsl': JSON.stringify('test'),
   './routingOffConfig': JSON.stringify({ serveStatic: routingOff }),
   './routingOnConfig': JSON.stringify({ serveStatic: routingOn }),
   './routingBadPathConfig': JSON.stringify({ serveStatic: routingBadPath }),
@@ -243,6 +246,50 @@ describe('Serve static (e2e)', () => {
         .get('/test/responseError')
         .expect(500)
         .expect('Content-Type', /json/);
+    });
+  });
+
+  describe('properly set headers', () => {
+    it('should return Content-type json for geojson', async () => {
+      ({ app, agent } = await buildApp(
+        './routingOnConfig',
+        './test/mockwwwroot',
+      ));
+      const response = await agent
+        .get('/test.geojson')
+        .expect(200)
+        .expect('Content-Type', /json/);
+      expect(response.text).toBe(
+        fs.readFileSync('./test/mockwwwroot/test.geojson', 'utf8'),
+      );
+    });
+
+    it('should return Content-type json for czml', async () => {
+      ({ app, agent } = await buildApp(
+        './routingOnConfig',
+        './test/mockwwwroot',
+      ));
+      const response = await agent
+        .get('/test.czml')
+        .expect(200)
+        .expect('Content-Type', /json/);
+      expect(response.text).toBe(
+        fs.readFileSync('./test/mockwwwroot/test.czml', 'utf8'),
+      );
+    });
+
+    it('should return Content-type json for czml', async () => {
+      ({ app, agent } = await buildApp(
+        './routingOnConfig',
+        './test/mockwwwroot',
+      ));
+      const response = await agent
+        .get('/test.glsl')
+        .expect(200)
+        .expect('Content-Type', /^text\/plain/);
+      expect(response.text).toBe(
+        fs.readFileSync('./test/mockwwwroot/test.glsl', 'utf8'),
+      );
     });
   });
 
