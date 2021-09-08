@@ -1,11 +1,16 @@
+/*global __dirname*/
+const path = require('path');
+
+// Pass through additional arguments that might ultimately have come from
+// something like `npm run start -- --port 3009`
 const argpos = process.argv.indexOf('--');
 const args = argpos > -1 ? process.argv.slice(argpos + 1) : [];
 
 module.exports = {
   apps: [
     {
-      name: 'serve-data-prod',
-      script: 'dist/main.js',
+      name: path.basename(__dirname),
+      script: 'dist/src/main.js',
 
       // Options reference: https://pm2.io/doc/en/runtime/reference/ecosystem-file/
       args: args.join(' '),
