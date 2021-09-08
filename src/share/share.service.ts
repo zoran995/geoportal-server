@@ -7,6 +7,7 @@ import {
 import { isDefined } from '../common/helpers/isDefined';
 import { LoggerService } from '../common/logger/logger.service';
 import { ShareConfigService } from './config/share-config.service';
+import { ISaveShareResponse } from './interfaces/save-share-response.interface';
 import { AbstractShareService } from './providers/abstract-share.service';
 import { ShareServiceManager } from './share-service-manager.service';
 import { ShareServiceDtoType } from './types/share-service-dto.type';
@@ -25,7 +26,7 @@ export class ShareService {
    * @param body Share data
    * @returns Share id
    */
-  async save(body: any): Promise<string> {
+  async save(body: any): Promise<ISaveShareResponse> {
     const newSharePrefix = this.configService.newPrefix;
     if (!isDefined(newSharePrefix)) {
       this.logger.error(

@@ -12,6 +12,7 @@ import https from 'https';
 import { AwsS3Service } from '../../aws-sdk/aws-s3.service';
 import { LoggerService } from '../../common/logger/logger.service';
 import { ShareS3Dto } from '../dto/share-s3.dto';
+import { ISaveShareResponse } from '../interfaces/save-share-response.interface';
 import { AbstractShareService } from './abstract-share.service';
 
 class S3Logger extends LoggerService {
@@ -49,7 +50,7 @@ export class S3ShareService extends AbstractShareService<ShareS3Dto> {
    * Save share configuration in s3 bucket
    * {@inheritdoc}
    */
-  async save(data: any): Promise<string> {
+  async save(data: any): Promise<ISaveShareResponse> {
     const id = shortId(data, this.config.keyLength);
     const params: PutObjectCommandInput = {
       Bucket: this.config.bucket,
@@ -62,7 +63,10 @@ export class S3ShareService extends AbstractShareService<ShareS3Dto> {
         this.logger.verbose(
           `Saved key ${id} to S3 bucket ${params.Bucket}: ${params.Key}. Etag: ${response.ETag}`,
         );
-        return id;
+        return {
+          id: `${this.config.prefix}-${id}`,
+          path: `/api/share/${this.config.prefix}-${id}`,
+        };
       })
       .catch((err) => {
         this.logger.error(

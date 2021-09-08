@@ -118,7 +118,7 @@ describe('ShareService', () => {
       const shareServiceSpy = jest.spyOn(service, 'save');
       const result = await service.save({});
       expect(shareServiceSpy).toHaveBeenCalledTimes(1);
-      expect(result).toBe('test');
+      expect(result.id).toBe(`${shareConfig.newPrefix}-test`);
     });
 
     it('should reuse connection', async () => {

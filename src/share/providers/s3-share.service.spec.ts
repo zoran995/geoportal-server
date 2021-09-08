@@ -58,7 +58,7 @@ describe('GistShareService', () => {
       mockSave.mockImplementationOnce(() => Promise.resolve('test'));
       const result = await service.save(share_body);
       expect(mockSave).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(share_id);
+      expect(result.id).toEqual(`${s3shareConfig.prefix}-${share_id}`);
     });
 
     it('should return InternalServerErrorException on s3 error', async () => {

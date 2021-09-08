@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ShareDto } from '../dto/share.dto';
-
+import { ISaveShareResponse } from '../interfaces/save-share-response.interface';
 @Injectable()
 export abstract class AbstractShareService<T extends ShareDto> {
   readonly id: string;
@@ -13,7 +13,7 @@ export abstract class AbstractShareService<T extends ShareDto> {
    * @param data share data
    * @returns id of saved share data
    */
-  abstract save(data: any): Promise<string>;
+  abstract save(data: any): Promise<ISaveShareResponse>;
 
   /**
    * @param id Share ID

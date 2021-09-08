@@ -9,6 +9,7 @@ import { catchError, map } from 'rxjs/operators';
 import { combineURLs } from '../../common/helpers/combineURLs';
 import { LoggerService } from '../../common/logger/logger.service';
 import { ShareGistDto } from '../dto/share-gist.dto';
+import { ISaveShareResponse } from '../interfaces/save-share-response.interface';
 import { AbstractShareService } from './abstract-share.service';
 
 export class GistShareService extends AbstractShareService<ShareGistDto> {
@@ -25,7 +26,7 @@ export class GistShareService extends AbstractShareService<ShareGistDto> {
    * Save share configuration using gist.
    * {@inheritdoc}
    */
-  public async save(data: any): Promise<string> {
+  public async save(data: any): Promise<ISaveShareResponse> {
     const gistFile: any = {};
     gistFile[this.config.fileName] = {
       content: JSON.stringify(data),
@@ -55,7 +56,10 @@ export class GistShareService extends AbstractShareService<ShareGistDto> {
               throw new NotFoundException();
             }
             this.logger.verbose(`Created Gist with ID '${res.data.id}`);
-            return <string>res.data.id;
+            return {
+              id: `${this.config.prefix}-${res.data.id}`,
+              path: `/api/share/${this.config.prefix}-${res.data.id}`,
+            };
           }),
           catchError((e) => {
             this.logger.error(`Creating share url failed`, e);

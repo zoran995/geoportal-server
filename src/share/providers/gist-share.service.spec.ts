@@ -83,7 +83,7 @@ describe('GistShareService', () => {
       const responseData = { id: 'test' };
       mockHttpPost.mockReturnValue(of({ data: responseData }));
       const result = await service.save({});
-      expect(result).toBe('test');
+      expect(result.id).toBe(`${gistShareConfig.prefix}-${responseData.id}`);
     });
 
     it('should throw an error when response data is undefined', async () => {
