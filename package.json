@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "author": "Zoran Kokeza",
-  "private": true,
+  "private": false,
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
@@ -23,8 +23,14 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "test:e2e:cov": "jest --coverage  --config ./test/jest-e2e.json",
-    "tool:merge-coverage": "ts-node --pretty --project=tools/tsconfig.tools.json tools/merge-coverage.ts"
+    "tool:merge-coverage": "ts-node --pretty --project=tools/tsconfig.tools.json tools/merge-coverage.ts",
+    "prepare": "tsc"
   },
+  "main": "./geoportal-server.js",
+  "files": [
+    "dist",
+    "geoportal-server.js"
+  ],
   "dependencies": {
     "@aws-sdk/client-s3": "^3.28.0",
     "@aws-sdk/node-http-handler": "^3.25.0",

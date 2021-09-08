@@ -10,7 +10,7 @@ module.exports = {
   apps: [
     {
       name: path.basename(__dirname),
-      script: 'dist/src/main.js',
+      script: 'dist/main.js',
 
       // Options reference: https://pm2.io/doc/en/runtime/reference/ecosystem-file/
       args: args.join(' '),
