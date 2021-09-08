@@ -4,7 +4,6 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
-import { AppService } from './app.service';
 import { LoggerModule } from './common/logger/logger.module';
 import { HttpLoggerMiddleware } from './common/middleware/http-logger.middleware';
 import { AppConfigModule } from './config/app-config.module';
@@ -30,7 +29,6 @@ import { ShareModule } from './share/share.module';
     PingModule,
     Proj4Module,
   ],
-  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
