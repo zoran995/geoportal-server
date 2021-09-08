@@ -26,7 +26,10 @@ export class NotFoundExceptionFilter extends HttpExceptionFilter {
       response.sendFile(file404);
     } else if (
       serveStatic?.serveStatic &&
-      existsSync(this.wwwroot + serveStatic.resolvePathRelativeToWwwroot)
+      serveStatic.resolveUnmatchedPathsWithIndexHtml &&
+      existsSync(
+        path.join(this.wwwroot, serveStatic.resolvePathRelativeToWwwroot),
+      )
     ) {
       response.redirect(303, '/');
     } else {

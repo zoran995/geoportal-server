@@ -14,7 +14,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     const status =
-      exception.statusCode === 404 || exception.response?.status === 404
+      (exception.getStatus && exception.getStatus() === 404) ||
+      exception.statusCode === 404 ||
+      exception.response?.status === 404
         ? HttpStatus.NOT_FOUND
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
