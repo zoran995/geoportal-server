@@ -54,8 +54,13 @@ vol.fromJSON(volJson);
 @Controller('test')
 export class TestController {
   @Get('response500')
-  redirect() {
+  response500() {
     throw new InternalServerErrorException();
+  }
+
+  @Get('responseError')
+  responseError() {
+    throw new Error('error');
   }
 }
 
@@ -97,7 +102,7 @@ describe('Serve static (e2e)', () => {
         './routingOffConfig',
         './nonexistentwwwroot',
       ));
-      await agent.get('/blah2').expect(404);
+      await agent.get('/blah2').expect(404).expect('Content-Type', /json/);
     });
 
     it('with good wwwroot, specifying invalid path', async () => {
@@ -105,7 +110,7 @@ describe('Serve static (e2e)', () => {
         './routingBadPathConfig',
         './test/mockwwwroot',
       ));
-      await agent.get('/blah2').expect(404);
+      await agent.get('/blah2').expect(404).expect('Content-Type', /html/);
     });
 
     it('when serve static off', async () => {
@@ -113,7 +118,7 @@ describe('Serve static (e2e)', () => {
         './serveStaticOff',
         './test/mockwwwroot',
       ));
-      await agent.get('/blah2').expect(404);
+      await agent.get('/blah2').expect(404).expect('Content-Type', /html/);
     });
   });
 
@@ -204,7 +209,7 @@ describe('Serve static (e2e)', () => {
       );
     });
 
-    it('should return 500', async () => {
+    it('should return 500 html when exists', async () => {
       ({ app, agent } = await buildApp(
         './routingOnConfig',
         './test/mockwwwroot',
@@ -216,6 +221,28 @@ describe('Serve static (e2e)', () => {
       expect(response.text).toBe(
         fs.readFileSync('./test/mockwwwroot/500.html', 'utf8'),
       );
+    });
+
+    it('should return 500', async () => {
+      ({ app, agent } = await buildApp(
+        './routingOnConfig',
+        './test/nonexistentwwwroot',
+      ));
+      await agent
+        .get('/test/response500')
+        .expect(500)
+        .expect('Content-Type', /json/);
+    });
+
+    it('should return 500 error', async () => {
+      ({ app, agent } = await buildApp(
+        './routingOnConfig',
+        './test/mockwwwroot',
+      ));
+      await agent
+        .get('/test/responseError')
+        .expect(500)
+        .expect('Content-Type', /json/);
     });
   });
 
