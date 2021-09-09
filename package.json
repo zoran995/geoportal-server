@@ -25,8 +25,7 @@
     "test:e2e:cov": "jest --coverage  --config ./test/jest-e2e.json",
     "tool:merge-coverage": "ts-node --pretty --project=tools/tsconfig.tools.json tools/merge-coverage.ts",
     "prepare": "npm run build",
-    "preversion": "npm run format && npm run lint && npm run build",
-    "version": "npx conventional-changelog-cli -p angular -i CHANGELOG.md -s && git add CHANGELOG.md"
+    "preversion": "npm run format && npm run lint && npm run build"
   },
   "main": "./geoportal-server.js",
   "files": [
