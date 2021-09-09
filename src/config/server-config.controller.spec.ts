@@ -51,11 +51,6 @@ describe('ServerConfigController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('contains version', () => {
-    const version = controller.serverConfig().version;
-    expect(version).toBeDefined();
-  });
-
   describe('default config', () => {
     let safeSettings: ISafeSettings;
 
