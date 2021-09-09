@@ -4,7 +4,7 @@
   "description": "",
   "author": "Zoran Kokeza",
   "private": false,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "prebuild": "npx rimraf dist",
     "build": "nest build",
