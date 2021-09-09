@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { proj4def } from './proj4def';
+import { proj4def } from 'proj4-cli-defs';
 
 @Injectable()
 export class Proj4Service {
