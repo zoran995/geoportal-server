@@ -1,7 +1,7 @@
 {
   "name": "geoportal-server",
   "version": "0.0.1",
-  "description": "",
+  "description": "A rewrite of TerriJS-Server using NestJS",
   "author": "Zoran Kokeza",
   "private": false,
   "license": "MIT",
