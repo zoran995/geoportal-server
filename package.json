@@ -6,7 +6,7 @@
   "private": false,
   "license": "UNLICENSED",
   "scripts": {
-    "prebuild": "rimraf dist",
+    "prebuild": "npx rimraf dist",
     "build": "nest build",
     "format-check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -24,7 +24,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "test:e2e:cov": "jest --coverage  --config ./test/jest-e2e.json",
     "tool:merge-coverage": "ts-node --pretty --project=tools/tsconfig.tools.json tools/merge-coverage.ts",
-    "prepare": "tsc"
+    "prepare": "npm run build",
+    "preversion": "npm run format && npm run lint && npm run build",
+    "version": "npx conventional-changelog-cli -p angular -i CHANGELOG.md -s && git add CHANGELOG.md"
   },
   "main": "./geoportal-server.js",
   "files": [
@@ -50,7 +52,6 @@
     "nodemailer": "^6.6.3",
     "range_check": "^2.0.4",
     "reflect-metadata": "^0.1.13",
-    "rimraf": "^3.0.2",
     "rxjs": "^7.3.0",
     "swagger-ui-express": "^4.1.6",
     "yargs": "^17.1.1"
