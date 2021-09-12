@@ -11,18 +11,6 @@ jest.mock('./utils/load-yargs.util', () => ({
   loadYargs: mockLoadYargs,
 }));
 
-/**
-jest.mock('./utils/load-json-config.util', () => mockLoadJsonConfig);
-jest.mock('./utils/load-yargs.util', () => mockLoadYargs);
- */
-
-/**
- jest.mock('./configurator', () => {
-  loadJsonConfig: jest.fn();
-  loadYargs: jest.fn();
-});
- */
-
 describe('configurator', () => {
   afterEach(async () => {
     mockLoadYargs.mockClear();

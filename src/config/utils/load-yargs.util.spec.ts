@@ -9,7 +9,6 @@ describe('load yargs', () => {
     const loadedYargs = await loadYargs();
     expect(loadedYargs.port).toBe(3005);
     expect(loadedYargs['config-file']).toBe('./serverconfig.json');
-    expect(loadedYargs['proxy-auth']).toBe('./proxyauth.json');
     expect(loadedYargs.verbose).toBe(false);
   });
 
