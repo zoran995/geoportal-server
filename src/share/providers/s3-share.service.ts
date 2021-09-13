@@ -48,7 +48,6 @@ export class S3ShareService extends AbstractShareService<ShareS3Dto> {
 
   /**
    * Save share configuration in s3 bucket
-   * {@inheritdoc}
    */
   async save(data: any): Promise<ISaveShareResponse> {
     const id = shortId(data, this.config.keyLength);
@@ -79,7 +78,6 @@ export class S3ShareService extends AbstractShareService<ShareS3Dto> {
 
   /**
    * Resolve saved share configuration from s3 bucket
-   * {@inheritdoc}
    */
   async resolve(id: string): Promise<string> {
     const params = {

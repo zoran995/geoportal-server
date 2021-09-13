@@ -19,8 +19,8 @@ export class InitController {
 
   /**
    * Special handling for /init/foo.json requests: look in initPaths, not just wwwroot/init
-   * @param params.fileName Name of the file
-   * @param res Express res
+   * @param params - Request params ({@link GetInitDto})
+   * @param res - Express res
    */
   @Get(':fileName')
   @ApiOperation({ summary: 'Resolves init configuration' })

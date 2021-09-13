@@ -24,7 +24,7 @@ export class ShareS3Dto extends ShareDto {
   /**
    * Credentials of a user with S3 getObject and putObject permission on the above bucket.
    * If not provided here, you must ensure they're available as environment variables or in a shared credentials file.
-   * See {@link http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html node configuring aws guide}.
+   * See {@link http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html | node configuring aws guide}.
    */
   @NotNull()
   readonly credentials?: {

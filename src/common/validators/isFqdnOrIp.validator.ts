@@ -12,15 +12,15 @@ export const IS_FQDN_OR_IP = 'isFqdnOrIp';
 
 interface IsFQDNOptions {
   /**
-   * @default true
+   * @defaultValue true
    */
   require_tld: boolean | undefined;
   /**
-   * @default false
+   * @defaultValue false
    */
   allow_underscores: boolean | undefined;
   /**
-   * @default false
+   * @defaultValue false
    */
   allow_trailing_dot: boolean | undefined;
 }

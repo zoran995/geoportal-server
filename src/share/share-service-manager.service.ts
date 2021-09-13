@@ -15,7 +15,7 @@ export class ShareServiceManager {
 
   /**
    * Check if share service with given id exists in manager
-   * @param id ID of the share service
+   * @param id - ID of the share service
    */
   has(id: string): boolean {
     return !!this.shareServices.find((share) => share.id === id);
@@ -23,9 +23,9 @@ export class ShareServiceManager {
 
   /**
    * Gets registered share service with given id.
-   * @param id ID of the share service.
-   * @returns instance of the share service.
-   * @throws { Error} if share service with given name was not found.
+   * @param id - ID of the share service.
+   * @returns Instance of the share service.
+   * @throws {@link Error} if share service with given name was not found.
    */
   get(id: string): AbstractShareService<ShareServiceDtoType> {
     const shareService = this.shareServices.find((share) => share.id === id);
@@ -50,9 +50,9 @@ export class ShareServiceManager {
 
   /**
    * Creates new instance of share service and registers it in manager.
-   * @param options share configuration
-   * @returns instance of share service
-   * @throws {Error} Unknown share service specified.
+   * @param options - Share configuration
+   * @returns Instance of share service
+   * @throws {@link Error} Unknown share service specified.
    */
   create(
     options: ShareServiceDtoType,

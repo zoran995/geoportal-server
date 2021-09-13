@@ -12,7 +12,7 @@ export const POST_SIZE_LIMIT = 'POST_SIZE_LIMIT';
 
 /**
  * Check the payload size and compares it with defined limit.
- * @throws {PayloadTooLargeException} - When the payload is larger the limit
+ * @throws {@link PayloadTooLargeException} - When the payload is larger the limit
  */
 @Injectable()
 export class PayloadLimitInterceptor implements NestInterceptor {

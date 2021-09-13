@@ -22,7 +22,7 @@ export class InitService {
 
   /**
    * Gets the path to the requested file
-   * @param fileName Name of the file
+   * @param fileName - Name of the file
    * @returns file path
    */
   getFilePath(fileName: string): string | undefined {

@@ -30,8 +30,8 @@ export class FeedbackServiceManager {
   /**
    * Gets registered feedback service with given id.
    * @param id - ID of the feedback service.
-   * @returns instance of the feedback service.
-   * @throws { Error} if feedback with given name was not found.
+   * @returns Instance of the feedback service.
+   * @throws {@link Error} If feedback with given name was not found.
    */
   get(id: string): AbstractFeedbackService<FeedbackServiceDtoType> {
     const feedbackService = this.feedbackServices.find(
@@ -44,7 +44,7 @@ export class FeedbackServiceManager {
 
   /**
    *
-   * @param options
+   * @param id - ID of the feedback service.
    * @returns
    */
   remove(id: string): boolean {
@@ -58,9 +58,9 @@ export class FeedbackServiceManager {
 
   /**
    * Creates new instance of feedback service and registers it in manager.
-   * @param options - feedback configuration
-   * @returns instance of feedback service
-   * @throws { Error} Unknown feedback service specified.
+   * @param options - Feedback configuration
+   * @returns Instance of feedback service
+   * @throws {@link Error} Unknown feedback service specified.
    */
   create(
     options: FeedbackServiceDtoType,

@@ -24,7 +24,6 @@ export class GistShareService extends AbstractShareService<ShareGistDto> {
 
   /**
    * Save share configuration using gist.
-   * {@inheritdoc}
    */
   public async save(data: any): Promise<ISaveShareResponse> {
     const gistFile: any = {};
@@ -74,7 +73,6 @@ export class GistShareService extends AbstractShareService<ShareGistDto> {
 
   /**
    * Resolve saved share configuration from gist using id.
-   * {@inheritdoc}
    */
   public async resolve(id: string): Promise<any> {
     const headers: any = {

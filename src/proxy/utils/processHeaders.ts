@@ -5,8 +5,8 @@ import { filterHeaders } from './filterHeaders';
  * retained for `maxAgeSeconds`, and sets CORS headers to allow all
  * origins
  *
- * @param headers The original object of headers. This is not mutated.
- * @param maxAgeSeconds the amount of time in seconds to cache for. This will
+ * @param headers - The original object of headers. This is not mutated.
+ * @param maxAgeSeconds - The amount of time in seconds to cache for. This will
  *          override what the original server specified because we know better
  *          than they do.
  * @returns The new headers object.

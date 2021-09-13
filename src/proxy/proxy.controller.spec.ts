@@ -40,7 +40,7 @@ describe('ProxyController', () => {
   it('should properly call the proxy service with url and duration', async () => {
     const duration = '5s';
     const url = 'http://example.com';
-    controller.proxy(duration, { '0': url });
+    controller.proxy({ '0': url, duration: duration });
     expect(mockProxyRequest).toHaveBeenCalledTimes(1);
     expect(mockProxyRequest).toHaveBeenCalledWith(url, duration);
   });
@@ -48,7 +48,7 @@ describe('ProxyController', () => {
   it('should properly call the proxy service with url and duration on post', async () => {
     const duration = '5s';
     const url = 'http://example.com';
-    controller.proxyPost(duration, { '0': url });
+    controller.proxyPost({ '0': url, duration: duration });
     expect(mockProxyRequest).toHaveBeenCalledTimes(1);
     expect(mockProxyRequest).toHaveBeenCalledWith(url, duration);
   });

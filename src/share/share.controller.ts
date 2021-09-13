@@ -30,7 +30,7 @@ export class ShareController {
 
   /**
    * Stores the share configuration and returns id of the share file.
-   * @param shareDto Share data
+   * @param shareDto - Share data
    * @returns The share ID
    */
   @Post()
@@ -50,7 +50,7 @@ export class ShareController {
 
   /**
    * Resolves the existing share ID.
-   * @param params.id The share id
+   * @param params - Request params ({@link GetShareDto})
    * @returns The share data
    */
   @Get(':id')
@@ -64,6 +64,6 @@ export class ShareController {
   @ApiBadRequestResponse({ description: 'Unknown prefix to resolve' })
   @UseFilters(HttpExceptionFilter)
   async resolve(@Param() params: GetShareDto) {
-    return await this.shareService.resolve(params.id);
+    return this.shareService.resolve(params.id);
   }
 }

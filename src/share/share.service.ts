@@ -23,7 +23,7 @@ export class ShareService {
 
   /**
    * Save the share data
-   * @param body Share data
+   * @param body - Share data
    * @returns Share id
    */
   async save(body: any): Promise<ISaveShareResponse> {
@@ -53,7 +53,7 @@ export class ShareService {
 
   /**
    * Resolves the share data using id
-   * @param id Share id
+   * @param id - Share id
    * @returns Share data
    */
   async resolve(id: string): Promise<string> {
