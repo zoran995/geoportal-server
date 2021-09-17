@@ -1,9 +1,9 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import fs from 'fs';
-import { when } from 'jest-when';
 import { vol } from 'memfs';
 import * as path from 'path';
+import { IConfigurationType } from 'src/config/configurator';
 import { LoggerModule } from '../common/logger/logger.module';
 import { WWWROOT_TOKEN } from '../config/app-config.module';
 import { InitService } from './init.service';
@@ -16,15 +16,21 @@ vol.fromJSON({
   './test/init/init2/init2.json': 'hello init 2',
 });
 
-const configGet = jest.fn((key: string): string | string[] | undefined => {
-  switch (key) {
-    case 'initPaths':
-      return ['test/init', 'test/init/init1'];
-    case 'config-file':
-      return undefined;
-  }
-  return undefined;
-});
+const defaultConfig: Partial<IConfigurationType> = {
+  initPaths: ['test/init', 'test/init/init1'],
+  'config-file': undefined,
+};
+
+const configGet = jest.fn();
+
+const mockConfigReturnValue = (config: Record<string, any> = defaultConfig) => {
+  configGet.mockImplementation((key: string) => {
+    if (key in config) {
+      return config[key];
+    }
+    return undefined;
+  });
+};
 
 describe('InitService', () => {
   let service: InitService;
@@ -55,6 +61,7 @@ describe('InitService', () => {
   });
 
   it('should properly resolve file path', async () => {
+    mockConfigReturnValue();
     const existsSyncSpy = jest.spyOn(fs, 'existsSync');
     const filePath = service.getFilePath('init.json');
     expect(filePath).toBe(path.resolve('./test/init/init.json'));
@@ -62,6 +69,7 @@ describe('InitService', () => {
   });
 
   it('should properly resolve file path in multiple directories', async () => {
+    mockConfigReturnValue();
     const existsSyncSpy = jest.spyOn(fs, 'existsSync');
     const filePath = service.getFilePath('init1.json');
     expect(filePath).toBe(path.resolve('./test/init/init1/init1.json'));
@@ -69,6 +77,7 @@ describe('InitService', () => {
   });
 
   it('resolves files only from initPaths directories', async () => {
+    mockConfigReturnValue();
     const existsSyncSpy = jest.spyOn(fs, 'existsSync');
     const filePath = service.getFilePath('init2.json');
     expect(filePath).toBeUndefined();
@@ -76,11 +85,10 @@ describe('InitService', () => {
   });
 
   it('should properly add WWWROOT_TOKEN init location and use it as a config location', async () => {
-    const configFile = 'test/test.json';
-    when(configGet).calledWith('config-file').mockReturnValueOnce(configFile);
-    when(configGet)
-      .calledWith('initPaths')
-      .mockReturnValueOnce(['init', 'init/init1']);
+    const config = { ...defaultConfig };
+    config['config-file'] = 'test/test.json';
+    config.initPaths = ['init', 'init/init1'];
+    mockConfigReturnValue(config);
     const existsSyncSpy = jest.spyOn(fs, 'existsSync');
     const filePath = service.getFilePath('init.json');
     expect(configGet).toBeCalledTimes(3);
@@ -92,9 +100,9 @@ describe('InitService', () => {
   });
 
   it("should return undefined when file doesn't exist", async () => {
-    when(configGet)
-      .calledWith('initPaths')
-      .mockReturnValueOnce(['test/init', 'test/init/init1']);
+    const config = { ...defaultConfig };
+    config.initPaths = ['test/init', 'test/init/init1'];
+    mockConfigReturnValue(config);
     const existsSyncSpy = jest.spyOn(fs, 'existsSync');
     const filePath = service.getFilePath('init-not-found.json');
     expect(filePath).toBeUndefined();

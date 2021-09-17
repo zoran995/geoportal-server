@@ -2,9 +2,9 @@ import { createMock } from '@golevelup/ts-jest';
 import { ExecutionContext, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { when } from 'jest-when';
 import { DirectoryJSON, fs, vol } from 'memfs';
 import path from 'path';
+import { ServeStaticDto } from 'src/serve-static/dto/serve-static.dto';
 import { HttpExceptionFilter } from './http-exception.filter';
 import { NotFoundExceptionFilter } from './not-found-exception.filter';
 jest.mock('fs');
@@ -35,6 +35,17 @@ const mockConfigGet = jest.fn();
 class MockConfigService {
   get = mockConfigGet;
 }
+
+const mockConfigReturnValue = (
+  serveStaticConfig: ServeStaticDto | undefined,
+) => {
+  mockConfigGet.mockImplementation((key) => {
+    if (key === 'serveStatic') {
+      return serveStaticConfig;
+    }
+    return undefined;
+  });
+};
 
 const spyHttpException = jest.spyOn(HttpExceptionFilter.prototype, 'catch');
 
@@ -82,7 +93,7 @@ describe('NotFoundExceptionFilter', () => {
 
   it('properly redirect to index html', async () => {
     const filter = new NotFoundExceptionFilter(configService, wwwroot);
-    when(mockConfigGet).calledWith('serveStatic').mockReturnValue({
+    mockConfigReturnValue({
       serveStatic: true,
       resolvePathRelativeToWwwroot: '/index.html',
       resolveUnmatchedPathsWithIndexHtml: true,
@@ -94,29 +105,31 @@ describe('NotFoundExceptionFilter', () => {
 
   it('calls super error filter when should not resolve index.html', async () => {
     const filter = new NotFoundExceptionFilter(configService, wwwroot);
-    when(mockConfigGet).calledWith('serveStatic').mockReturnValue({
+    const config = {
       serveStatic: true,
       resolvePathRelativeToWwwroot: '/index.html',
       resolveUnmatchedPathsWithIndexHtml: false,
-    });
+    };
+    mockConfigReturnValue(config);
     filter.catch(new NotFoundException(), mockExecutionContext);
     expect(spyHttpException).toHaveBeenCalledTimes(1);
   });
 
   it("calls super error filter when index file doesn't exist", async () => {
     const filter = new NotFoundExceptionFilter(configService, wwwroot);
-    when(mockConfigGet).calledWith('serveStatic').mockReturnValue({
+    const config = {
       serveStatic: true,
       resolvePathRelativeToWwwroot: '/index1.html',
       resolveUnmatchedPathsWithIndexHtml: true,
-    });
+    };
+    mockConfigReturnValue(config);
     filter.catch(new NotFoundException(), mockExecutionContext);
     expect(spyHttpException).toHaveBeenCalledTimes(1);
   });
 
   it('calls super error filter when serve static disabled', async () => {
     const filter = new NotFoundExceptionFilter(configService, wwwroot);
-    when(mockConfigGet).calledWith('serveStatic').mockReturnValue({
+    mockConfigReturnValue({
       serveStatic: false,
       resolvePathRelativeToWwwroot: '/index.html',
       resolveUnmatchedPathsWithIndexHtml: true,
@@ -127,7 +140,7 @@ describe('NotFoundExceptionFilter', () => {
 
   it('calls super error filter when serve static undefined', async () => {
     const filter = new NotFoundExceptionFilter(configService, wwwroot);
-    when(mockConfigGet).calledWith('serveStatic').mockReturnValue(undefined);
+    mockConfigReturnValue(undefined);
     filter.catch(new NotFoundException(), mockExecutionContext);
     expect(spyHttpException).toHaveBeenCalledTimes(1);
   });

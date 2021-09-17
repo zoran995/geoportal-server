@@ -9,7 +9,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { REQUEST } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
-import { when } from 'jest-when';
 import { of, throwError } from 'rxjs';
 import { POST_SIZE_LIMIT } from '../common/interceptor/payload-limit.interceptor';
 import { ProxyConfigService } from './config/proxy-config.service';
@@ -82,13 +81,26 @@ async function sendRequest(
   await service.proxyRequest(url, params?.duration);
 }
 
+const mockConfigReturnValue = (
+  other: Record<string, any>,
+  proxy: ProxyConfigDto = defaultProxyConfig.proxy,
+) => {
+  mockConfigGet.mockImplementation((key: string) => {
+    if (key === 'proxy') {
+      return proxy;
+    } else if (key in other) {
+      return other[key];
+    }
+    return undefined;
+  });
+};
+
 describe('ProxyService', () => {
   const url = 'https://example.com/blah?query=value&otherQuery=otherValue';
   beforeEach(async () => {
-    when(mockConfigGet)
-      .calledWith('proxy')
-      .mockReturnValue(defaultProxyConfig.proxy);
+    mockConfigReturnValue({});
   });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -161,7 +173,7 @@ describe('ProxyService', () => {
     const proxyConf = { ...defaultProxyConfig.proxy };
     proxyConf.proxyAllDomains = true;
     proxyConf.allowProxyFor = ['example2.com'];
-    when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
+    mockConfigReturnValue({}, proxyConf);
     mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
     await sendRequest(url);
     expect(mockHttpRequest).toHaveBeenCalledTimes(1);
@@ -194,9 +206,7 @@ describe('ProxyService', () => {
         username: 'test',
         password: 'test',
       };
-      when(mockConfigGet)
-        .calledWith('basicAuthentication')
-        .mockReturnValue(authorizationHeader);
+      mockConfigReturnValue({ basicAuthentication: authorizationHeader });
       const service = await prepareRequest(url);
       const spyDeleteAuthorizationHeader = jest.spyOn(
         service as any,
@@ -209,9 +219,7 @@ describe('ProxyService', () => {
     });
 
     it('should not call delete authorization header', async () => {
-      when(mockConfigGet)
-        .calledWith('basicAuthentication')
-        .mockReturnValue(undefined);
+      mockConfigReturnValue({ basicAuthentication: undefined });
       const service = await prepareRequest(url);
       const spyDeleteAuthorizationHeader = jest.spyOn(
         service as any,
@@ -233,7 +241,7 @@ describe('ProxyService', () => {
       const proxyConf = { ...defaultProxyConfig.proxy };
       proxyConf.upstreamProxy = proxy;
       mockConfigGet.mockClear();
-      when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
+      mockConfigReturnValue({}, proxyConf);
       mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
       await sendRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledWith(
@@ -248,7 +256,7 @@ describe('ProxyService', () => {
       const proxy = undefined;
       const proxyConf = { ...defaultProxyConfig.proxy };
       proxyConf.upstreamProxy = proxy;
-      when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
+      mockConfigReturnValue({}, proxyConf);
       mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
       await sendRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledWith(
@@ -265,7 +273,7 @@ describe('ProxyService', () => {
       proxyConf.upstreamProxy = proxy;
       proxyConf.bypassUpstreamProxyHosts = new Map();
       proxyConf.bypassUpstreamProxyHosts.set('example.com', true);
-      when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
+      mockConfigReturnValue({}, proxyConf);
       mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
       await sendRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledWith(
@@ -282,7 +290,7 @@ describe('ProxyService', () => {
       proxyConf.upstreamProxy = proxy;
       proxyConf.bypassUpstreamProxyHosts = new Map();
       proxyConf.bypassUpstreamProxyHosts.set('example2.com', true);
-      when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
+      mockConfigReturnValue({}, proxyConf);
       mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
       await sendRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledWith(
@@ -303,7 +311,7 @@ describe('ProxyService', () => {
       proxyConf.proxyAuth = {
         'example.com': auth,
       };
-      when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
+      mockConfigReturnValue({}, proxyConf);
       mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
       await sendRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledWith(
@@ -322,7 +330,7 @@ describe('ProxyService', () => {
       proxyConf.proxyAuth = {
         'example2.com': auth,
       };
-      when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
+      mockConfigReturnValue({}, proxyConf);
       mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
       await sendRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledWith(
@@ -344,7 +352,7 @@ describe('ProxyService', () => {
       mockHttpRequest
         .mockReturnValueOnce(throwError(() => new ForbiddenException()))
         .mockReturnValueOnce(of({ data: 'success' }));
-      when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
+      mockConfigReturnValue({}, proxyConf);
       await sendRequest(url);
       expect(mockHttpRequest).toHaveBeenCalledTimes(2);
       expect(mockHttpRequest).toHaveBeenNthCalledWith(
@@ -375,7 +383,7 @@ describe('ProxyService', () => {
         mockHttpRequest.mockReturnValueOnce(
           throwError(() => new NotFoundException()),
         );
-        when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
+        mockConfigReturnValue({}, proxyConf);
         await sendRequest(url);
 
         expect(mockHttpRequest).toHaveBeenCalledTimes(1);
@@ -413,7 +421,7 @@ describe('ProxyService', () => {
       proxyConf.proxyAuth = {
         'example.com': auth,
       };
-      when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
+      mockConfigReturnValue({}, proxyConf);
       mockHttpRequest
         .mockReturnValueOnce(throwError(() => new ForbiddenException()))
         .mockReturnValueOnce(of({ data: 'success' }));
@@ -439,7 +447,7 @@ describe('ProxyService', () => {
       proxyConf.proxyAuth = {
         'example.com': auth,
       };
-      when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
+      mockConfigReturnValue({}, proxyConf);
       mockHttpRequest
         .mockReturnValueOnce(throwError(() => new ForbiddenException()))
         .mockReturnValueOnce(throwError(() => new ForbiddenException()))
@@ -487,7 +495,7 @@ describe('ProxyService', () => {
           headers: headers,
         },
       };
-      when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
+      mockConfigReturnValue({}, proxyConf);
       mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
 
       await sendRequest(url);
@@ -520,7 +528,7 @@ describe('ProxyService', () => {
           headers: headers,
         },
       };
-      when(mockConfigGet).calledWith('proxy').mockReturnValue(proxyConf);
+      mockConfigReturnValue({}, proxyConf);
       mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
 
       await sendRequest(url);
