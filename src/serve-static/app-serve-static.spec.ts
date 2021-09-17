@@ -1,7 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { plainToClass } from 'class-transformer';
-import { when } from 'jest-when';
 import { vol } from 'memfs';
 import path from 'path';
 import { WWWROOT_TOKEN } from '../config/app-config.module';
@@ -15,6 +14,17 @@ const defaultConfig = plainToClass(ServeStaticDto, {});
 vol.fromJSON({
   'testwwwroot/index.html': 'index.html',
 });
+
+const mockConfigReturnValue = (
+  serveStaticConfig: ServeStaticDto | undefined,
+) => {
+  mockConfigGet.mockImplementation((key) => {
+    if (key === 'serveStatic') {
+      return serveStaticConfig;
+    }
+    return undefined;
+  });
+};
 
 describe('AppServeStatic', () => {
   let service: AppServeStatic;
@@ -47,31 +57,33 @@ describe('AppServeStatic', () => {
   });
 
   it('should return empty array when serve static undefined', () => {
-    mockConfigGet.mockReturnValueOnce(undefined);
+    expect.assertions(3);
+    mockConfigReturnValue(undefined);
 
     emptyOptions(service);
   });
 
   it('should return empty array when serveStatic.serveStatic is false', () => {
+    expect.assertions(3);
     const config = { ...defaultConfig };
     config.serveStatic = false;
-    when(mockConfigGet).calledWith('serveStatic').mockReturnValueOnce(config);
+    mockConfigReturnValue(config);
 
     emptyOptions(service);
   });
 
   it("should return empty array when index file doesn't exist", () => {
+    expect.assertions(3);
     const config = { ...defaultConfig };
     config.resolvePathRelativeToWwwroot = 'index1.html';
-    when(mockConfigGet).calledWith('serveStatic').mockReturnValueOnce(config);
+    mockConfigReturnValue(config);
 
     emptyOptions(service);
   });
 
   it('should properly resolve options when serve static set', () => {
-    when(mockConfigGet)
-      .calledWith('serveStatic')
-      .mockReturnValueOnce(defaultConfig);
+    console.log('should properly resolve options when serve static set');
+    mockConfigReturnValue(defaultConfig);
     const options = service.createLoggerOptions();
     expect(options).toBeDefined();
     expect(Array.isArray(options)).toBe(true);
