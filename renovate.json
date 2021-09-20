@@ -5,5 +5,13 @@
   ],
   "labels": [
     "dependencies"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "axios"
+      ],
+      "enabled": false
+    }
   ]
 }
