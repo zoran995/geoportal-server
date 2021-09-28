@@ -12,11 +12,11 @@ export function filterHeaders(
   headers: Record<string, unknown>,
   socket?: Socket,
 ) {
-  const result: Record<string, unknown> = {};
+  const result: Record<string, string> = {};
   // filter out headers that are listed in the regex
   Object.keys(headers).forEach(function (name) {
     if (!DO_NOT_PROXY_REGEX.test(name)) {
-      result[name] = headers[name];
+      result[name] = headers[name] as string;
     }
   });
 
@@ -28,7 +28,7 @@ export function filterHeaders(
     result[
       'x-forwarded-for'
     ] = `${result['x-forwarded-for']}, ${socket.remoteAddress}`;
-  } else {
+  } else if (socket.remoteAddress) {
     result['x-forwarded-for'] = socket.remoteAddress;
   }
 

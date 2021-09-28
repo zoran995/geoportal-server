@@ -2,11 +2,19 @@
 const yargs = require('yargs');
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { DirectoryJSON, vol } from 'memfs';
 import request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { NoopLoggerService } from './noop-logger.service';
 
+jest.mock('fs');
 jest.mock('src/common/logger/logger.service');
+
+const volJson: DirectoryJSON = {
+  './serverconfig.json': JSON.stringify({}),
+};
+
+vol.fromJSON(volJson);
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
