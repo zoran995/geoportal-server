@@ -33,8 +33,12 @@ const axiosRequest: any = axios.request;
 axios.Cancel = Cancel;
 axios.CancelToken = CancelToken;
 axiosRequest.mockImplementation(
-  (reqConfig: AxiosRequestConfig): Promise<AxiosResponse> => {
-    const status = reqConfig.headers['x-give-response-status'] || 200;
+  (reqConfig: AxiosRequestConfig): Promise<AxiosResponse<any>> => {
+    let status = 200;
+    if (reqConfig.headers && 'x-give-response-status' in reqConfig.headers) {
+      status = reqConfig.headers['x-give-response-status'] as any as number;
+    }
+
     return Promise.resolve({
       data: data,
       status: status,
