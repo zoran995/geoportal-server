@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { LoggerModule } from './common/logger/logger.module';
 import { HttpLoggerMiddleware } from './common/middleware/http-logger.middleware';
+import { HttpsRedirectMiddleware } from './common/middleware/https-redirect/https-redirect.middleware';
 import { AppConfigModule } from './config/app-config.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { CustomHttpModule } from './http/custom-http.module';
@@ -33,6 +34,9 @@ import { ShareModule } from './share/share.module';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer
+      .apply(HttpsRedirectMiddleware)
+      .exclude({ path: 'api/ping', method: RequestMethod.ALL })
+      .forRoutes({ path: '*', method: RequestMethod.ALL })
       .apply(HttpLoggerMiddleware)
       .forRoutes({ path: '*', method: RequestMethod.ALL });
   }

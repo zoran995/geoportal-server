@@ -3,11 +3,13 @@ import {
   IsBoolean,
   IsNumber,
   IsObject,
+  IsOptional,
   IsString,
   Max,
   Min,
   ValidateNested,
 } from 'class-validator';
+import { HttpsDto } from '../../common/middleware/https-redirect/https.dto';
 import { NotNull } from '../../common/validators/not-null.validator';
 import { FeedbackConfigDto } from '../../feedback/dto/feedback.config.dto';
 import { ProxyConfigDto } from '../../proxy/dto/proxy-config.dto';
@@ -97,6 +99,15 @@ export class ConfigurationDto {
    */
   @NotNull()
   trustProxy: boolean | string | string[] | number = false;
+
+  /**
+   * Configuration for the https
+   */
+  @IsObject()
+  @NotNull()
+  @ValidateNested()
+  @IsOptional()
+  https?: HttpsDto = undefined;
 
   /**
    * Configuration for serving static files.

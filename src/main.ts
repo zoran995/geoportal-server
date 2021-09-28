@@ -1,16 +1,25 @@
 import { LogLevel, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
+import {
+  ExpressAdapter,
+  NestExpressApplication,
+} from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import compression from 'compression';
+import express from 'express';
+import fs from 'fs';
 import helmet from 'helmet';
+import http from 'http';
+import https from 'https';
+import * as tls from 'tls';
 import { AppModule } from './app.module';
 import { ValidationException } from './common/exceptions/validation.exception';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { InternalServerErrorExceptionFilter } from './common/filters/internal-server-error-exception.filter';
 import { NotFoundExceptionFilter } from './common/filters/not-found-exception.filter';
 import { LoggerService } from './common/logger/logger.service';
+import { HttpsDto } from './common/middleware/https-redirect/https.dto';
 import { WWWROOT_TOKEN } from './config/app-config.module';
 
 /**
@@ -37,9 +46,14 @@ function getLoggerLevelByEnvironment(): LogLevel[] {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    bufferLogs: true,
-  });
+  const server = express();
+  const app = await NestFactory.create<NestExpressApplication>(
+    AppModule,
+    new ExpressAdapter(server),
+    {
+      bufferLogs: true,
+    },
+  );
 
   const configService = app.get(ConfigService);
   const logger = await app.resolve(LoggerService);
@@ -98,7 +112,25 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, document);
 
   const port = configService.get<number>('port', 3001);
-  await app.use(helmet()).listen(port);
+
+  let httpsOptions: tls.SecureContextOptions | undefined = undefined;
+  const httpsConfig: HttpsDto | undefined = configService.get<
+    HttpsDto | undefined
+  >('https');
+  if (httpsConfig && httpsConfig.httpsOptions) {
+    httpsOptions = {
+      key: fs.readFileSync(httpsConfig.httpsOptions.keyPath),
+      cert: fs.readFileSync(httpsConfig.httpsOptions.certPath),
+      passphrase: httpsConfig.httpsOptions.passphrase,
+    };
+  }
+  await app.use(helmet()).init();
+
+  if (httpsOptions) {
+    https.createServer(httpsOptions, server).listen(port);
+  } else {
+    http.createServer(server).listen(port);
+  }
   logger.log(`started listening on port: ${port}`);
 }
 
