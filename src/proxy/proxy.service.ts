@@ -100,7 +100,7 @@ export class ProxyService {
 
   async #performRequest(
     remoteUrl: URL,
-    headers: Record<string, unknown>,
+    headers: Record<string, string>,
     maxAge: number,
     proxy?: AxiosProxyConfig,
     retryWithoutAuth = false,
