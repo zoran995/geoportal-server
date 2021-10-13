@@ -13,6 +13,7 @@ import {
 import { REQUEST } from '@nestjs/core';
 import { AxiosProxyConfig } from 'axios';
 import { Request } from 'express';
+import * as http from 'http';
 import { catchError, lastValueFrom, map } from 'rxjs';
 import { URL } from 'url';
 import { isDefined } from '../common/helpers/isDefined';
@@ -98,6 +99,21 @@ export class ProxyService {
     );
   }
 
+  /**
+   * Each request will be proxied with authentication header in following order,
+   * the first successfull breaks the chain.
+   * - Send the request with authorization header provided by user unless we use
+   *   basic authentication.
+   * - Send the request with authorization header specified in proxyAuth.
+   * - Send the request without authentication.
+   * @param remoteUrl - URL to proxy to
+   * @param headers - headers to be issued with request
+   * @param maxAge - for how long to cache the response
+   * @param proxy - Upstream proxy definition
+   * @param retryWithoutAuth - Should we retry request without auth
+   * @param proxyAuthCredentials - Are we using the proxyAuthCredentials in this
+   * request.
+   */
   async #performRequest(
     remoteUrl: URL,
     headers: Record<string, string>,
@@ -107,8 +123,8 @@ export class ProxyService {
     proxyAuthCredentials = false,
   ): Promise<any> | never {
     const proxyHeaders = { ...headers };
-    const proxyAuth = this.proxyConfigService.proxyAuth;
-    const authRequired = proxyAuth[remoteUrl.host];
+    const authRequired = this.proxyConfigService.proxyAuth[remoteUrl.host];
+
     if (!retryWithoutAuth && authRequired && !headers['authorization']) {
       // identify that we tried using proxy auth headers
       proxyAuthCredentials = true;
@@ -122,6 +138,12 @@ export class ProxyService {
           proxyHeaders[header.name] = header.value;
         });
       }
+    } else if (
+      !retryWithoutAuth &&
+      !headers['authorization'] &&
+      !authRequired
+    ) {
+      retryWithoutAuth = true;
     }
 
     return lastValueFrom(
@@ -134,32 +156,9 @@ export class ProxyService {
           proxy,
           data: this.request.body,
           maxBodyLength: this.proxyConfigService.postSizeLimit,
-          beforeRedirect: (options, { headers }) => {
-            // Before redirect check if we are allowed to proxy that host
-            const location = headers.location;
-            if (location && location.length > 0) {
-              const url = new URL(location);
-              // location header can be a relative URL with no host name. In that case, we default to the remote url host.
-              const redirectHost =
-                typeof url.host === 'string' ? url.host : remoteUrl.host;
-              return this.proxyAllowedHost(redirectHost);
-            }
-            // redirect could not be completed
-            throw new InternalServerErrorException();
-          },
-          onHttpSocketEvent: (socket: NodeJS.Socket) => {
-            socket.once('lookup', (err, address) => {
-              if (this.proxyListService.addressBlacklisted(address)) {
-                // ip address is blacklisted so emit an error to abort request
-                socket.emit(
-                  'error',
-                  new ForbiddenException(
-                    `IP address is not allowed: ${address}`,
-                  ),
-                );
-              }
-            });
-          },
+          beforeRedirect: (options, { headers }) =>
+            this.beforeRedirect(headers, remoteUrl),
+          onHttpSocketEvent: this.onHttpSocketEvent,
         })
         .pipe(
           map((response) => {
@@ -169,14 +168,14 @@ export class ProxyService {
               <any>processHeaders(response.headers, maxAgeSeconds),
             );
 
-            // have to go this way since express will add charset Content-Type which
-            // will make some responses not working (image/png)
+            // have to go this way since express will add charset Content-Type
+            // which will make some responses not working (image/png)
             this.request.res?.status(response.status);
             this.request.res?.write(response.data);
           }),
           catchError((err) => {
-            // before redirect may throw BadRequestException we catch it here and
-            // throw instance of it
+            // before redirect may throw BadRequestException we catch it here
+            // and throw instance of it
             this.logger.error('An error occurred', err);
             if (
               !retryWithoutAuth &&
@@ -190,9 +189,9 @@ export class ProxyService {
                 !proxyAuthCredentials
               ) {
                 // User specified an authentication header to this request which
-                // failed with 403, indicating credentials didn't authorize access to
-                // this resource. We have credentials for this host specified in
-                // proxy auth so try again with them.
+                // failed with 403, indicating credentials didn't authorize
+                // access to this resource. We have credentials for this host
+                // specified in proxy auth so try again with them.
                 this.deleteAuthorizationHeader(headers);
                 return this.#performRequest(
                   remoteUrl,
@@ -202,11 +201,11 @@ export class ProxyService {
                   false,
                   true,
                 );
-              } else {
-                // We automatically added an authentication header to this request
-                // (e.g. from proxyauth.json), but got back a 403, indicating our
-                // credentials didn't authorize access to this resource. Try again
-                // without credentials.
+              } else if ('authorization' in proxyHeaders) {
+                // We automatically added an authentication header to this
+                // request (e.g. from proxyauth.json), but got back a 403,
+                // indicating our credentials didn't authorize access to this
+                // resource. Try again without credentials.
                 this.deleteAuthorizationHeader(headers);
                 return this.#performRequest(
                   remoteUrl,
@@ -246,6 +245,33 @@ export class ProxyService {
           }),
         ),
     );
+  }
+
+  private beforeRedirect(headers: http.IncomingHttpHeaders, remoteUrl: URL) {
+    // Before redirect check if we are allowed to proxy that host
+    const location = headers.location;
+    if (location && location.length > 0) {
+      const url = new URL(location);
+      // location header can be a relative URL with no host name. In that case,
+      // we default to the remote url host.
+      const redirectHost =
+        typeof url.host === 'string' ? url.host : remoteUrl.host;
+      return this.proxyAllowedHost(redirectHost);
+    }
+    // redirect could not be completed
+    throw new InternalServerErrorException();
+  }
+
+  private onHttpSocketEvent(socket: NodeJS.Socket) {
+    socket.once('lookup', (err, address) => {
+      if (this.proxyListService.addressBlacklisted(address)) {
+        // ip address is blacklisted so emit an error to abort request
+        socket.emit(
+          'error',
+          new ForbiddenException(`IP address is not allowed: ${address}`),
+        );
+      }
+    });
   }
 
   /**

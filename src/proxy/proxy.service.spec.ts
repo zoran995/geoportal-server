@@ -303,6 +303,9 @@ describe('ProxyService', () => {
   });
 
   describe('specifying an domain basic authention', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
     it('should set auth header for that domain', async () => {
       const auth = {
         authorization: 'testauth',
@@ -471,6 +474,21 @@ describe('ProxyService', () => {
           method: 'GET',
         }),
       );
+    });
+
+    it('should not retry when no auth specified in request and no auth for domain', async () => {
+      expect.assertions(2);
+      const proxyConf = { ...defaultProxyConfig.proxy };
+      mockConfigReturnValue({}, proxyConf);
+      mockHttpRequest.mockReturnValueOnce(
+        throwError(() => new ForbiddenException()),
+      );
+      try {
+        await sendRequest(url);
+      } catch (err) {
+        expect(mockHttpRequest).toHaveBeenCalledTimes(1);
+        expect(err).toBeInstanceOf(ForbiddenException);
+      }
     });
   });
 
