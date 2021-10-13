@@ -82,7 +82,6 @@ describe('AppServeStatic', () => {
   });
 
   it('should properly resolve options when serve static set', () => {
-    console.log('should properly resolve options when serve static set');
     mockConfigReturnValue(defaultConfig);
     const options = service.createLoggerOptions();
     expect(options).toBeDefined();
