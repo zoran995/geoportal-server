@@ -1,4 +1,4 @@
-import { Equals, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { Equals, IsInt, IsNotEmpty, IsString } from 'class-validator';
 import { NotNull } from '../../common/validators/not-null.validator';
 import { ShareType } from '../types/share.type';
 import { ShareDto } from './share.dto';
@@ -35,7 +35,7 @@ export class ShareS3Dto extends ShareDto {
   /**
    * The length of the random share key to generate (not including prefix), up to 54 characters. Defaults to the full length.
    */
-  @IsNumber()
+  @IsInt()
   @NotNull()
   readonly keyLength = 54;
 }

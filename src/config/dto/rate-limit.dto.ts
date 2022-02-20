@@ -1,24 +1,24 @@
-import { IsNumber } from 'class-validator';
+import { IsInt } from 'class-validator';
 import { NotNull } from '../../common/validators/not-null.validator';
 
 export class RateLimitDto {
   /**
    * The number of retries the user gets before they need to start waiting.
    */
-  @IsNumber()
+  @IsInt()
   @NotNull()
   freeRetries = 2;
 
   /**
    * The initial wait time (in milliseconds) after the free retries above.
    */
-  @IsNumber()
+  @IsInt()
   @NotNull()
   minWait = 200;
   /**
    * The maximum time that the user will need to wait.
    */
-  @IsNumber()
+  @IsInt()
   @NotNull()
   maxWait = 6000;
 }

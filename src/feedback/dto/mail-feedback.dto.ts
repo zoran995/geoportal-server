@@ -1,9 +1,10 @@
+import { Type } from 'class-transformer';
 import {
   Equals,
   IsBoolean,
   IsEmail,
+  IsInt,
   IsNotEmpty,
-  IsNumber,
   IsString,
 } from 'class-validator';
 import { NotNull } from '../../common/validators/not-null.validator';
@@ -40,7 +41,7 @@ export class MailFeedbackDto extends BaseFeedbackDto {
   /**
    * Port of smtp server to connect to.
    */
-  @IsNumber()
+  @IsInt()
   @IsNotEmpty()
   smtpPort!: number;
 
@@ -49,6 +50,7 @@ export class MailFeedbackDto extends BaseFeedbackDto {
 
   //@ValidateIf((o: MailFeedbackDto) => o.secure)
   @NotNull()
+  @Type(() => MailFeedbackAuth)
   auth?: MailFeedbackAuth;
 
   @IsEmail()

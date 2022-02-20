@@ -1,4 +1,10 @@
-import { Equals, IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import {
+  Equals,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+} from 'class-validator';
 import { FeedbackServiceType } from '../types/feedback-service.type';
 import { BaseFeedbackDto } from './base-feedback.dto';
 
@@ -15,5 +21,6 @@ export class GithubFeedbackDto extends BaseFeedbackDto {
   accessToken!: string;
 
   @IsString()
+  @IsOptional()
   userAgent = 'TerriaJS-Bot';
 }

@@ -2,7 +2,7 @@ import {
   IsArray,
   IsBoolean,
   IsFQDN,
-  IsNumber,
+  IsInt,
   IsObject,
   IsString,
 } from 'class-validator';
@@ -15,7 +15,7 @@ export class ProxyConfigDto {
    * The largest size, in bytes, of data that the proxy will send in a POST
    * request.
    */
-  @IsNumber()
+  @IsInt()
   @NotNull()
   postSizeLimit = 102400;
 
