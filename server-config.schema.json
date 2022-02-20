@@ -405,8 +405,7 @@
         "service": {
           "type": "string",
           "enum": [
-            "gist",
-            "s3"
+            "gist"
           ],
           "not": {
             "type": "null"
@@ -450,7 +449,6 @@
         "service": {
           "type": "string",
           "enum": [
-            "gist",
             "s3"
           ],
           "not": {
