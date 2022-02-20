@@ -44,6 +44,9 @@ export class MailFeedbackDto extends BaseFeedbackDto {
   @IsNotEmpty()
   smtpPort!: number;
 
+  /**
+   * Whether authentication should be done against SMPT server.
+   */
   @IsBoolean()
   secure = false;
 
@@ -51,6 +54,9 @@ export class MailFeedbackDto extends BaseFeedbackDto {
   @NotNull()
   auth?: MailFeedbackAuth;
 
+  /**
+   * Email to which feedback will be sent.
+   */
   @IsEmail()
   email!: string;
 }
