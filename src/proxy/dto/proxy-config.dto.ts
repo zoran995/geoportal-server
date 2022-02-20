@@ -5,6 +5,7 @@ import {
   IsInt,
   IsObject,
   IsString,
+  Min,
 } from 'class-validator';
 import { isFqdnOrIp } from '../../common/validators/isFqdnOrIp.validator';
 import { NotNull } from '../../common/validators/not-null.validator';
@@ -17,6 +18,7 @@ export class ProxyConfigDto {
    */
   @IsInt()
   @NotNull()
+  @Min(0)
   postSizeLimit = 102400;
 
   /**

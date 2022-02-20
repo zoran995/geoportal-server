@@ -1,5 +1,6 @@
 import {
   Equals,
+  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -11,6 +12,7 @@ import { BaseFeedbackDto } from './base-feedback.dto';
 export class GithubFeedbackDto extends BaseFeedbackDto {
   @IsString()
   @Equals('github')
+  @IsIn(['github'])
   readonly service: FeedbackServiceType = 'github';
 
   @IsUrl()

@@ -1,4 +1,4 @@
-import { Equals, IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { Equals, IsInt, IsNotEmpty, IsString, Max, Min } from 'class-validator';
 import { NotNull } from '../../common/validators/not-null.validator';
 import { ShareType } from '../types/share.type';
 import { ShareDto } from './share.dto';
@@ -37,5 +37,7 @@ export class ShareS3Dto extends ShareDto {
    */
   @IsInt()
   @NotNull()
+  @Max(54)
+  @Min(0)
   readonly keyLength = 54;
 }
