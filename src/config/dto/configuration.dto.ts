@@ -93,14 +93,13 @@ export class ConfigurationDto {
    * true if you want to provide publicly usable URLs behind a reverse proxy For
    * more details read
    * {@link http://expressjs.com/en/guide/behind-proxies.html | express behind proxies}
-   * {@link http://expressjs.com/en/api.html#trust.proxy.options.table}
+   * {@link http://expressjs.com/en/api.html#trust.proxy.options.table | Trust proxy options}
    */
   @NotNull()
   trustProxy: boolean | string | string[] | number = false;
 
   /**
    * Configuration for serving static files.
-   * {@link ServeStaticDto}
    */
   @IsObject()
   @NotNull()
