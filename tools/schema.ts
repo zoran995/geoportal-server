@@ -14,7 +14,7 @@ const schemas = validationMetadatasToSchemas({
   classTransformerMetadataStorage: defaultMetadataStorage,
   additionalConverters: {
     isFqdnOrIp: {
-      any: [
+      anyOf: [
         {
           type: 'string',
           pattern:
@@ -36,10 +36,17 @@ const configDto = schemas.ConfigurationDto;
 delete schemas.ConfigurationDto;
 
 const output = {
-  title: 'test',
+  title: 'Geoportal-Server config schema',
   $schema: 'http://json-schema.org/draft-04/schema#',
+  additionalProperties: false,
   ...configDto,
   definitions: { ...schemas },
 };
+if (output.properties) {
+  output.properties['$schema'] = { type: 'string' };
+}
 
-writeFileSync('dist/schema.json', JSON.stringify(output, null, 2));
+writeFileSync(
+  'dist/server-config.schema.json',
+  JSON.stringify(output, null, 2),
+);

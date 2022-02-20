@@ -1,4 +1,4 @@
-import { Equals, IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { Equals, IsIn, IsNotEmpty, IsString, IsUrl } from 'class-validator';
 import { NotNull } from '../../common/validators/not-null.validator';
 import { ShareType } from '../types/share.type';
 import { ShareDto } from './share.dto';
@@ -6,6 +6,7 @@ import { ShareDto } from './share.dto';
 export class ShareGistDto extends ShareDto {
   @IsString()
   @Equals('gist')
+  @IsIn(['gist'])
   readonly service: ShareType = 'gist';
 
   /**

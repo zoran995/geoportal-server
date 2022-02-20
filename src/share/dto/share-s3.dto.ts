@@ -1,4 +1,12 @@
-import { Equals, IsInt, IsNotEmpty, IsString, Max, Min } from 'class-validator';
+import {
+  Equals,
+  IsIn,
+  IsInt,
+  IsNotEmpty,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 import { NotNull } from '../../common/validators/not-null.validator';
 import { ShareType } from '../types/share.type';
 import { ShareDto } from './share.dto';
@@ -6,6 +14,7 @@ import { ShareDto } from './share.dto';
 export class ShareS3Dto extends ShareDto {
   @IsString()
   @Equals('s3')
+  @IsIn(['s3'])
   readonly service: ShareType = 's3';
   /**
    * The AWS region

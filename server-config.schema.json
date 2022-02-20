@@ -1,6 +1,7 @@
 {
   "title": "Geoportal-Server config schema",
   "$schema": "http://json-schema.org/draft-04/schema#",
+  "additionalProperties": false,
   "properties": {
     "compressResponse": {
       "type": "boolean"
@@ -36,6 +37,9 @@
     "serveStatic": {
       "$ref": "#/definitions/ServeStaticDto",
       "type": "object"
+    },
+    "$schema": {
+      "type": "string"
     }
   },
   "type": "object",
@@ -151,12 +155,26 @@
           "minLength": 1
         },
         "smtpHost": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "((?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])[.]){3}(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])"
+            },
+            {
+              "type": "string",
+              "format": "ipv6"
+            },
+            {
+              "type": "string",
+              "format": "hostname"
+            }
+          ],
           "minLength": 1,
           "type": "string"
         },
         "smtpPort": {
-          "minLength": 1,
-          "type": "integer"
+          "type": "integer",
+          "minLength": 1
         },
         "secure": {
           "type": "boolean"
@@ -197,6 +215,8 @@
           "minLength": 1
         },
         "project_id": {
+          "exclusiveMinimum": true,
+          "minimum": 0,
           "type": "integer"
         },
         "issuesUrl": {
@@ -231,6 +251,128 @@
         "password",
         "id"
       ]
+    },
+    "FeedbackConfigDto": {
+      "properties": {
+        "primaryId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "options": {
+          "items": {
+            "$ref": "#/definitions/BaseFeedbackDto",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/GithubFeedbackDto"
+              },
+              {
+                "$ref": "#/definitions/MailFeedbackDto"
+              },
+              {
+                "$ref": "#/definitions/RedmineFeedbackDto"
+              }
+            ]
+          },
+          "type": "array",
+          "not": {
+            "type": "null"
+          }
+        }
+      },
+      "type": "object",
+      "required": [
+        "primaryId",
+        "options"
+      ]
+    },
+    "ProxyConfigDto": {
+      "properties": {
+        "postSizeLimit": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "proxyAllDomains": {
+          "type": "boolean"
+        },
+        "allowProxyFor": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "((?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])[.]){3}(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])"
+              },
+              {
+                "type": "string",
+                "format": "ipv6"
+              },
+              {
+                "type": "string",
+                "format": "hostname"
+              }
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "blacklistedAddresses": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "whitelistPath": {
+          "type": "string"
+        },
+        "blacklistPath": {
+          "type": "string"
+        },
+        "upstreamProxy": {
+          "format": "hostname",
+          "type": "string"
+        },
+        "bypassUpstreamProxyHosts": {
+          "items": {
+            "type": "boolean"
+          },
+          "type": "object"
+        },
+        "appendParamToQueryString": {
+          "type": "object"
+        },
+        "proxyAuth": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "AppendParamToQueryStringDto": {
+      "properties": {
+        "regexPattern": {
+          "type": "string"
+        },
+        "params": {
+          "type": "object"
+        }
+      },
+      "type": "object",
+      "required": [
+        "regexPattern",
+        "params"
+      ]
+    },
+    "ServeStaticDto": {
+      "properties": {
+        "serveStatic": {
+          "type": "boolean"
+        },
+        "resolvePathRelativeToWwwroot": {
+          "type": "string"
+        },
+        "resolveUnmatchedPathsWithIndexHtml": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
     },
     "ShareDto": {
       "properties": {
@@ -325,7 +467,9 @@
         },
         "credentials": {},
         "keyLength": {
-          "type": "integer"
+          "minimum": 0,
+          "type": "integer",
+          "maximum": 54
         },
         "prefix": {
           "not": {
@@ -342,127 +486,6 @@
         "bucket",
         "prefix"
       ]
-    },
-    "FeedbackConfigDto": {
-      "properties": {
-        "primaryId": {
-          "minLength": 1,
-          "type": "string"
-        },
-        "options": {
-          "items": {
-            "$ref": "#/definitions/BaseFeedbackDto",
-            "oneOf": [
-              {
-                "$ref": "#/definitions/GithubFeedbackDto"
-              },
-              {
-                "$ref": "#/definitions/MailFeedbackDto"
-              },
-              {
-                "$ref": "#/definitions/RedmineFeedbackDto"
-              }
-            ]
-          },
-          "type": "array",
-          "not": {
-            "type": "null"
-          }
-        }
-      },
-      "type": "object",
-      "required": [
-        "primaryId",
-        "options"
-      ]
-    },
-    "ProxyConfigDto": {
-      "properties": {
-        "postSizeLimit": {
-          "type": "integer"
-        },
-        "proxyAllDomains": {
-          "type": "boolean"
-        },
-        "allowProxyFor": {
-          "items": {
-            "any": [
-              {
-                "type": "string",
-                "pattern": "((?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])[.]){3}(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])"
-              },
-              {
-                "type": "string",
-                "format": "ipv6"
-              },
-              {
-                "type": "string",
-                "format": "hostname"
-              }
-            ],
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "blacklistedAddresses": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "whitelistPath": {
-          "type": "string"
-        },
-        "blacklistPath": {
-          "type": "string"
-        },
-        "upstreamProxy": {
-          "format": "hostname",
-          "type": "string"
-        },
-        "bypassUpstreamProxyHosts": {
-          "items": {
-            "type": "boolean"
-          },
-          "type": "object"
-        },
-        "appendParamToQueryString": {
-          "type": "object"
-        },
-        "proxyAuth": {
-          "type": "object"
-        }
-      },
-      "type": "object"
-    },
-    "AppendParamToQueryStringDto": {
-      "properties": {
-        "regexPattern": {
-          "type": "string"
-        },
-        "params": {
-          "type": "object"
-        }
-      },
-      "type": "object",
-      "required": [
-        "regexPattern",
-        "params"
-      ]
-    },
-    "ServeStaticDto": {
-      "properties": {
-        "serveStatic": {
-          "type": "boolean"
-        },
-        "resolvePathRelativeToWwwroot": {
-          "type": "string"
-        },
-        "resolveUnmatchedPathsWithIndexHtml": {
-          "type": "boolean"
-        }
-      },
-      "type": "object"
     },
     "ShareConfigDto": {
       "properties": {
