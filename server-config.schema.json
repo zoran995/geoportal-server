@@ -1,0 +1,539 @@
+{
+  "title": "Geoportal-Server config schema",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "properties": {
+    "compressResponse": {
+      "type": "boolean"
+    },
+    "basicAuthentication": {
+      "$ref": "#/definitions/BasicAuthenticationDto",
+      "type": "object"
+    },
+    "port": {
+      "maximum": 65535,
+      "type": "integer",
+      "minimum": 0
+    },
+    "initPaths": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "share": {
+      "$ref": "#/definitions/ShareConfigDto",
+      "type": "object"
+    },
+    "feedback": {
+      "$ref": "#/definitions/FeedbackConfigDto",
+      "type": "object"
+    },
+    "proxy": {
+      "$ref": "#/definitions/ProxyConfigDto",
+      "type": "object"
+    },
+    "trustProxy": {},
+    "serveStatic": {
+      "$ref": "#/definitions/ServeStaticDto",
+      "type": "object"
+    }
+  },
+  "type": "object",
+  "definitions": {
+    "AdditionalParametersDto": {
+      "properties": {
+        "descriptiveLabel": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "descriptiveLabel",
+        "name"
+      ]
+    },
+    "BaseFeedbackDto": {
+      "properties": {
+        "service": {
+          "minLength": 1,
+          "type": "string",
+          "enum": [
+            "github",
+            "mail",
+            "redmine"
+          ]
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "additionalParameters": {
+          "items": {
+            "$ref": "#/definitions/AdditionalParametersDto"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "service",
+        "id"
+      ]
+    },
+    "GithubFeedbackDto": {
+      "properties": {
+        "service": {
+          "type": "string",
+          "enum": [
+            "github"
+          ],
+          "minLength": 1
+        },
+        "issuesUrl": {
+          "format": "url",
+          "type": "string"
+        },
+        "accessToken": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "userAgent": {
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "additionalParameters": {
+          "items": {
+            "$ref": "#/definitions/AdditionalParametersDto"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "service",
+        "issuesUrl",
+        "accessToken",
+        "id"
+      ]
+    },
+    "MailFeedbackAuth": {
+      "properties": {
+        "user": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "pass": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "user",
+        "pass"
+      ]
+    },
+    "MailFeedbackDto": {
+      "properties": {
+        "service": {
+          "type": "string",
+          "enum": [
+            "mail"
+          ],
+          "minLength": 1
+        },
+        "smtpHost": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "smtpPort": {
+          "minLength": 1,
+          "type": "integer"
+        },
+        "secure": {
+          "type": "boolean"
+        },
+        "auth": {},
+        "email": {
+          "format": "email",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "additionalParameters": {
+          "items": {
+            "$ref": "#/definitions/AdditionalParametersDto"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "service",
+        "smtpHost",
+        "smtpPort",
+        "secure",
+        "email",
+        "id"
+      ]
+    },
+    "RedmineFeedbackDto": {
+      "properties": {
+        "service": {
+          "type": "string",
+          "enum": [
+            "redmine"
+          ],
+          "minLength": 1
+        },
+        "project_id": {
+          "type": "integer"
+        },
+        "issuesUrl": {
+          "format": "url",
+          "type": "string"
+        },
+        "username": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "password": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "additionalParameters": {
+          "items": {
+            "$ref": "#/definitions/AdditionalParametersDto"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object",
+      "required": [
+        "service",
+        "project_id",
+        "issuesUrl",
+        "username",
+        "password",
+        "id"
+      ]
+    },
+    "ShareDto": {
+      "properties": {
+        "service": {
+          "type": "string",
+          "enum": [
+            "gist",
+            "s3"
+          ],
+          "not": {
+            "type": "null"
+          }
+        },
+        "prefix": {
+          "not": {
+            "type": "null"
+          },
+          "pattern": "^[0-9a-zA-Z]+$",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "service",
+        "prefix"
+      ]
+    },
+    "ShareGistDto": {
+      "properties": {
+        "service": {
+          "type": "string",
+          "enum": [
+            "gist",
+            "s3"
+          ],
+          "not": {
+            "type": "null"
+          }
+        },
+        "apiUrl": {
+          "format": "url",
+          "type": "string"
+        },
+        "accessToken": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "userAgent": {
+          "type": "string"
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "prefix": {
+          "not": {
+            "type": "null"
+          },
+          "pattern": "^[0-9a-zA-Z]+$",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "service",
+        "apiUrl",
+        "userAgent",
+        "prefix"
+      ]
+    },
+    "ShareS3Dto": {
+      "properties": {
+        "service": {
+          "type": "string",
+          "enum": [
+            "gist",
+            "s3"
+          ],
+          "not": {
+            "type": "null"
+          }
+        },
+        "region": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "bucket": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "credentials": {},
+        "keyLength": {
+          "type": "integer"
+        },
+        "prefix": {
+          "not": {
+            "type": "null"
+          },
+          "pattern": "^[0-9a-zA-Z]+$",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "service",
+        "region",
+        "bucket",
+        "prefix"
+      ]
+    },
+    "FeedbackConfigDto": {
+      "properties": {
+        "primaryId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "options": {
+          "items": {
+            "$ref": "#/definitions/BaseFeedbackDto",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/GithubFeedbackDto"
+              },
+              {
+                "$ref": "#/definitions/MailFeedbackDto"
+              },
+              {
+                "$ref": "#/definitions/RedmineFeedbackDto"
+              }
+            ]
+          },
+          "type": "array",
+          "not": {
+            "type": "null"
+          }
+        }
+      },
+      "type": "object",
+      "required": [
+        "primaryId",
+        "options"
+      ]
+    },
+    "ProxyConfigDto": {
+      "properties": {
+        "postSizeLimit": {
+          "type": "integer"
+        },
+        "proxyAllDomains": {
+          "type": "boolean"
+        },
+        "allowProxyFor": {
+          "items": {
+            "any": [
+              {
+                "type": "string",
+                "pattern": "((?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])[.]){3}(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])"
+              },
+              {
+                "type": "string",
+                "format": "ipv6"
+              },
+              {
+                "type": "string",
+                "format": "hostname"
+              }
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "blacklistedAddresses": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "whitelistPath": {
+          "type": "string"
+        },
+        "blacklistPath": {
+          "type": "string"
+        },
+        "upstreamProxy": {
+          "format": "hostname",
+          "type": "string"
+        },
+        "bypassUpstreamProxyHosts": {
+          "items": {
+            "type": "boolean"
+          },
+          "type": "object"
+        },
+        "appendParamToQueryString": {
+          "type": "object"
+        },
+        "proxyAuth": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "AppendParamToQueryStringDto": {
+      "properties": {
+        "regexPattern": {
+          "type": "string"
+        },
+        "params": {
+          "type": "object"
+        }
+      },
+      "type": "object",
+      "required": [
+        "regexPattern",
+        "params"
+      ]
+    },
+    "ServeStaticDto": {
+      "properties": {
+        "serveStatic": {
+          "type": "boolean"
+        },
+        "resolvePathRelativeToWwwroot": {
+          "type": "string"
+        },
+        "resolveUnmatchedPathsWithIndexHtml": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "ShareConfigDto": {
+      "properties": {
+        "newPrefix": {
+          "minLength": 1,
+          "type": "string",
+          "pattern": "^[0-9a-zA-Z]+$"
+        },
+        "maxRequestSize": {
+          "type": "number"
+        },
+        "availablePrefixes": {
+          "items": {
+            "$ref": "#/definitions/ShareDto",
+            "oneOf": [
+              {
+                "$ref": "#/definitions/ShareGistDto"
+              },
+              {
+                "$ref": "#/definitions/ShareS3Dto"
+              }
+            ]
+          },
+          "type": "array",
+          "not": {
+            "type": "null"
+          }
+        }
+      },
+      "type": "object",
+      "required": [
+        "newPrefix",
+        "availablePrefixes"
+      ]
+    },
+    "RateLimitDto": {
+      "properties": {
+        "freeRetries": {
+          "type": "integer"
+        },
+        "minWait": {
+          "type": "integer"
+        },
+        "maxWait": {
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "BasicAuthenticationDto": {
+      "properties": {
+        "username": {
+          "minLength": 1,
+          "type": "string",
+          "pattern": "^[0-9a-zA-Z]+$"
+        },
+        "password": {
+          "minLength": 1,
+          "type": "string",
+          "pattern": "^[0-9a-zA-Z]+$"
+        },
+        "rateLimit": {
+          "$ref": "#/definitions/RateLimitDto",
+          "type": "object"
+        }
+      },
+      "type": "object",
+      "required": [
+        "username",
+        "password"
+      ]
+    }
+  }
+}

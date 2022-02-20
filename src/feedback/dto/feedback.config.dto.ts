@@ -12,6 +12,7 @@ import { BaseFeedbackDto } from './base-feedback.dto';
 import { GithubFeedbackDto } from './github-feedback.dto';
 import { MailFeedbackDto } from './mail-feedback.dto';
 import { RedmineFeedbackDto } from './redmine-feedback.dto';
+import { JSONSchema } from 'class-validator-jsonschema';
 
 export class FeedbackConfigDto {
   /**
@@ -38,6 +39,16 @@ export class FeedbackConfigDto {
         { value: RedmineFeedbackDto, name: 'redmine' },
       ],
     },
+  })
+  @JSONSchema({
+    items: {
+      oneOf: [
+        { $ref: '#/definitions/GithubFeedbackDto' },
+        { $ref: '#/definitions/MailFeedbackDto' },
+        { $ref: '#/definitions/RedmineFeedbackDto' },
+      ],
+    },
+    type: 'array',
   })
   options?: FeedbackServiceDtoType[];
 }

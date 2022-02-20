@@ -12,6 +12,7 @@ import { NotNull } from '../../common/validators/not-null.validator';
 import { ShareGistDto } from './share-gist.dto';
 import { ShareS3Dto } from './share-s3.dto';
 import { ShareDto } from './share.dto';
+import { JSONSchema } from 'class-validator-jsonschema';
 
 export class ShareConfigDto {
   /**
@@ -45,5 +46,14 @@ export class ShareConfigDto {
       ],
     },
   })
-  availablePrefixes?: (ShareGistDto | ShareS3Dto)[];
+  @JSONSchema({
+    items: {
+      oneOf: [
+        { $ref: '#/definitions/ShareGistDto' },
+        { $ref: '#/definitions/ShareS3Dto' },
+      ],
+    },
+    type: 'array',
+  })
+  availablePrefixes!: (ShareGistDto | ShareS3Dto)[];
 }
