@@ -103,7 +103,7 @@ describe('ShareService', () => {
 
     it('should throw a NotFoundException when there is availablePrefixes configured', async () => {
       const shareConf = { ...shareConfig };
-      shareConf.availablePrefixes = undefined;
+      shareConf.availablePrefixes = [];
       configGet.mockReturnValue(shareConf);
       try {
         await service.save({});

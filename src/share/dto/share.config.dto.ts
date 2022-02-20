@@ -12,6 +12,7 @@ import { NotNull } from '../../common/validators/not-null.validator';
 import { ShareGistDto } from './share-gist.dto';
 import { ShareS3Dto } from './share-s3.dto';
 import { ShareDto } from './share.dto';
+import { JSONSchema } from 'class-validator-jsonschema';
 
 export class ShareConfigDto {
   /**
@@ -20,7 +21,7 @@ export class ShareConfigDto {
    */
   @IsAlphanumeric()
   @IsNotEmpty()
-  newPrefix!: string;
+  newPrefix?: string;
 
   /**
    * Max payload size for share in kb.
@@ -44,6 +45,15 @@ export class ShareConfigDto {
         { value: ShareS3Dto, name: 's3' },
       ],
     },
+  })
+  @JSONSchema({
+    items: {
+      oneOf: [
+        { $ref: '#/definitions/ShareGistDto' },
+        { $ref: '#/definitions/ShareS3Dto' },
+      ],
+    },
+    type: 'array',
   })
   availablePrefixes!: (ShareGistDto | ShareS3Dto)[];
 }

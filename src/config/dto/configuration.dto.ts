@@ -1,7 +1,7 @@
 import {
   IsArray,
   IsBoolean,
-  IsNumber,
+  IsInt,
   IsObject,
   IsString,
   Max,
@@ -37,7 +37,7 @@ export class ConfigurationDto {
   /**
    * Port to listen on. Overridden by the --port command line setting.
    */
-  @IsNumber()
+  @IsInt()
   @Min(0)
   @Max(65535)
   @NotNull()

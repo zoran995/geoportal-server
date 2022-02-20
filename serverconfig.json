@@ -1,4 +1,5 @@
 {
+  "$schema": "./server-config.schema.json",
   "port": 3002,
   "initPaths": [
     "init/",

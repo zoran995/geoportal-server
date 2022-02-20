@@ -1,4 +1,11 @@
-import { IsIn, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import {
   FeedbackServiceType,
   FeedbackServiceTypeArr,
@@ -22,5 +29,7 @@ export class BaseFeedbackDto {
   readonly id!: string;
 
   @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => AdditionalParametersDto)
   readonly additionalParameters?: AdditionalParametersDto[];
 }

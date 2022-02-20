@@ -1,11 +1,15 @@
+import { Type } from 'class-transformer';
 import {
   Equals,
   IsBoolean,
   IsEmail,
+  IsIn,
+  IsInt,
   IsNotEmpty,
-  IsNumber,
+  IsPort,
   IsString,
 } from 'class-validator';
+import { isFqdnOrIp } from '../../common/validators/isFqdnOrIp.validator';
 import { NotNull } from '../../common/validators/not-null.validator';
 import { FeedbackServiceType } from '../types/feedback-service.type';
 import { BaseFeedbackDto } from './base-feedback.dto';
@@ -28,6 +32,7 @@ export class MailFeedbackAuth {
 export class MailFeedbackDto extends BaseFeedbackDto {
   @IsString()
   @Equals('mail')
+  @IsIn(['mail'])
   readonly service: FeedbackServiceType = 'mail';
 
   /**
@@ -35,13 +40,15 @@ export class MailFeedbackDto extends BaseFeedbackDto {
    */
   @IsString()
   @IsNotEmpty()
+  @isFqdnOrIp()
   smtpHost!: string;
 
   /**
    * Port of smtp server to connect to.
    */
-  @IsNumber()
+  @IsInt()
   @IsNotEmpty()
+  @IsPort()
   smtpPort!: number;
 
   /**
@@ -52,6 +59,7 @@ export class MailFeedbackDto extends BaseFeedbackDto {
 
   //@ValidateIf((o: MailFeedbackDto) => o.secure)
   @NotNull()
+  @Type(() => MailFeedbackAuth)
   auth?: MailFeedbackAuth;
 
   /**

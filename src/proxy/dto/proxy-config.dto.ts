@@ -2,9 +2,10 @@ import {
   IsArray,
   IsBoolean,
   IsFQDN,
-  IsNumber,
+  IsInt,
   IsObject,
   IsString,
+  Min,
 } from 'class-validator';
 import { isFqdnOrIp } from '../../common/validators/isFqdnOrIp.validator';
 import { NotNull } from '../../common/validators/not-null.validator';
@@ -15,8 +16,9 @@ export class ProxyConfigDto {
    * The largest size, in bytes, of data that the proxy will send in a POST
    * request.
    */
-  @IsNumber()
+  @IsInt()
   @NotNull()
+  @Min(0)
   postSizeLimit = 102400;
 
   /**
