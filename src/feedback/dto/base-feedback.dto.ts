@@ -6,11 +6,17 @@ import {
 import { AdditionalParametersDto } from './additional-parameters.dto';
 
 export class BaseFeedbackDto {
+  /**
+   * Service to use.
+   */
   @IsString()
   @IsIn(FeedbackServiceTypeArr)
   @IsNotEmpty()
   readonly service!: FeedbackServiceType;
 
+  /**
+   * Id of feedback service.
+   */
   @IsString()
   @IsNotEmpty()
   readonly id!: string;

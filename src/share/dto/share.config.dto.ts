@@ -20,7 +20,7 @@ export class ShareConfigDto {
    */
   @IsAlphanumeric()
   @IsNotEmpty()
-  newPrefix?: string;
+  newPrefix!: string;
 
   /**
    * Max payload size for share in kb.
@@ -45,5 +45,5 @@ export class ShareConfigDto {
       ],
     },
   })
-  availablePrefixes?: (ShareGistDto | ShareS3Dto)[];
+  availablePrefixes!: (ShareGistDto | ShareS3Dto)[];
 }
