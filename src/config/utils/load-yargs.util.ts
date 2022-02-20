@@ -11,9 +11,7 @@ type RemoveIndex<T> = {
 };
 type PromiseResolvedType<T> = T extends Promise<infer R> ? R : never;
 
-export type YargsConfigType = RemoveIndex<
-  PromiseResolvedType<ReturnType<typeof loadYargs>>
->;
+export type YargsConfigType = RemoveIndex<ReturnType<typeof loadYargs>>;
 
 export interface YargsConfigModuleSettings {
   /**
@@ -26,7 +24,7 @@ export interface YargsConfigModuleSettings {
   returnLastValue: boolean;
 }
 
-export async function loadYargs(
+export function loadYargs(
   options: YargsConfigModuleSettings = { returnLastValue: true },
 ) {
   const argv = yargs
@@ -80,5 +78,5 @@ export async function loadYargs(
     });
   }
 
-  return argv.parseAsync();
+  return argv.parseSync();
 }

@@ -5,12 +5,12 @@ import { validate } from './validators/config.validator';
 
 export declare type IConfigurationType = ConfigurationDto & YargsConfigType;
 
-export async function configurator(): Promise<IConfigurationType> {
-  const yargsConfig = await loadYargs();
+export function configurator(): IConfigurationType {
+  const yargsConfig = loadYargs();
   const jsonConfig = loadJsonConfig({ filePath: yargsConfig['config-file'] });
 
   const validatedJsonConfig = validate(jsonConfig);
   const config = Object.assign(validatedJsonConfig, yargsConfig);
 
-  return Promise.resolve(<any>config);
+  return config;
 }
