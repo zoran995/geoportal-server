@@ -60,7 +60,7 @@ export class FeedbackService {
       );
       try {
         if (feedbackConfig) {
-          feedback = this.feedbackServiceManager.create(feedbackConfig);
+          feedback = this.feedbackServiceManager.register(feedbackConfig);
         } else {
           throw new InternalServerErrorException();
         }

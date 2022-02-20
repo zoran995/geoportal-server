@@ -62,7 +62,7 @@ export class FeedbackServiceManager {
    * @returns Instance of feedback service
    * @throws {@link Error} Unknown feedback service specified.
    */
-  create(
+  register(
     options: FeedbackServiceDtoType,
   ): AbstractFeedbackService<FeedbackServiceDtoType> | never {
     const existFeedback = this.feedbackServices.find(

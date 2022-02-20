@@ -124,7 +124,7 @@ describe('FeedbackService', () => {
     const feedbackManagerGetSpy = jest.spyOn(feedbackServiceManager, 'get');
     const feedbackManagerCreateSpy = jest.spyOn(
       feedbackServiceManager,
-      'create',
+      'register',
     );
     mockHttpPost.mockReturnValue(of(new Observable()));
     await service.create({}, req as any);

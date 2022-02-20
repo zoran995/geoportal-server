@@ -39,7 +39,7 @@ const unknownService = {
 const mockHttpPost = jest.fn();
 
 describe('FeedbackServiceManager', () => {
-  let service: FeedbackServiceManager;
+  let serviceManager: FeedbackServiceManager;
   let httpService: HttpService;
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -54,7 +54,7 @@ describe('FeedbackServiceManager', () => {
       ],
     }).compile();
 
-    service = module.get<FeedbackServiceManager>(FeedbackServiceManager);
+    serviceManager = module.get<FeedbackServiceManager>(FeedbackServiceManager);
     httpService = module.get<HttpService>(HttpService);
   });
 
@@ -63,7 +63,7 @@ describe('FeedbackServiceManager', () => {
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(serviceManager).toBeDefined();
   });
 
   it('httpService should be defined', () => {
@@ -72,32 +72,32 @@ describe('FeedbackServiceManager', () => {
 
   describe('github', () => {
     it('successfully create service instance and stores it', async () => {
-      const feedback = service.create(githubConf);
+      const feedback = serviceManager.register(githubConf);
       expect(feedback).toBeInstanceOf(GithubFeedbackService);
-      expect(service.feedbackServices).toHaveLength(1);
+      expect(serviceManager.feedbackServices).toHaveLength(1);
     });
 
     it('keep instance stored', () => {
-      const exists = service.has(githubConf.id);
+      const exists = serviceManager.has(githubConf.id);
       expect(exists).toBe(true);
-      expect(service.feedbackServices).toHaveLength(1);
+      expect(serviceManager.feedbackServices).toHaveLength(1);
     });
 
     it('successfully resolve stored instance', () => {
-      const feedback = service.get(githubConf.id);
+      const feedback = serviceManager.get(githubConf.id);
       expect(feedback).toBeInstanceOf(GithubFeedbackService);
-      expect(service.feedbackServices).toHaveLength(1);
+      expect(serviceManager.feedbackServices).toHaveLength(1);
     });
 
     it('successfully removes stored instance', () => {
-      const removed = service.remove(githubConf.id);
+      const removed = serviceManager.remove(githubConf.id);
       expect(removed).toBeTruthy();
-      expect(service.feedbackServices).toHaveLength(0);
+      expect(serviceManager.feedbackServices).toHaveLength(0);
     });
 
     it("throws an error when getting instance of service that doesn't exist", () => {
       try {
-        const feedback = service.get(githubConf.id);
+        const feedback = serviceManager.get(githubConf.id);
         expect(feedback).toBeUndefined();
       } catch (err: any) {
         expect(err).toBeDefined();
@@ -107,33 +107,33 @@ describe('FeedbackServiceManager', () => {
   });
 
   it('successfully create service instance and stores it', async () => {
-    const feedback = service.create(mailConf);
+    const feedback = serviceManager.register(mailConf);
     expect(feedback).toBeInstanceOf(MailFeedbackService);
-    expect(service.feedbackServices).toHaveLength(1);
+    expect(serviceManager.feedbackServices).toHaveLength(1);
   });
 
   it('successfully create service instance and stores it', async () => {
-    const feedback = service.create(redmineConf);
+    const feedback = serviceManager.register(redmineConf);
     expect(feedback).toBeInstanceOf(RedmineFeedbackService);
-    expect(service.feedbackServices).toHaveLength(2);
+    expect(serviceManager.feedbackServices).toHaveLength(2);
   });
 
   it("return false when removing service that doesn't exist", () => {
-    const removed = service.remove(githubConf.id);
+    const removed = serviceManager.remove(githubConf.id);
     expect(removed).toBe(false);
-    expect(service.feedbackServices).toHaveLength(2);
+    expect(serviceManager.feedbackServices).toHaveLength(2);
   });
 
   it('successfully recreates service instance', () => {
-    expect(service.feedbackServices).toHaveLength(2);
-    const feedback = service.create(mailConf);
+    expect(serviceManager.feedbackServices).toHaveLength(2);
+    const feedback = serviceManager.register(mailConf);
     expect(feedback).toBeInstanceOf(MailFeedbackService);
-    expect(service.feedbackServices).toHaveLength(2);
+    expect(serviceManager.feedbackServices).toHaveLength(2);
   });
 
   it('throws an error on unknown service type', () => {
     try {
-      const feedback = service.create(unknownService as any);
+      const feedback = serviceManager.register(unknownService as any);
       expect(feedback).toBeUndefined();
     } catch (err: any) {
       expect(err).toBeDefined();
