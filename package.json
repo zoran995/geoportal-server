@@ -48,7 +48,7 @@
     "@nestjs/serve-static": "2.2.2",
     "@nestjs/swagger": "5.2.0",
     "axios": "git://github.com/zoran995/axios.git#geoportal",
-    "base-x": "3.0.9",
+    "base-x": "4.0.0",
     "class-transformer": "0.5.1",
     "class-validator": "0.13.2",
     "compression": "1.7.4",
