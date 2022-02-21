@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+import sanitize from 'sanitize-filename';
 import { HttpExceptionFilter } from '../common/filters/http-exception.filter';
 import { GetInitDto } from './dto/get-init.dto';
 import { InitService } from './init.service';
@@ -30,7 +31,8 @@ export class InitController {
     @Param() params: GetInitDto,
     @Res() res: Response,
   ): Promise<any> {
-    const filePath = this.initService.getFilePath(params.fileName);
+    const fileName = sanitize(params.fileName);
+    const filePath = this.initService.getFilePath(fileName);
     if (!filePath) {
       throw new NotFoundException();
     }

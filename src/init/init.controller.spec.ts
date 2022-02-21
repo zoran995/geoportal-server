@@ -12,6 +12,7 @@ import { InitService } from './init.service';
 jest.mock('fs');
 
 vol.fromJSON({
+  './test/serverconfig.json': 'server config',
   './test/init/init.json': 'hello init',
   './test/init/init1/init1.json': 'hello init 1',
   './test/init/init2/init2.json': 'hello init 2',
@@ -29,6 +30,7 @@ const responseMock = createMock<Response>();
 
 describe('InitController', () => {
   let controller: InitController;
+  let initService: InitService;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [LoggerModule],
@@ -44,6 +46,7 @@ describe('InitController', () => {
     }).compile();
 
     controller = module.get<InitController>(InitController);
+    initService = module.get<InitService>(InitService);
   });
 
   afterEach(() => {
@@ -52,6 +55,21 @@ describe('InitController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
+  });
+
+  it('should sanitize filename', async () => {
+    expect.assertions(3);
+    const getFilePathSpy = jest.spyOn(initService, 'getFilePath');
+    try {
+      await controller.serveInitFile(
+        { fileName: '../serverconfig.json' },
+        responseMock,
+      );
+    } catch (error) {
+      expect(getFilePathSpy).toHaveBeenCalledWith('..serverconfig.json');
+      expect(responseMock.sendFile).toBeCalledTimes(0);
+      expect(error).toBeInstanceOf(NotFoundException);
+    }
   });
 
   it('should return file', async () => {
