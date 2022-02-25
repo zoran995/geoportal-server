@@ -48,5 +48,5 @@ export class ShareS3Dto extends ShareDto {
   @NotNull()
   @Max(54)
   @Min(0)
-  readonly keyLength = 54;
+  readonly keyLength: number = 54;
 }

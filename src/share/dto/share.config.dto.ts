@@ -28,7 +28,7 @@ export class ShareConfigDto {
    */
   @IsNumber()
   @NotNull()
-  maxRequestSize = 200;
+  maxRequestSize: number = 200;
 
   /**
    * List of available configurations for share urls.

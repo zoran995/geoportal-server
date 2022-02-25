@@ -2,6 +2,7 @@ import {
   IsArray,
   IsBoolean,
   IsInt,
+  IsNumber,
   IsObject,
   IsString,
   Max,
@@ -27,7 +28,7 @@ export class ConfigurationDto {
    */
   @IsBoolean()
   @NotNull()
-  compressResponse = true;
+  compressResponse: boolean = true;
 
   @IsObject()
   @NotNull()
@@ -41,7 +42,7 @@ export class ConfigurationDto {
   @Min(0)
   @Max(65535)
   @NotNull()
-  port = 3001;
+  port: number = 3001;
 
   /**
    * List of directories where init (catalog) files will be sought, before

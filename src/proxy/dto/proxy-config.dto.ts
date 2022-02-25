@@ -19,7 +19,7 @@ export class ProxyConfigDto {
   @IsInt()
   @NotNull()
   @Min(0)
-  postSizeLimit = 102400;
+  postSizeLimit: number = 102400;
 
   /**
    * If this setting is true, the allowProxyFor list is ignored, and all
@@ -27,7 +27,7 @@ export class ProxyConfigDto {
    */
   @IsBoolean()
   @NotNull()
-  proxyAllDomains = false;
+  proxyAllDomains: boolean = false;
 
   /**
    * List of domains which the server is willing to proxy for. Subdomains are
