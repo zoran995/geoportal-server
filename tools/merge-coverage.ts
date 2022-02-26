@@ -9,7 +9,7 @@ import { createCoverageMap } from 'istanbul-lib-coverage';
 import libReport from 'istanbul-lib-report';
 import reports from 'istanbul-reports';
 
-main().catch((err) => {
+main().catch(() => {
   process.exit(1);
 });
 
