@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import fs from 'fs';
 import * as path from 'path';
 import { WWWROOT_TOKEN } from '../config/app-config.module';
-import { IConfigurationType } from '../config/configurator';
+import { IConfigurationType } from '../config/config-loader';
 
 @Injectable()
 export class InitService {

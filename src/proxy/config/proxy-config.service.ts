@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IConfigurationType } from '../../config/configurator';
+import { IConfigurationType } from '../../config/config-loader';
 import { BasicAuthenticationDto } from '../../config/dto/basic-authentication.dto';
 import { ProxyConfigDto } from '../dto/proxy-config.dto';
 

@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import fs from 'fs';
 import { vol } from 'memfs';
 import * as path from 'path';
-import { IConfigurationType } from 'src/config/configurator';
+import { IConfigurationType } from '../config/config-loader';
 import { LoggerModule } from '../common/logger/logger.module';
 import { WWWROOT_TOKEN } from '../config/app-config.module';
 import { InitService } from './init.service';
