@@ -1,7 +1,7 @@
 const mockLoadJsonConfig = jest.fn();
 const mockLoadYargs = jest.fn();
 
-import { configurator } from './configurator';
+import { configurator } from './config-loader';
 import { DEFAULT_CONFIG_LOCATION } from './utils/load-yargs.util';
 
 jest.mock('./utils/load-json-config.util', () => ({
