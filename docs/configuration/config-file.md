@@ -1,7 +1,6 @@
 # Config file
 
-Config file contains all sever-side configuration parameters. Default name of
-the file is `server-config.json` and is located in the root process directory.
+Config file contains all sever-side configuration parameters. Default name of the file is `server-config.json` and is located in the root process directory.
 Another name and configuration location can be specified using [`config-file`
 command line argument](./command-line-arguments.md#config-file).
 
