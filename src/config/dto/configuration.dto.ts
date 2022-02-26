@@ -2,7 +2,6 @@ import {
   IsArray,
   IsBoolean,
   IsInt,
-  IsNumber,
   IsObject,
   IsString,
   Max,
