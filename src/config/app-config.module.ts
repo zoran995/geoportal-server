@@ -12,6 +12,8 @@ export const WWWROOT_TOKEN = 'wwwroot';
     ConfigModule.forRoot({
       load: [configurator],
       isGlobal: true,
+      ignoreEnvFile: true,
+      ignoreEnvVars: true,
     }),
     ProxyModule,
   ],
