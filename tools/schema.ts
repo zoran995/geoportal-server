@@ -1,3 +1,12 @@
+import {
+  IS_BOOLEAN,
+  IS_INT,
+  IS_NUMBER,
+  IS_POSITIVE,
+  IS_URL,
+  MAX,
+  MIN,
+} from 'class-validator';
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
 import { writeFileSync } from 'fs';
 export { ConfigurationDto } from '../src/config/dto/configuration.dto';
@@ -25,10 +34,41 @@ const schemas = validationMetadatasToSchemas({
           format: 'ipv6',
         },
         { type: 'string', format: 'hostname' },
+        { type: 'string', pattern: '^\\$.*' },
       ],
     },
     ArrayContainsObjectKey: {},
-    IS_URL: { format: 'uri', pattern: '^(https?|wss?|ftp)://' },
+    [IS_URL]: {
+      oneOf: [
+        { format: 'uri', pattern: '^(https?|wss?|ftp)://' },
+        { type: 'string', pattern: '^\\$.*' },
+      ],
+    },
+    [IS_INT]: {
+      oneOf: [{ type: 'integer' }, { type: 'string', pattern: '^\\$.*' }],
+    },
+    [IS_NUMBER]: {
+      oneOf: [{ type: 'number' }, { type: 'string', pattern: '^\\$.*' }],
+    },
+    [IS_POSITIVE]: {
+      minimum: 0,
+      exclusiveMinimum: true,
+    },
+    [MIN]: (meta) => ({
+      oneOf: [
+        { minimum: meta.constraints[0] },
+        { type: 'string', pattern: '^\\$.*' },
+      ],
+    }),
+    [MAX]: (meta) => ({
+      oneOf: [
+        { maximum: meta.constraints[0] },
+        { type: 'string', pattern: '^\\$.*' },
+      ],
+    }),
+    [IS_BOOLEAN]: {
+      oneOf: [{ type: 'boolean' }, { type: 'string', pattern: '^\\$.*' }],
+    },
   },
 });
 
