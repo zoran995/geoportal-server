@@ -2380,10 +2380,10 @@ aws-sdk-client-mock@0.6.2:
     sinon "^11.1.1"
     tslib "^2.1.0"
 
-axios@0.26.0, "axios@git://github.com/zoran995/axios.git#geoportal":
+axios@0.26.0, "axios@github:zoran995/axios.git#geoportal":
   version "0.26.0"
   uid "92eb2c86affcf42bf433cf79949440e738bfca28"
-  resolved "git://github.com/zoran995/axios.git#92eb2c86affcf42bf433cf79949440e738bfca28"
+  resolved "https://codeload.github.com/zoran995/axios/tar.gz/92eb2c86affcf42bf433cf79949440e738bfca28"
   dependencies:
     follow-redirects "^1.14.8"
 
