@@ -3,9 +3,9 @@ import {
   IsIn,
   IsInt,
   IsNotEmpty,
-  IsPositive,
   IsString,
   IsUrl,
+  Min,
 } from 'class-validator';
 import { FeedbackServiceType } from '../types/feedback-service.type';
 import { BaseFeedbackDto } from './base-feedback.dto';
@@ -20,7 +20,7 @@ export class RedmineFeedbackDto extends BaseFeedbackDto {
    * Id of redmine project.
    */
   @IsInt()
-  @IsPositive()
+  @Min(1)
   project_id!: number;
 
   /**

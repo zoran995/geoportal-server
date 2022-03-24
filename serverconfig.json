@@ -1,6 +1,6 @@
 {
   "$schema": "./server-config.schema.json",
-  "port": 3002,
+  "port": "${port:-3002}",
   "initPaths": [
     "init/",
     "init2/",
@@ -28,8 +28,8 @@
       {
         "service": "github",
         "id": "g1",
-        "accessToken": "",
-        "issuesUrl": ""
+        "accessToken": "${accessToken}",
+        "issuesUrl": "${issuesUrl}"
       }
     ]
   }

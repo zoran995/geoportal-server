@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProxyModule } from '../proxy/proxy.module';
-import { configurator } from './configurator';
+import { ConfigLoader } from './config-loader';
 import { ServerConfigController } from './server-config.controller';
 
 export const WWWROOT_TOKEN = 'wwwroot';
@@ -10,8 +10,10 @@ export const WWWROOT_TOKEN = 'wwwroot';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [configurator],
+      load: [ConfigLoader.load],
       isGlobal: true,
+      ignoreEnvFile: true,
+      ignoreEnvVars: true,
     }),
     ProxyModule,
   ],

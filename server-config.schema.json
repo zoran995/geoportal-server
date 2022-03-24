@@ -4,16 +4,32 @@
   "additionalProperties": false,
   "properties": {
     "compressResponse": {
-      "type": "boolean"
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string",
+          "pattern": "^\\$.*"
+        }
+      ]
     },
     "basicAuthentication": {
       "$ref": "#/definitions/BasicAuthenticationDto",
       "type": "object"
     },
     "port": {
-      "maximum": 65535,
-      "type": "integer",
-      "minimum": 0
+      "oneOf": [
+        {
+          "maximum": 65535,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "string",
+          "pattern": "^\\$.*"
+        }
+      ]
     },
     "initPaths": {
       "items": {
@@ -99,8 +115,16 @@
           "minLength": 1
         },
         "issuesUrl": {
-          "format": "url",
-          "type": "string"
+          "oneOf": [
+            {
+              "format": "uri",
+              "pattern": "^(https?|wss?|ftp)://"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
+            }
+          ]
         },
         "accessToken": {
           "minLength": 1,
@@ -167,17 +191,38 @@
             {
               "type": "string",
               "format": "hostname"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
             }
           ],
           "minLength": 1,
           "type": "string"
         },
         "smtpPort": {
-          "type": "integer",
-          "minLength": 1
+          "type": "string",
+          "minLength": 1,
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
+            }
+          ]
         },
         "secure": {
-          "type": "boolean"
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
+            }
+          ]
         },
         "auth": {},
         "email": {
@@ -215,13 +260,28 @@
           "minLength": 1
         },
         "project_id": {
-          "exclusiveMinimum": true,
-          "minimum": 0,
-          "type": "integer"
+          "oneOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
+            }
+          ]
         },
         "issuesUrl": {
-          "format": "url",
-          "type": "string"
+          "oneOf": [
+            {
+              "format": "uri",
+              "pattern": "^(https?|wss?|ftp)://"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
+            }
+          ]
         },
         "username": {
           "minLength": 1,
@@ -288,11 +348,27 @@
     "ProxyConfigDto": {
       "properties": {
         "postSizeLimit": {
-          "minimum": 0,
-          "type": "integer"
+          "oneOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
+            }
+          ]
         },
         "proxyAllDomains": {
-          "type": "boolean"
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
+            }
+          ]
         },
         "allowProxyFor": {
           "items": {
@@ -308,6 +384,10 @@
               {
                 "type": "string",
                 "format": "hostname"
+              },
+              {
+                "type": "string",
+                "pattern": "^\\$.*"
               }
             ],
             "type": "string"
@@ -332,7 +412,15 @@
         },
         "bypassUpstreamProxyHosts": {
           "items": {
-            "type": "boolean"
+            "oneOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "string",
+                "pattern": "^\\$.*"
+              }
+            ]
           },
           "type": "object"
         },
@@ -363,13 +451,29 @@
     "ServeStaticDto": {
       "properties": {
         "serveStatic": {
-          "type": "boolean"
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
+            }
+          ]
         },
         "resolvePathRelativeToWwwroot": {
           "type": "string"
         },
         "resolveUnmatchedPathsWithIndexHtml": {
-          "type": "boolean"
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
+            }
+          ]
         }
       },
       "type": "object"
@@ -412,8 +516,16 @@
           }
         },
         "apiUrl": {
-          "format": "url",
-          "type": "string"
+          "oneOf": [
+            {
+              "format": "uri",
+              "pattern": "^(https?|wss?|ftp)://"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
+            }
+          ]
         },
         "accessToken": {
           "minLength": 1,
@@ -465,9 +577,17 @@
         },
         "credentials": {},
         "keyLength": {
-          "minimum": 0,
-          "type": "integer",
-          "maximum": 54
+          "oneOf": [
+            {
+              "minimum": 0,
+              "maximum": 54,
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
+            }
+          ]
         },
         "prefix": {
           "not": {
@@ -493,7 +613,15 @@
           "pattern": "^[0-9a-zA-Z]+$"
         },
         "maxRequestSize": {
-          "type": "number"
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
+            }
+          ]
         },
         "availablePrefixes": {
           "items": {
@@ -522,13 +650,37 @@
     "RateLimitDto": {
       "properties": {
         "freeRetries": {
-          "type": "integer"
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
+            }
+          ]
         },
         "minWait": {
-          "type": "integer"
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
+            }
+          ]
         },
         "maxWait": {
-          "type": "integer"
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
+            }
+          ]
         }
       },
       "type": "object"

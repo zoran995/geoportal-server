@@ -45,6 +45,23 @@ export function loadYargs(
       description: 'Run a public server that listens on all interfaces.',
       boolean: true,
     })
+    .option('ignore-env-file', {
+      type: 'string',
+      description: 'If "true", environment files (`.env`) will be ignored.',
+      default: false,
+    })
+    .option('ignore-env-vars', {
+      type: 'string',
+      description:
+        'If "true", predefined environment variables will be ignored',
+      default: false,
+    })
+    .option('env-file-path', {
+      type: 'string',
+      description:
+        'Path to .env file to be load. Not used if ignore-env-file=false',
+      default: undefined,
+    })
     .option('config-file', {
       type: 'string',
       description:

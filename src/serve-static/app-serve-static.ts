@@ -8,7 +8,7 @@ import { existsSync } from 'fs';
 import path, { extname } from 'path';
 import { isDefined } from '../common/helpers/isDefined';
 import { WWWROOT_TOKEN } from '../config/app-config.module';
-import { IConfigurationType } from '../config/configurator';
+import { IConfigurationType } from '../config/config-loader';
 import { ServeStaticDto } from '../serve-static/dto/serve-static.dto';
 
 @Injectable()
