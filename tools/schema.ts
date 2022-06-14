@@ -9,12 +9,12 @@ import {
 } from 'class-validator';
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
 import { writeFileSync } from 'fs';
-export { ConfigurationDto } from '../src/config/dto/configuration.dto';
-export { GithubFeedbackDto } from '../src/feedback/dto/github-feedback.dto';
-export { MailFeedbackDto } from '../src/feedback/dto/mail-feedback.dto';
-export { RedmineFeedbackDto } from '../src/feedback/dto/redmine-feedback.dto';
-export { ShareGistDto } from '../src/share/dto/share-gist.dto';
-export { ShareS3Dto } from '../src/share/dto/share-s3.dto';
+export { ConfigurationDto } from 'src/infrastructure/config/dto/configuration.dto';
+export { GithubFeedbackDto } from 'src/modules/feedback/dto/github-feedback.dto';
+export { MailFeedbackDto } from 'src/modules/feedback/dto/mail-feedback.dto';
+export { RedmineFeedbackDto } from 'src/modules/feedback/dto/redmine-feedback.dto';
+export { ShareGistDto } from 'src/modules/share/dto/share-gist.dto';
+export { ShareS3Dto } from 'src/modules/share/dto/share-s3.dto';
 // needed for properly resolving @Type decorators
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { defaultMetadataStorage } = require('class-transformer/cjs/storage'); // See https://github.com/typestack/class-transformer/issues/563 for alternatives

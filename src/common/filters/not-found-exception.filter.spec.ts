@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DirectoryJSON, fs, vol } from 'memfs';
 import path from 'path';
-import { ServeStaticDto } from '../../serve-static/dto/serve-static.dto';
+import { ServeStaticDto } from 'src/infrastructure/serve-static/dto/serve-static.dto';
 import { HttpExceptionFilter } from './http-exception.filter';
 import { NotFoundExceptionFilter } from './not-found-exception.filter';
 jest.mock('fs');

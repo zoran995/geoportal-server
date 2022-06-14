@@ -6,15 +6,16 @@ import {
 } from '@nestjs/common';
 import { LoggerModule } from './common/logger/logger.module';
 import { HttpLoggerMiddleware } from './common/middleware/http-logger.middleware';
-import { AppConfigModule } from './config/app-config.module';
-import { FeedbackModule } from './feedback/feedback.module';
-import { AppHttpModule } from './http/app-http.module';
-import { InitModule } from './init/init.module';
-import { PingModule } from './ping/ping.module';
-import { Proj4Module } from './proj4/proj4.module';
-import { ProxyModule } from './proxy/proxy.module';
-import { AppServeStaticModule } from './serve-static/app-serve-static.module';
-import { ShareModule } from './share/share.module';
+import { AppConfigModule } from './infrastructure/config/app-config.module';
+import { AppHttpModule } from './infrastructure/http/app-http.module';
+import { AppServeStaticModule } from './infrastructure/serve-static/app-serve-static.module';
+import { FeedbackModule } from './modules/feedback/feedback.module';
+import { InitModule } from './modules/init/init.module';
+import { PingModule } from './modules/ping/ping.module';
+import { Proj4Module } from './modules/proj4/proj4.module';
+import { ProxyModule } from './modules/proxy/proxy.module';
+import { ServerConfigModule } from './modules/server-config/server-config.module';
+import { ShareModule } from './modules/share/share.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ShareModule } from './share/share.module';
     AppServeStaticModule,
     PingModule,
     Proj4Module,
+    ServerConfigModule,
   ],
 })
 export class AppModule implements NestModule {
