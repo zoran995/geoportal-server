@@ -8,7 +8,7 @@ import { LoggerModule } from './common/logger/logger.module';
 import { HttpLoggerMiddleware } from './common/middleware/http-logger.middleware';
 import { AppConfigModule } from './config/app-config.module';
 import { FeedbackModule } from './feedback/feedback.module';
-import { CustomHttpModule } from './http/custom-http.module';
+import { AppHttpModule } from './http/app-http.module';
 import { InitModule } from './init/init.module';
 import { PingModule } from './ping/ping.module';
 import { Proj4Module } from './proj4/proj4.module';
@@ -19,7 +19,7 @@ import { ShareModule } from './share/share.module';
 @Module({
   imports: [
     LoggerModule,
-    CustomHttpModule,
+    AppHttpModule,
     AppConfigModule,
     InitModule,
     ShareModule,

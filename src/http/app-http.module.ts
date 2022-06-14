@@ -1,3 +1,4 @@
+import { AppHttpService } from './app-http.service';
 import { HttpModule as BaseHttpModule } from '@nestjs/axios';
 import { Global, Module } from '@nestjs/common';
 import http from 'http';
@@ -19,7 +20,7 @@ const agentConfig: https.AgentOptions = {
       httpsAgent: new https.Agent(agentConfig),
     }),
   ],
-  providers: [AxiosLogInterceptor],
-  exports: [BaseHttpModule],
+  providers: [AxiosLogInterceptor, AppHttpService],
+  exports: [BaseHttpModule, AppHttpService],
 })
-export class CustomHttpModule extends BaseHttpModule {}
+export class AppHttpModule extends BaseHttpModule {}
