@@ -43,6 +43,7 @@ describe('AwsSdkService', () => {
     });
 
     it('should properly handle error', async () => {
+      expect.assertions(1);
       const value = {
         message: 'fake error',
       };
@@ -73,6 +74,7 @@ describe('AwsSdkService', () => {
     });
 
     it('should properly handle error while resolving', async () => {
+      expect.assertions(1);
       const value = {
         message: 'fake error',
       };

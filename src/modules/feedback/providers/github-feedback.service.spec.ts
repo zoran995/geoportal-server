@@ -76,12 +76,13 @@ describe('GithubFeedbackService', () => {
   });
 
   it('should throw an InternalServerErrorException', async () => {
+    expect.assertions(4);
     const headers = {
       'User-Agent': 'TerriaJS-Bot',
       Accept: 'application/vnd.github.v3+json',
       Authorization: `Token ${githubFeedbackConfig.accessToken}`,
     };
-    mockHttpPost.mockReturnValue(throwError({}));
+    mockHttpPost.mockReturnValue(throwError(() => new Error('test error')));
 
     try {
       await service.post({}, req as any);

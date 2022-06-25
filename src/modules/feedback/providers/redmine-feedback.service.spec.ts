@@ -71,12 +71,13 @@ describe('RedmineFeedbackService', () => {
   });
 
   it('should throw an InternalServerErrorException', async () => {
+    expect.assertions(3);
     const auth = {
       username: redmineConf.username,
       password: redmineConf.password,
     };
 
-    mockHttpPost.mockReturnValue(throwError({}));
+    mockHttpPost.mockReturnValue(throwError(() => new Error('test error')));
 
     try {
       await service.post({}, req as any);

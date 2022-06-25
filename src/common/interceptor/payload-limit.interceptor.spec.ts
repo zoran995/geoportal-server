@@ -31,6 +31,7 @@ describe('PayloadLimitInterceptor', () => {
     expect(interceptor).toBeDefined();
   });
   it('should block request when limit exceeded', () => {
+    expect.assertions(1);
     const mockExecutionContext = createExecutionContextMock(150);
     try {
       interceptor.intercept(mockExecutionContext, next);

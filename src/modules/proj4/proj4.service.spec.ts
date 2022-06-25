@@ -25,6 +25,7 @@ describe('Proj4Service', () => {
   });
 
   it('throws BadRequestException on non number code', function () {
+    expect.assertions(1);
     try {
       service.getDefinition(NaN);
     } catch (err) {
@@ -33,6 +34,7 @@ describe('Proj4Service', () => {
   });
 
   it('throws NotFoundException on unknown code', function () {
+    expect.assertions(1);
     try {
       const code = 999999;
       service.getDefinition(code);

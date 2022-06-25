@@ -65,6 +65,7 @@ describe('MailFeedbackService', () => {
   });
 
   it('should throw an error InternalServerErrorException', async () => {
+    expect.assertions(1);
     sendMailMock.mockReturnValue(Promise.reject('test sending email failed'));
     nodemailer.createTransport.mockReturnValue({ sendMail: sendMailMock });
     try {

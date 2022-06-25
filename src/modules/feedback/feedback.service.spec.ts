@@ -95,6 +95,7 @@ describe('FeedbackService', () => {
   });
 
   it('should throw a NotFoundException when no primary key', async () => {
+    expect.assertions(1);
     const feedbackConf = { ...feedbackConfig };
     feedbackConf.primaryId = undefined;
     configGet.mockReturnValue(feedbackConf);
@@ -106,6 +107,7 @@ describe('FeedbackService', () => {
   });
 
   it("should throw an InternalServerErrorException when corresponding feedback doesn't exist", async () => {
+    expect.assertions(1);
     const feedbackConf = { ...feedbackConfig };
     feedbackConf.primaryId = 'test1';
     configGet.mockReturnValue(feedbackConf);
@@ -142,6 +144,7 @@ describe('FeedbackService', () => {
   });
 
   it('should throw InternalServerErrorException when unknown service', async () => {
+    expect.assertions(1);
     const feedbackConf = { ...feedbackConfig };
     (<any>feedbackConf.options)[0].service = 'test';
     configGet.mockReturnValue(feedbackConf);
