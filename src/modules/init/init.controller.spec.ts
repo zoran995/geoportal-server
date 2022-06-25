@@ -1,5 +1,5 @@
 import { createMock } from '@golevelup/ts-jest';
-import { HttpStatus, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Response } from 'express';
@@ -81,14 +81,14 @@ describe('InitController', () => {
   });
 
   it('should return 404 - file not found', async () => {
+    expect.assertions(2);
     try {
       await controller.serveInitFile(
         { fileName: 'init-not-found.json' },
         responseMock,
       );
-      expect(responseMock.sendFile).toBeCalledTimes(0);
-      expect(responseMock.status).toBe(HttpStatus.NOT_FOUND);
     } catch (error) {
+      expect(responseMock.sendFile).toBeCalledTimes(0);
       expect(error).toBeInstanceOf(NotFoundException);
     }
   });

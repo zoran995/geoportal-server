@@ -91,6 +91,7 @@ describe('ShareService', () => {
 
   describe('save', () => {
     it('should throw a NotFoundException when newPrefix is not specified in config', async () => {
+      expect.assertions(1);
       const shareConf = { ...shareConfig };
       shareConf.newPrefix = undefined;
       configGet.mockReturnValue(shareConf);
@@ -102,6 +103,7 @@ describe('ShareService', () => {
     });
 
     it('should throw a NotFoundException when there is availablePrefixes configured', async () => {
+      expect.assertions(1);
       const shareConf = { ...shareConfig };
       shareConf.availablePrefixes = [];
       configGet.mockReturnValue(shareConf);
@@ -146,6 +148,7 @@ describe('ShareService', () => {
 
   describe('resolve', () => {
     it('throws an error when id is in form prefix-id', async () => {
+      expect.assertions(2);
       let result;
       try {
         result = await service.resolve('testId');
@@ -164,6 +167,7 @@ describe('ShareService', () => {
     });
 
     it('throws a NotFoundException on unknown prefix ', async () => {
+      expect.assertions(2);
       const data = { files: [{ content: 'test' }] };
       configGet.mockReturnValue(shareConfig);
       mockHttpGet.mockReturnValue(of({ data }));
@@ -201,6 +205,7 @@ describe('ShareService', () => {
   });
 
   it('should throw InternalServerErrorException when unknown service', async () => {
+    expect.assertions(1);
     const shareConf = { ...shareConfig };
     if (shareConf.availablePrefixes) {
       (<any>shareConf.availablePrefixes[0]).service = 'test';

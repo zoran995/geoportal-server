@@ -104,20 +104,24 @@ describe('ShareServiceManager', () => {
   });
 
   it("throws an error when getting instance of service that doesn't exist", () => {
+    expect.assertions(3);
+    let share;
     try {
-      const share = service.get(gistConf.prefix);
-      expect(share).toBeUndefined();
+      share = service.get(gistConf.prefix);
     } catch (err: any) {
+      expect(share).toBeUndefined();
       expect(err).toBeDefined();
       expect(JSON.stringify(err.message)).toContain(gistConf.prefix);
     }
   });
 
   it('throws an error on unknown service type', () => {
+    expect.assertions(3);
+    let share;
     try {
-      const share = service.create(unknownService as any);
-      expect(share).toBeUndefined();
+      share = service.create(unknownService as any);
     } catch (err: any) {
+      expect(share).toBeUndefined();
       expect(err).toBeDefined();
       expect(JSON.stringify(err.message)).toContain(unknownService.service);
     }

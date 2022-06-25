@@ -161,6 +161,7 @@ describe('ProxyService', () => {
   });
 
   it('blocks a domain not on allowedProxy list ', async () => {
+    expect.assertions(2);
     try {
       await sendRequest('http://example2.com');
     } catch (err) {
@@ -180,6 +181,7 @@ describe('ProxyService', () => {
   });
 
   it('should block address on blacklist', async () => {
+    expect.assertions(2);
     try {
       await sendRequest('http://192.163.0.1:8080/test');
     } catch (err) {
@@ -189,6 +191,7 @@ describe('ProxyService', () => {
   });
 
   it('should block address on blacklist even when proxyAllDomains is true', async () => {
+    expect.assertions(2);
     try {
       await sendRequest('http://192.163.0.1:8080/test');
     } catch (err) {
@@ -375,6 +378,7 @@ describe('ProxyService', () => {
     });
 
     it('should not try again without auth when another exception', async () => {
+      expect.assertions(3);
       const auth = {
         authorization: 'testauth',
       };
@@ -388,9 +392,8 @@ describe('ProxyService', () => {
         );
         mockConfigReturnValue({}, proxyConf);
         await sendRequest(url);
-
-        expect(mockHttpRequest).toHaveBeenCalledTimes(1);
       } catch (err) {
+        expect(mockHttpRequest).toHaveBeenCalledTimes(1);
         expect(err).toBeInstanceOf(NotFoundException);
         expect(mockHttpRequest).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -731,6 +734,7 @@ describe('ProxyService', () => {
       jest.clearAllMocks();
     });
     it('interpret NotFoundException exception', async () => {
+      expect.assertions(1);
       mockHttpRequest.mockReturnValueOnce(
         throwError(() => new NotFoundException()),
       );
@@ -742,6 +746,7 @@ describe('ProxyService', () => {
     });
 
     it('catch ECONNREFUSED', async () => {
+      expect.assertions(2);
       mockHttpRequest.mockReturnValueOnce(
         throwError(() => ({
           code: 'ECONNREFUSED',
@@ -757,6 +762,7 @@ describe('ProxyService', () => {
     });
 
     it('catch error status and message', async () => {
+      expect.assertions(4);
       mockHttpRequest.mockReturnValueOnce(
         throwError(() => ({
           response: {
@@ -776,6 +782,7 @@ describe('ProxyService', () => {
     });
 
     it('catch error statusCode and message', async () => {
+      expect.assertions(4);
       mockHttpRequest.mockReturnValueOnce(
         throwError(() => ({
           response: {
@@ -795,6 +802,7 @@ describe('ProxyService', () => {
     });
 
     it('should skip when status code is incorrect', async () => {
+      expect.assertions(2);
       mockHttpRequest.mockReturnValueOnce(
         throwError(() => ({
           response: {
@@ -812,6 +820,7 @@ describe('ProxyService', () => {
     });
 
     it('should throw InternalServerErrorException on general error', async () => {
+      expect.assertions(2);
       mockHttpRequest.mockReturnValueOnce(
         throwError(() => new Error('error-proxy-test')),
       );

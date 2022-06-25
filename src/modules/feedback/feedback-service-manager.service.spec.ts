@@ -96,10 +96,12 @@ describe('FeedbackServiceManager', () => {
     });
 
     it("throws an error when getting instance of service that doesn't exist", () => {
+      expect.assertions(3);
+      let feedback;
       try {
-        const feedback = serviceManager.get(githubConf.id);
-        expect(feedback).toBeUndefined();
+        feedback = serviceManager.get(githubConf.id);
       } catch (err: any) {
+        expect(feedback).toBeUndefined();
         expect(err).toBeDefined();
         expect(JSON.stringify(err.message)).toContain(githubConf.id);
       }
@@ -132,10 +134,12 @@ describe('FeedbackServiceManager', () => {
   });
 
   it('throws an error on unknown service type', () => {
+    expect.assertions(3);
+    let feedback;
     try {
-      const feedback = serviceManager.register(unknownService as any);
-      expect(feedback).toBeUndefined();
+      feedback = serviceManager.register(unknownService as any);
     } catch (err: any) {
+      expect(feedback).toBeUndefined();
       expect(err).toBeDefined();
       expect(JSON.stringify(err.message)).toContain(unknownService.service);
     }

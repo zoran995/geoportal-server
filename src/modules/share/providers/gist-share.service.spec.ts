@@ -87,6 +87,7 @@ describe('GistShareService', () => {
     });
 
     it('should throw an error when response data is undefined', async () => {
+      expect.assertions(2);
       mockHttpPost.mockReturnValue(of({}));
       let result;
       try {
@@ -98,6 +99,7 @@ describe('GistShareService', () => {
     });
 
     it('should throw error when id is undefined', async () => {
+      expect.assertions(2);
       mockHttpPost.mockReturnValue(of({ data: {} }));
       let result;
       try {
@@ -109,7 +111,8 @@ describe('GistShareService', () => {
     });
 
     it('should throw an InternalServerErrorException on gist api error', async () => {
-      mockHttpPost.mockReturnValue(throwError({}));
+      expect.assertions(2);
+      mockHttpPost.mockReturnValue(throwError(() => new Error('test error')));
       let result;
       try {
         result = await service.save({});
@@ -162,6 +165,7 @@ describe('GistShareService', () => {
     });
 
     it('returns a NotFoundException when files undefined', async () => {
+      expect.assertions(2);
       const responseData = { files: undefined };
       mockHttpGet.mockReturnValue(of({ data: responseData }));
       const id = 'test';
@@ -175,6 +179,7 @@ describe('GistShareService', () => {
     });
 
     it('returns a NotFoundException when there is no files saved', async () => {
+      expect.assertions(2);
       const responseData = { files: {} };
       mockHttpGet.mockReturnValue(of({ data: responseData }));
       const id = 'test';
@@ -198,7 +203,8 @@ describe('GistShareService', () => {
     });
 
     it('should throw an InternalServerErrorException on gist api error', async () => {
-      mockHttpGet.mockReturnValue(throwError({}));
+      expect.assertions(2);
+      mockHttpGet.mockReturnValue(throwError(() => new Error('test error')));
       let result;
       try {
         const id = 'test';

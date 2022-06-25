@@ -62,6 +62,7 @@ describe('GistShareService', () => {
     });
 
     it('should return InternalServerErrorException on s3 error', async () => {
+      expect.assertions(3);
       mockSave.mockImplementationOnce(() => Promise.reject('test'));
       let result;
       try {
@@ -86,6 +87,7 @@ describe('GistShareService', () => {
   });
 
   it('should return NotFoundException on s3 error', async () => {
+    expect.assertions(3);
     mockResolveObject.mockImplementationOnce(() => Promise.reject('test'));
     let result;
     try {

@@ -32,6 +32,7 @@ describe('proxy process duration', () => {
   });
 
   it('throws an BadRequestException on invalid suffix', () => {
+    expect.assertions(1);
     try {
       processDuration('0.1ss');
     } catch (err) {
