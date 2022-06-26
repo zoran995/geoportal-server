@@ -24,7 +24,7 @@ import { ServeStaticDto } from 'src/infrastructure/serve-static/dto/serve-static
 import { NoopLoggerService } from './noop-logger.service';
 
 jest.mock('fs');
-jest.mock('src/common/logger/logger.service');
+jest.mock('src/infrastructure/logger/logger.service');
 
 const routingOff: Partial<ServeStaticDto> = {
   serveStatic: true,

@@ -23,7 +23,7 @@ import { Cancel, CancelToken } from './helpers/axios-cancel';
 import { NoopLoggerService } from './noop-logger.service';
 
 // mock our logger service so there is no logs when testing
-jest.mock('src/common/logger/logger.service');
+jest.mock('src/infrastructure/logger/logger.service');
 jest.mock('axios');
 jest.mock('fs');
 const data = 'success';

@@ -12,7 +12,7 @@ import { AppModule } from 'src/app.module';
 import { NoopLoggerService } from './noop-logger.service';
 
 jest.mock('fs');
-jest.mock('src/common/logger/logger.service');
+jest.mock('src/infrastructure/logger/logger.service');
 
 const volJson: DirectoryJSON = {
   './serverconfig.json': JSON.stringify({}),
