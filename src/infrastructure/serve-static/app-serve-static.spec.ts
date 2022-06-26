@@ -5,7 +5,7 @@ import { plainToClass } from 'class-transformer';
 import { vol } from 'memfs';
 import path from 'path';
 
-import { WWWROOT_TOKEN } from '../config/app-config.module';
+import { WWWROOT_TOKEN } from '../config';
 import { AppServeStatic } from './app-serve-static';
 import { ServeStaticDto } from './dto/serve-static.dto';
 

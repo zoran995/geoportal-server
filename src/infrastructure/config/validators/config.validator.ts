@@ -1,8 +1,8 @@
 import { ClassConstructor, plainToClass } from 'class-transformer';
 import { validateSync } from 'class-validator';
 
-import { ValidationErrorsFormatter } from 'src/common/validators/validation-errors.formater';
-import { LoggerService } from 'src/infrastructure/logger/logger.service';
+import { ValidationErrorsFormatter } from 'src/common/validators';
+import { LoggerService } from 'src/infrastructure/logger';
 
 import { ConfigurationDto } from '../dto/configuration.dto';
 

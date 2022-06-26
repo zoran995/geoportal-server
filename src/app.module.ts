@@ -5,18 +5,18 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 
-import { HttpLoggerMiddleware } from './common/middleware/http-logger.middleware';
-import { AppConfigModule } from './infrastructure/config/app-config.module';
-import { AppHttpModule } from './infrastructure/http/app-http.module';
-import { LoggerModule } from './infrastructure/logger/logger.module';
-import { AppServeStaticModule } from './infrastructure/serve-static/app-serve-static.module';
-import { FeedbackModule } from './modules/feedback/feedback.module';
-import { InitModule } from './modules/init/init.module';
-import { PingModule } from './modules/ping/ping.module';
-import { Proj4Module } from './modules/proj4/proj4.module';
-import { ProxyModule } from './modules/proxy/proxy.module';
-import { ServerConfigModule } from './modules/server-config/server-config.module';
-import { ShareModule } from './modules/share/share.module';
+import { HttpLoggerMiddleware } from './common/middleware';
+import { AppConfigModule } from './infrastructure/config';
+import { AppHttpModule } from './infrastructure/http';
+import { LoggerModule } from './infrastructure/logger';
+import { AppServeStaticModule } from './infrastructure/serve-static';
+import { FeedbackModule } from './modules/feedback';
+import { InitModule } from './modules/init';
+import { PingModule } from './modules/ping';
+import { Proj4Module } from './modules/proj4';
+import { ProxyModule } from './modules/proxy';
+import { ServerConfigModule } from './modules/server-config';
+import { ShareModule } from './modules/share';
 
 @Module({
   imports: [

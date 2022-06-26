@@ -8,8 +8,7 @@ import {
   Min,
 } from 'class-validator';
 
-import { isFqdnOrIp } from 'src/common/validators/isFqdnOrIp.validator';
-import { NotNull } from 'src/common/validators/not-null.validator';
+import { NotNull, isFqdnOrIp } from 'src/common/validators';
 
 import { DEFAULT_BLACKLIST } from '../proxy.constants';
 

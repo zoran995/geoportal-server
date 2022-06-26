@@ -2,7 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { ProxyListService } from '../proxy/utils/proxy-list.service';
+import { ProxyListService } from '../proxy';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 

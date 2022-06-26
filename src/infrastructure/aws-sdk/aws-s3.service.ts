@@ -16,7 +16,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
 
-import { LoggerService } from 'src/infrastructure/logger/logger.service';
+import { LoggerService } from 'src/infrastructure/logger';
 
 import { AWS_CONFIG_OPTIONS } from './aws-s3.contants';
 import { streamToString } from './stream-to-string';

@@ -9,11 +9,12 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-import { NotNull } from 'src/common/validators/not-null.validator';
+import { NotNull } from 'src/common/validators';
 
-import { FeedbackConfigDto } from '../../../modules/feedback/dto/feedback.config.dto';
-import { ProxyConfigDto } from '../../../modules/proxy/dto/proxy-config.dto';
-import { ShareConfigDto } from '../../../modules/share/dto/share.config.dto';
+import { FeedbackConfigDto } from 'src/modules/feedback';
+import { ProxyConfigDto } from 'src/modules/proxy';
+import { ShareConfigDto } from 'src/modules/share';
+
 import { ServeStaticDto } from '../../serve-static/dto/serve-static.dto';
 import { BasicAuthenticationDto } from './basic-authentication.dto';
 

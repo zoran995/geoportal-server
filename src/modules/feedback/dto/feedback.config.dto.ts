@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { JSONSchema } from 'class-validator-jsonschema';
 
-import { ArrayContainsObjectKey } from 'src/common/validators/array-contains-object-key.validator';
+import { ArrayContainsObjectKey } from 'src/common/validators';
 
 import { FeedbackServiceDtoType } from '../types/feedback-service.type';
 import { BaseFeedbackDto } from './base-feedback.dto';

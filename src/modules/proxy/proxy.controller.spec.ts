@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { POST_SIZE_LIMIT } from 'src/common/interceptor/payload-limit.interceptor';
+import { POST_SIZE_LIMIT } from 'src/common/interceptor';
 
 import { ProxyController } from './proxy.controller';
 import { ProxyService } from './proxy.service';

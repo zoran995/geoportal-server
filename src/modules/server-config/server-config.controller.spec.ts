@@ -3,11 +3,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { plainToClass } from 'class-transformer';
 
-import { ConfigurationDto } from 'src/infrastructure/config/dto/configuration.dto';
+import { ConfigurationDto } from 'src/infrastructure/config';
 
-import { ProxyConfigService } from '../proxy/config/proxy-config.service';
-import { ProxyListService } from '../proxy/utils/proxy-list.service';
-import { ShareConfigDto } from '../share/dto/share.config.dto';
+import { ProxyConfigService, ProxyListService } from '../proxy';
+import { ShareConfigDto } from '../share';
 import {
   ISafeSettings,
   ServerConfigController,

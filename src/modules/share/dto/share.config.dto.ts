@@ -9,8 +9,7 @@ import {
 } from 'class-validator';
 import { JSONSchema } from 'class-validator-jsonschema';
 
-import { ArrayContainsObjectKey } from 'src/common/validators/array-contains-object-key.validator';
-import { NotNull } from 'src/common/validators/not-null.validator';
+import { ArrayContainsObjectKey, NotNull } from 'src/common/validators';
 
 import { ShareGistDto } from './share-gist.dto';
 import { ShareS3Dto } from './share-s3.dto';

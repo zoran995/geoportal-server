@@ -1,6 +1,6 @@
 import { IsBoolean, IsString } from 'class-validator';
 
-import { NotNull } from 'src/common/validators/not-null.validator';
+import { NotNull } from 'src/common/validators';
 
 export class ServeStaticDto {
   /**

@@ -1,6 +1,6 @@
 import { Request } from 'express';
 
-import { LoggerService } from 'src/infrastructure/logger/logger.service';
+import { LoggerService } from 'src/infrastructure/logger';
 
 import { HttpLoggerMiddleware } from './http-logger.middleware';
 

@@ -10,8 +10,7 @@ import {
   IsString,
 } from 'class-validator';
 
-import { isFqdnOrIp } from 'src/common/validators/isFqdnOrIp.validator';
-import { NotNull } from 'src/common/validators/not-null.validator';
+import { NotNull, isFqdnOrIp } from 'src/common/validators';
 
 import { FeedbackServiceType } from '../types/feedback-service.type';
 import { BaseFeedbackDto } from './base-feedback.dto';

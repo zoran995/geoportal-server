@@ -18,8 +18,8 @@ import * as http from 'http';
 import { catchError, lastValueFrom, map } from 'rxjs';
 import { URL } from 'url';
 
-import { isDefined } from 'src/common/helpers/isDefined';
-import { LoggerService } from 'src/infrastructure/logger/logger.service';
+import { isDefined } from 'src/common/helpers';
+import { LoggerService } from 'src/infrastructure/logger';
 
 import { ProxyConfigService } from './config/proxy-config.service';
 import { AppendParamToQueryStringDto } from './dto/proxy-config.dto';

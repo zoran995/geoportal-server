@@ -5,7 +5,7 @@ import { Request } from 'express';
 import { lastValueFrom } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
-import { LoggerService } from 'src/infrastructure/logger/logger.service';
+import { LoggerService } from 'src/infrastructure/logger';
 
 import { formatBody } from '../common/formatBody';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';

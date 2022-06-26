@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 
-import { LoggerService } from 'src/infrastructure/logger/logger.service';
+import { LoggerService } from 'src/infrastructure/logger';
 
 @Injectable()
 export class AxiosLogInterceptor implements OnModuleInit {

@@ -8,8 +8,8 @@ import { isDefined } from 'class-validator';
 import { lastValueFrom } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
-import { combineURLs } from 'src/common/helpers/combineURLs';
-import { LoggerService } from 'src/infrastructure/logger/logger.service';
+import { combineURLs } from 'src/common/helpers';
+import { LoggerService } from 'src/infrastructure/logger';
 
 import { ShareGistDto } from '../dto/share-gist.dto';
 import { ISaveShareResponse } from '../interfaces/save-share-response.interface';

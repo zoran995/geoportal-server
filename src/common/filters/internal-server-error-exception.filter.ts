@@ -9,7 +9,7 @@ import { Response } from 'express';
 import { existsSync } from 'fs';
 import path from 'path';
 
-import { WWWROOT_TOKEN } from 'src/infrastructure/config/app-config.module';
+import { WWWROOT_TOKEN } from 'src/infrastructure/config';
 
 import { HttpExceptionFilter } from './http-exception.filter';
 

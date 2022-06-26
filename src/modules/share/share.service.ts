@@ -5,8 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { isDefined } from 'src/common/helpers/isDefined';
-import { LoggerService } from 'src/infrastructure/logger/logger.service';
+import { isDefined } from 'src/common/helpers';
+import { LoggerService } from 'src/infrastructure/logger';
 
 import { ShareConfigService } from './config/share-config.service';
 import { ISaveShareResponse } from './interfaces/save-share-response.interface';

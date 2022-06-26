@@ -11,7 +11,7 @@ import { createMock } from '@golevelup/ts-jest';
 import { plainToClass } from 'class-transformer';
 import { Observable, of } from 'rxjs';
 
-import { LoggerModule } from 'src/infrastructure/logger/logger.module';
+import { LoggerModule } from 'src/infrastructure/logger';
 
 import { FeedbackConfigService } from './config/feedback.config.service';
 import { FeedbackConfigDto } from './dto/feedback.config.dto';

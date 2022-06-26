@@ -1,4 +1,4 @@
-import { isArray, isObject } from 'src/common/helpers/helpers';
+import { isArray, isObject } from 'src/common/helpers';
 
 import { ConfigurationDto } from './dto/configuration.dto';
 import { EnvConfigLoader } from './utils/load-env.util';
