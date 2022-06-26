@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 
 import { isDefined } from 'src/common/helpers/isDefined';
-import { LoggerService } from 'src/common/logger/logger.service';
+import { LoggerService } from 'src/infrastructure/logger/logger.service';
 
 import { ShareConfigService } from './config/share-config.service';
 import { ISaveShareResponse } from './interfaces/save-share-response.interface';

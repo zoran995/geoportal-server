@@ -11,8 +11,8 @@ import * as crypto from 'crypto';
 import http from 'http';
 import https from 'https';
 
-import { LoggerService } from 'src/common/logger/logger.service';
 import { AwsS3Service } from 'src/infrastructure/aws-sdk/aws-s3.service';
+import { LoggerService } from 'src/infrastructure/logger/logger.service';
 
 import { ShareS3Dto } from '../dto/share-s3.dto';
 import { ISaveShareResponse } from '../interfaces/save-share-response.interface';

@@ -3,7 +3,7 @@
 
 import { LoggerService as NestLoggerService } from '@nestjs/common';
 
-import { LoggerService } from 'src/common/logger/logger.service';
+import { LoggerService } from 'src/infrastructure/logger/logger.service';
 
 export class NoopLoggerService
   extends LoggerService

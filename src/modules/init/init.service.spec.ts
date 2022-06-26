@@ -5,9 +5,9 @@ import fs from 'fs';
 import { vol } from 'memfs';
 import * as path from 'path';
 
-import { LoggerModule } from 'src/common/logger/logger.module';
 import { WWWROOT_TOKEN } from 'src/infrastructure/config/app-config.module';
 import { IConfigurationType } from 'src/infrastructure/config/config-loader';
+import { LoggerModule } from 'src/infrastructure/logger/logger.module';
 
 import { InitService } from './init.service';
 

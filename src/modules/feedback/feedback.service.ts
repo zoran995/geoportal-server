@@ -7,8 +7,8 @@ import {
 import { Request } from 'express';
 
 import { isDefined } from 'src/common/helpers/isDefined';
-import { LoggerService } from 'src/common/logger/logger.service';
 import { arrayContainsObjectKey } from 'src/common/validators/array-contains-object-key.validator';
+import { LoggerService } from 'src/infrastructure/logger/logger.service';
 
 import { FeedbackConfigService } from './config/feedback.config.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';

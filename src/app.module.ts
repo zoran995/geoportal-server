@@ -5,10 +5,10 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 
-import { LoggerModule } from './common/logger/logger.module';
 import { HttpLoggerMiddleware } from './common/middleware/http-logger.middleware';
 import { AppConfigModule } from './infrastructure/config/app-config.module';
 import { AppHttpModule } from './infrastructure/http/app-http.module';
+import { LoggerModule } from './infrastructure/logger/logger.module';
 import { AppServeStaticModule } from './infrastructure/serve-static/app-serve-static.module';
 import { FeedbackModule } from './modules/feedback/feedback.module';
 import { InitModule } from './modules/init/init.module';

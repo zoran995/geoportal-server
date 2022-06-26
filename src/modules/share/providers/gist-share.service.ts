@@ -9,7 +9,7 @@ import { lastValueFrom } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 import { combineURLs } from 'src/common/helpers/combineURLs';
-import { LoggerService } from 'src/common/logger/logger.service';
+import { LoggerService } from 'src/infrastructure/logger/logger.service';
 
 import { ShareGistDto } from '../dto/share-gist.dto';
 import { ISaveShareResponse } from '../interfaces/save-share-response.interface';

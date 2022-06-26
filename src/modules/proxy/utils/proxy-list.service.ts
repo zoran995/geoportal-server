@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import { inRange } from 'range_check';
 
 import { isDefined } from 'src/common/helpers/isDefined';
-import { LoggerService } from 'src/common/logger/logger.service';
+import { LoggerService } from 'src/infrastructure/logger/logger.service';
 
 import { ProxyConfigService } from '../config/proxy-config.service';
 

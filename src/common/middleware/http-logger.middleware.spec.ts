@@ -1,9 +1,10 @@
 import { Request } from 'express';
 
-import { LoggerService } from '../logger/logger.service';
+import { LoggerService } from 'src/infrastructure/logger/logger.service';
+
 import { HttpLoggerMiddleware } from './http-logger.middleware';
 
-jest.mock('src/common/logger/logger.service');
+jest.mock('src/infrastructure/logger/logger.service');
 
 const reqMockObject: Partial<Request> = {
   body: 'test-body',

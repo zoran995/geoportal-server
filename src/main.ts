@@ -12,8 +12,8 @@ import { ValidationException } from './common/exceptions/validation.exception';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { InternalServerErrorExceptionFilter } from './common/filters/internal-server-error-exception.filter';
 import { NotFoundExceptionFilter } from './common/filters/not-found-exception.filter';
-import { LoggerService } from './common/logger/logger.service';
 import { WWWROOT_TOKEN } from './infrastructure/config/app-config.module';
+import { LoggerService } from './infrastructure/logger/logger.service';
 
 /**
  *

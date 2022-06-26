@@ -10,7 +10,7 @@ import { Readable } from 'stream';
 
 import { AwsS3Service } from './aws-s3.service';
 
-jest.mock('src/common/logger/logger.service');
+jest.mock('src/infrastructure/logger/logger.service');
 
 const s3Mock = mockClient(S3Client);
 

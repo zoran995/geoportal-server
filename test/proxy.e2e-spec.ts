@@ -14,8 +14,8 @@ import { AppModule } from 'src/app.module';
 import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
 import { InternalServerErrorExceptionFilter } from 'src/common/filters/internal-server-error-exception.filter';
 import { NotFoundExceptionFilter } from 'src/common/filters/not-found-exception.filter';
-import { LoggerService } from 'src/common/logger/logger.service';
 import { WWWROOT_TOKEN } from 'src/infrastructure/config/app-config.module';
+import { LoggerService } from 'src/infrastructure/logger/logger.service';
 
 import { ProxyConfigDto } from 'src/modules/proxy/dto/proxy-config.dto';
 
