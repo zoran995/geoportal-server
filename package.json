@@ -121,7 +121,8 @@
     "coverageDirectory": "coverage/unit",
     "coveragePathIgnorePatterns": [
       ".module.ts$",
-      ".spec.ts$"
+      ".spec.ts$",
+      "index.ts"
     ],
     "testEnvironment": "node",
     "modulePaths": [

@@ -29,6 +29,7 @@
   ],
   "coveragePathIgnorePatterns": [
     ".module.ts$",
-    ".spec.ts$"
+    ".spec.ts$",
+    "index.ts"
   ]
 }
