@@ -37,8 +37,6 @@ describe('ConfigLoader', () => {
   describe('interprolate config values with env variables', () => {
     beforeEach(() => {
       jest.spyOn(EnvConfigLoader, 'load').mockReturnValueOnce({
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         PORT: '4444',
         compress: 'true',
       });

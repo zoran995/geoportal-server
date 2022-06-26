@@ -11,10 +11,16 @@ test('helper isObject', () => {
   expect(isObject(true)).toBe(false);
   expect(isObject(null)).toBe(false);
   expect(isObject(undefined)).toBe(false);
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  expect(isObject(() => {})).toBe(false);
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  expect(isObject(function () {})).toBe(false);
+  expect(
+    isObject(() => {
+      return;
+    }),
+  ).toBe(false);
+  expect(
+    isObject(function () {
+      return;
+    }),
+  ).toBe(false);
   expect(isObject(1)).toBe(false);
   expect(isObject('1')).toBe(false);
 

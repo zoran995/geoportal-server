@@ -4,8 +4,6 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { ProxyListService } from '../proxy';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-
 export interface ISafeSettings {
   version?: string;
   allowProxyFor?: string[];
