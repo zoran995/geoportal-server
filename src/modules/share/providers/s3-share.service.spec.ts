@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-types */
+
 import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+
 import { plainToClass } from 'class-transformer';
+
 import { ShareS3Dto } from '../dto/share-s3.dto';
-import { idToObject, S3ShareService, shortId } from './s3-share.service';
+import { S3ShareService, idToObject, shortId } from './s3-share.service';
 
 const mockSave = jest.fn();
 const mockResolveObject = jest.fn();

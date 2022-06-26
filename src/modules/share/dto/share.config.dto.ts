@@ -7,12 +7,14 @@ import {
   IsNumber,
   ValidateNested,
 } from 'class-validator';
+import { JSONSchema } from 'class-validator-jsonschema';
+
 import { ArrayContainsObjectKey } from 'src/common/validators/array-contains-object-key.validator';
 import { NotNull } from 'src/common/validators/not-null.validator';
+
 import { ShareGistDto } from './share-gist.dto';
 import { ShareS3Dto } from './share-s3.dto';
 import { ShareDto } from './share.dto';
-import { JSONSchema } from 'class-validator-jsonschema';
 
 export class ShareConfigDto {
   /**

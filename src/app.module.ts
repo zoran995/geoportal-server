@@ -4,6 +4,7 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
+
 import { LoggerModule } from './common/logger/logger.module';
 import { HttpLoggerMiddleware } from './common/middleware/http-logger.middleware';
 import { AppConfigModule } from './infrastructure/config/app-config.module';

@@ -1,6 +1,8 @@
-import { createMock } from '@golevelup/ts-jest';
 import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
+
+import { createMock } from '@golevelup/ts-jest';
 import { of, throwError } from 'rxjs';
+
 import { RedmineFeedbackDto } from '../dto/redmine-feedback.dto';
 import { RedmineFeedbackService } from './redmine-feedback.service';
 

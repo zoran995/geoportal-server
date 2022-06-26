@@ -4,7 +4,9 @@ import {
   IsObject,
   ValidateNested,
 } from 'class-validator';
+
 import { NotNull } from 'src/common/validators/not-null.validator';
+
 import { RateLimitDto } from './rate-limit.dto';
 
 export class BasicAuthenticationDto {

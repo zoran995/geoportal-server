@@ -1,8 +1,10 @@
-import { AppHttpService } from './app-http.service';
 import { HttpModule as BaseHttpModule } from '@nestjs/axios';
 import { Global, Module } from '@nestjs/common';
+
 import http from 'http';
 import https from 'https';
+
+import { AppHttpService } from './app-http.service';
 import { AxiosLogInterceptor } from './axios-log-interceptors';
 
 const agentConfig: https.AgentOptions = {

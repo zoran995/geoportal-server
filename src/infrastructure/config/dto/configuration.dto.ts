@@ -8,11 +8,13 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+
 import { NotNull } from 'src/common/validators/not-null.validator';
+
 import { FeedbackConfigDto } from '../../../modules/feedback/dto/feedback.config.dto';
 import { ProxyConfigDto } from '../../../modules/proxy/dto/proxy-config.dto';
-import { ServeStaticDto } from '../../serve-static/dto/serve-static.dto';
 import { ShareConfigDto } from '../../../modules/share/dto/share.config.dto';
+import { ServeStaticDto } from '../../serve-static/dto/serve-static.dto';
 import { BasicAuthenticationDto } from './basic-authentication.dto';
 
 export class ConfigurationDto {

@@ -1,4 +1,5 @@
 import { Validator } from 'class-validator';
+
 import { NotNull } from './not-null.validator';
 
 const validator = new Validator();

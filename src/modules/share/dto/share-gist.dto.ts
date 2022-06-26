@@ -1,5 +1,7 @@
 import { Equals, IsIn, IsNotEmpty, IsString, IsUrl } from 'class-validator';
+
 import { NotNull } from 'src/common/validators/not-null.validator';
+
 import { ShareType } from '../types/share.type';
 import { ShareDto } from './share.dto';
 

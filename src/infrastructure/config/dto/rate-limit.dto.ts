@@ -1,4 +1,5 @@
 import { IsInt } from 'class-validator';
+
 import { NotNull } from 'src/common/validators/not-null.validator';
 
 export class RateLimitDto {

@@ -1,4 +1,5 @@
 import { Socket } from 'net';
+
 import { DO_NOT_PROXY_REGEX } from '../proxy.constants';
 
 /**

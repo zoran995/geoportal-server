@@ -1,7 +1,9 @@
 import { ClassConstructor, plainToClass } from 'class-transformer';
 import { validateSync } from 'class-validator';
+
 import { LoggerService } from 'src/common/logger/logger.service';
 import { ValidationErrorsFormatter } from 'src/common/validators/validation-errors.formater';
+
 import { ConfigurationDto } from '../dto/configuration.dto';
 
 /* enum Environment {Development = 'development', Production = 'production',

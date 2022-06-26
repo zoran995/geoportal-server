@@ -1,5 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const yargs = require('yargs');
+
 import { loadYargs } from './load-yargs.util';
 
 describe('load yargs', () => {

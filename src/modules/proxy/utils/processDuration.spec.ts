@@ -1,4 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
+
 import { processDuration } from './processDuration';
 
 describe('proxy process duration', () => {

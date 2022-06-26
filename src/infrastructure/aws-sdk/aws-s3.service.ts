@@ -1,4 +1,11 @@
 import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  Optional,
+} from '@nestjs/common';
+
+import {
   GetObjectCommand,
   GetObjectCommandInput,
   PutObjectCommand,
@@ -7,14 +14,10 @@ import {
   S3Client,
   S3ClientConfig,
 } from '@aws-sdk/client-s3';
-import {
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  Optional,
-} from '@nestjs/common';
 import { Readable } from 'stream';
+
 import { LoggerService } from 'src/common/logger/logger.service';
+
 import { AWS_CONFIG_OPTIONS } from './aws-s3.contants';
 import { streamToString } from './stream-to-string';
 

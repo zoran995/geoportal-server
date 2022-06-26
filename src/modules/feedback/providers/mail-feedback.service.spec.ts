@@ -1,7 +1,9 @@
-import { createMock } from '@golevelup/ts-jest';
 import { HttpModule } from '@nestjs/axios';
 import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+
+import { createMock } from '@golevelup/ts-jest';
+
 import { MailFeedbackDto } from '../dto/mail-feedback.dto';
 import { MailFeedbackService } from './mail-feedback.service';
 

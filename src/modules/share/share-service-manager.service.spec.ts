@@ -1,6 +1,8 @@
 import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { plainToClass } from 'class-transformer';
+
 import { ShareGistDto } from './dto/share-gist.dto';
 import { ShareS3Dto } from './dto/share-s3.dto';
 import { GistShareService } from './providers/gist-share.service';

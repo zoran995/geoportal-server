@@ -1,8 +1,9 @@
 import { isArray, isObject } from 'src/common/helpers/helpers';
+
 import { ConfigurationDto } from './dto/configuration.dto';
 import { EnvConfigLoader } from './utils/load-env.util';
 import { loadJsonConfig } from './utils/load-json-config.util';
-import { loadYargs, YargsConfigType } from './utils/load-yargs.util';
+import { YargsConfigType, loadYargs } from './utils/load-yargs.util';
 import { validate } from './validators/config.validator';
 
 export declare type IConfigurationType = ConfigurationDto & YargsConfigType;

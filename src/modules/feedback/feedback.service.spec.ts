@@ -1,4 +1,3 @@
-import { createMock } from '@golevelup/ts-jest';
 import { HttpService } from '@nestjs/axios';
 import {
   ExecutionContext,
@@ -7,9 +6,13 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+
+import { createMock } from '@golevelup/ts-jest';
 import { plainToClass } from 'class-transformer';
 import { Observable, of } from 'rxjs';
+
 import { LoggerModule } from 'src/common/logger/logger.module';
+
 import { FeedbackConfigService } from './config/feedback.config.service';
 import { FeedbackConfigDto } from './dto/feedback.config.dto';
 import { FeedbackServiceManager } from './feedback-service-manager.service';

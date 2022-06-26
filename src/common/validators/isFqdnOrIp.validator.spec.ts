@@ -1,5 +1,7 @@
 import { ValidationError } from '@nestjs/common';
+
 import { Validator } from 'class-validator';
+
 import { isFqdnOrIp } from './isFqdnOrIp.validator';
 
 const validator = new Validator();

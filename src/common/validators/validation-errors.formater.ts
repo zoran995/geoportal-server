@@ -1,4 +1,5 @@
 import { ValidationError } from 'class-validator';
+
 import { isDefined } from '../helpers/isDefined';
 
 export class ValidationErrorsFormatter {

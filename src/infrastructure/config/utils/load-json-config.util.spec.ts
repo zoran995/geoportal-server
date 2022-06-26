@@ -1,4 +1,5 @@
 import { vol } from 'memfs';
+
 import { loadJsonConfig } from './load-json-config.util';
 
 jest.mock('fs');

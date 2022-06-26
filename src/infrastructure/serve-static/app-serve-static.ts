@@ -4,9 +4,12 @@ import {
   ServeStaticModuleOptions,
   ServeStaticModuleOptionsFactory,
 } from '@nestjs/serve-static';
+
 import { existsSync } from 'fs';
 import path, { extname } from 'path';
+
 import { isDefined } from 'src/common/helpers/isDefined';
+
 import { WWWROOT_TOKEN } from '../config/app-config.module';
 import { IConfigurationType } from '../config/config-loader';
 import { ServeStaticDto } from './dto/serve-static.dto';

@@ -2,8 +2,10 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+
 import { plainToClass } from 'class-transformer';
 import { of, throwError } from 'rxjs';
+
 import { ShareGistDto } from '../dto/share-gist.dto';
 import { GistShareService } from './gist-share.service';
 

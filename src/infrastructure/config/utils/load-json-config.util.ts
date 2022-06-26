@@ -1,4 +1,5 @@
 import { EncodingOption, existsSync, readFileSync } from 'fs';
+
 import { ConfigurationDto } from '../dto/configuration.dto';
 
 interface ILoadJsonConfigOptions {

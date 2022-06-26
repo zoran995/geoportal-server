@@ -1,4 +1,5 @@
 import { IsAlphanumeric, IsDefined, IsIn, IsString } from 'class-validator';
+
 import { ShareType, ShareTypeArr } from '../types/share.type';
 
 export class ShareDto {

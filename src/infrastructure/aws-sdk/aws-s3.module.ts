@@ -1,4 +1,5 @@
 import { DynamicModule, Module } from '@nestjs/common';
+
 import { AWS_CONFIG_OPTIONS } from './aws-s3.contants';
 import { AwsS3Service } from './aws-s3.service';
 import { AwsS3ModuleAsyncOption } from './interfaces/aws-s3-options.interface';

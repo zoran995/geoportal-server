@@ -1,4 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
+
 import { DURATION_REGEX, DURATION_UNITS } from '../proxy.constants';
 
 /**

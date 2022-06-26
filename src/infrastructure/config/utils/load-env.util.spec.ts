@@ -1,6 +1,8 @@
-import { EnvConfigLoader } from './load-env.util';
-import { vol } from 'memfs';
 import fs from 'fs';
+import { vol } from 'memfs';
+
+import { EnvConfigLoader } from './load-env.util';
+
 jest.mock('fs');
 
 vol.fromJSON({

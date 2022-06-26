@@ -1,4 +1,5 @@
 import { Validator } from 'class-validator';
+
 import { ArrayContainsObjectKey } from './array-contains-object-key.validator';
 
 const validator = new Validator();

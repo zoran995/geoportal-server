@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { PingController } from './ping.controller';
 
 describe('PingController', () => {

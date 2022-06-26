@@ -1,11 +1,14 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+
 import fs from 'fs';
 import { vol } from 'memfs';
 import * as path from 'path';
-import { IConfigurationType } from 'src/infrastructure/config/config-loader';
+
 import { LoggerModule } from 'src/common/logger/logger.module';
 import { WWWROOT_TOKEN } from 'src/infrastructure/config/app-config.module';
+import { IConfigurationType } from 'src/infrastructure/config/config-loader';
+
 import { InitService } from './init.service';
 
 jest.mock('fs');

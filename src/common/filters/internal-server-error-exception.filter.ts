@@ -4,10 +4,13 @@ import {
   Inject,
   InternalServerErrorException,
 } from '@nestjs/common';
+
 import { Response } from 'express';
 import { existsSync } from 'fs';
 import path from 'path';
+
 import { WWWROOT_TOKEN } from 'src/infrastructure/config/app-config.module';
+
 import { HttpExceptionFilter } from './http-exception.filter';
 
 @Catch(InternalServerErrorException)

@@ -1,8 +1,9 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
+
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ClassConstructor, plainToInstance } from 'class-transformer';
-import { map, Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 type Unarray<T> = T extends Array<infer U> ? U : T;
 

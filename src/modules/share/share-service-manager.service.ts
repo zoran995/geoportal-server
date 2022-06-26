@@ -1,5 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
+
 import { ShareGistDto } from './dto/share-gist.dto';
 import { ShareS3Dto } from './dto/share-s3.dto';
 import { AbstractShareService } from './providers/abstract-share.service';

@@ -1,16 +1,19 @@
-import { PutObjectCommandInput } from '@aws-sdk/client-s3';
-import { NodeHttpHandler } from '@aws-sdk/node-http-handler';
 import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+
+import { PutObjectCommandInput } from '@aws-sdk/client-s3';
+import { NodeHttpHandler } from '@aws-sdk/node-http-handler';
 import baseX from 'base-x';
 import * as crypto from 'crypto';
 import http from 'http';
 import https from 'https';
+
 import { LoggerService } from 'src/common/logger/logger.service';
 import { AwsS3Service } from 'src/infrastructure/aws-sdk/aws-s3.service';
+
 import { ShareS3Dto } from '../dto/share-s3.dto';
 import { ISaveShareResponse } from '../interfaces/save-share-response.interface';
 import { AbstractShareService } from './abstract-share.service';

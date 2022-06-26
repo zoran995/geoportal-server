@@ -1,11 +1,11 @@
 import {
+  IsIpVersion,
+  ValidateBy,
+  ValidationOptions,
   buildMessage,
   isFQDN,
   isIP,
-  IsIpVersion,
   isPort,
-  ValidateBy,
-  ValidationOptions,
 } from 'class-validator';
 
 export const IS_FQDN_OR_IP = 'isFqdnOrIp';

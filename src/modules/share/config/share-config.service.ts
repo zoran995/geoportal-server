@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
 import { IConfigurationType } from 'src/infrastructure/config/config-loader';
+
 import { ShareConfigDto } from '../dto/share.config.dto';
 
 @Injectable()

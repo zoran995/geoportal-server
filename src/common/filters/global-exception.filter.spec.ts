@@ -1,5 +1,7 @@
-import { createMock } from '@golevelup/ts-jest';
 import { ExecutionContext, NotFoundException } from '@nestjs/common';
+
+import { createMock } from '@golevelup/ts-jest';
+
 import { GlobalExceptionFilter } from './global-exception.filter';
 
 const mockStatusJson = jest.fn();

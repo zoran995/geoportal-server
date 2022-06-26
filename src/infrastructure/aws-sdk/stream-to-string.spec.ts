@@ -1,4 +1,5 @@
 import { Readable } from 'stream';
+
 import { streamToString } from './stream-to-string';
 
 describe('streamToString', () => {

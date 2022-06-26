@@ -1,12 +1,15 @@
+import { Test, TestingModule } from '@nestjs/testing';
+
 import {
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
-import { Test, TestingModule } from '@nestjs/testing';
 import { mockClient } from 'aws-sdk-client-mock';
 import { Readable } from 'stream';
+
 import { AwsS3Service } from './aws-s3.service';
+
 jest.mock('src/common/logger/logger.service');
 
 const s3Mock = mockClient(S3Client);
