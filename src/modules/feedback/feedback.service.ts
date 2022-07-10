@@ -51,7 +51,7 @@ export class FeedbackService {
       )
     ) {
       this.logger.error(
-        `Feedback options doesn\'t contain object with id ${primaryId}.`,
+        `Feedback options doesn't contain object with id ${primaryId}.`,
       );
       throw new InternalServerErrorException();
     }

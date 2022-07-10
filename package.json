@@ -84,7 +84,6 @@
     "aws-sdk-client-mock": "1.0.0",
     "eslint": "8.18.0",
     "eslint-config-prettier": "8.5.0",
-    "eslint-plugin-prettier": "4.0.0",
     "istanbul-lib-coverage": "3.2.0",
     "istanbul-lib-report": "3.0.0",
     "jest": "28.1.1",
