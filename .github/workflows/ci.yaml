@@ -4,7 +4,7 @@ name: CI
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events 
+  # Triggers the workflow on push or pull request events
   push:
     branches:
       - 'master'
@@ -22,7 +22,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
+        node-version: [14.x, 16.x]
         os: [ubuntu-latest]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -38,10 +38,9 @@ jobs:
         run: yarn run format-check
       - name: build
         run: yarn run build
-      - name: lint 
+      - name: lint
         run: yarn run lint
       - name: Unit tests
-        run: yarn run test 
+        run: yarn run test
       - name: e2e tests
-        if: ${{ github.event_name == 'pull_request' }}
         run: yarn run test:e2e
