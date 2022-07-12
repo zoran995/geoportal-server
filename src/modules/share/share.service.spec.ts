@@ -75,7 +75,7 @@ describe('ShareService', () => {
     shareServiceManager = module.get<ShareServiceManager>(ShareServiceManager);
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
     configGet.mockClear();
   });

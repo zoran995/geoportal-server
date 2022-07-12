@@ -35,7 +35,7 @@ describe('GlobalExceptionFilter', () => {
     expect(filter).toBeDefined();
   });
 
-  it('returns 404 on NotFoundException', async () => {
+  it('returns 404 on NotFoundException', () => {
     const exception = new NotFoundException('test-not-found');
     filter.catch(exception, mockExecutionContext);
     expect(mockStatus).toHaveBeenCalledTimes(1);
@@ -50,7 +50,7 @@ describe('GlobalExceptionFilter', () => {
     );
   });
 
-  it('returns 404 when statusCode 404', async () => {
+  it('returns 404 when statusCode 404', () => {
     const exception = {
       statusCode: 404,
       message: 'test',
@@ -68,7 +68,7 @@ describe('GlobalExceptionFilter', () => {
     );
   });
 
-  it('returns 404 when response status 404', async () => {
+  it('returns 404 when response status 404', () => {
     const exception = {
       response: { status: 404 },
       message: 'test',
@@ -86,8 +86,8 @@ describe('GlobalExceptionFilter', () => {
     );
   });
 
-  it('returns 500 on general error', async () => {
-    filter.catch(new Error('test') as any, mockExecutionContext);
+  it('returns 500 on general error', () => {
+    filter.catch(new Error('test'), mockExecutionContext);
     expect(mockStatus).toHaveBeenCalledTimes(1);
     expect(mockStatus).toHaveBeenCalledWith(500);
 

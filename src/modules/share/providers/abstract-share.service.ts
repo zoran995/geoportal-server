@@ -15,11 +15,11 @@ export abstract class AbstractShareService<T extends ShareDto> {
    * @param data - share data
    * @returns id of saved share data
    */
-  abstract save(data: any): Promise<ISaveShareResponse>;
+  abstract save(data: Record<string, unknown>): Promise<ISaveShareResponse>;
 
   /**
    * @param id - Share ID
    * @returns Resolve share data
    */
-  abstract resolve(id: string): Promise<any>;
+  abstract resolve(id: string): Promise<Record<string, unknown>>;
 }

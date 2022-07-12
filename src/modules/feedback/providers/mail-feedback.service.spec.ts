@@ -7,12 +7,9 @@ import { createMock } from '@golevelup/ts-jest';
 import { MailFeedbackDto } from '../dto/mail-feedback.dto';
 import { MailFeedbackService } from './mail-feedback.service';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const nodemailer = require('nodemailer');
-const sendMailMock = jest.fn();
+import * as nodemailer from 'nodemailer';
 
 jest.mock('nodemailer');
-nodemailer.createTransport.mockReturnValue({ sendMail: sendMailMock });
 
 const mockExecutionContext = createMock<ExecutionContext>({
   switchToHttp: () => ({
@@ -38,6 +35,7 @@ const mailConf: MailFeedbackDto = {
 
 describe('MailFeedbackService', () => {
   let service: MailFeedbackService;
+  const sendMailMock = jest.fn();
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -48,11 +46,14 @@ describe('MailFeedbackService', () => {
       ],
     }).compile();
     service = module.get<MailFeedbackService>(MailFeedbackService);
+
+    jest.spyOn(nodemailer, 'createTransport').mockReturnValue({
+      sendMail: sendMailMock,
+    } as never);
   });
 
   afterEach(() => {
     sendMailMock.mockClear();
-    nodemailer.createTransport.mockClear();
   });
 
   it('should be defined', () => {
@@ -62,16 +63,15 @@ describe('MailFeedbackService', () => {
   it('should properly send feedback', async () => {
     const message = 'test mail success';
     sendMailMock.mockReturnValue(Promise.resolve(message));
-    const result = await service.post({}, req as any);
+    const result = await service.post({}, req as never);
     expect(result).toEqual(message);
   });
 
   it('should throw an error InternalServerErrorException', async () => {
     expect.assertions(1);
     sendMailMock.mockReturnValue(Promise.reject('test sending email failed'));
-    nodemailer.createTransport.mockReturnValue({ sendMail: sendMailMock });
     try {
-      await service.post({}, req as any);
+      await service.post({}, req as never);
     } catch (err) {
       expect(err).toBeInstanceOf(InternalServerErrorException);
     }

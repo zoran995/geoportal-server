@@ -18,7 +18,7 @@ export function processHeaders(
   const result = filterHeaders(headers);
 
   if (maxAgeSeconds !== undefined) {
-    result['Cache-Control'] = 'public,max-age=' + maxAgeSeconds;
+    result['Cache-Control'] = `public,max-age=${maxAgeSeconds}`;
   }
 
   result['Access-Control-Allow-Origin'] = '*';

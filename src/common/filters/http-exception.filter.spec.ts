@@ -34,7 +34,7 @@ const spyGlobalExceptionCatch = jest.spyOn(
   'catch',
 );
 
-describe('GlobalExceptionFilter', () => {
+describe('HttpExceptionFilter', () => {
   let filter: HttpExceptionFilter;
 
   beforeEach(() => {
@@ -49,7 +49,7 @@ describe('GlobalExceptionFilter', () => {
     expect(filter).toBeDefined();
   });
 
-  it('properly catch NotFoundException', async () => {
+  it('properly catch NotFoundException', () => {
     const exception = new NotFoundException('test-not-found');
     filter.catch(exception, mockExecutionContext);
     expect(mockStatus).toHaveBeenCalledTimes(1);
@@ -65,7 +65,7 @@ describe('GlobalExceptionFilter', () => {
     );
   });
 
-  it('properly catch InternalServerErrorException', async () => {
+  it('properly catch InternalServerErrorException', () => {
     const exception = new InternalServerErrorException('test-internal-error');
     filter.catch(exception, mockExecutionContext);
     expect(mockStatus).toHaveBeenCalledTimes(1);
@@ -81,7 +81,7 @@ describe('GlobalExceptionFilter', () => {
     );
   });
 
-  it('properly catch BadRequestException', async () => {
+  it('properly catch BadRequestException', () => {
     const exception = new BadRequestException('test-bad-request');
     filter.catch(exception, mockExecutionContext);
     expect(mockStatus).toHaveBeenCalledTimes(1);
@@ -97,8 +97,8 @@ describe('GlobalExceptionFilter', () => {
     );
   });
 
-  it('properly handle ValidationException', async () => {
-    const exception = new ValidationException('test-bad-request');
+  it('properly handle ValidationException', () => {
+    const exception = new ValidationException(new Error('test-bad-request'));
     filter.catch(exception, mockExecutionContext);
     expect(mockStatus).toHaveBeenCalledTimes(1);
     expect(mockStatus).toHaveBeenCalledWith(400);
@@ -113,8 +113,8 @@ describe('GlobalExceptionFilter', () => {
     );
   });
 
-  it('calls super error filter when general error', async () => {
-    filter.catch(new Error('test') as any, mockExecutionContext);
+  it('calls super error filter when general error', () => {
+    filter.catch(new Error('test') as never, mockExecutionContext);
     expect(spyGlobalExceptionCatch).toHaveBeenCalledTimes(1);
   });
 });

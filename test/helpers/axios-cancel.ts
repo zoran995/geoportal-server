@@ -24,7 +24,7 @@ export class CancelToken {
     };
   }
 
-  private resolvePromise!: (string: any) => void;
+  private resolvePromise!: (string: Cancel | Promise<Cancel>) => void;
 
   public reason!: Cancel;
 

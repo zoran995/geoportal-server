@@ -30,10 +30,7 @@ export class InitController {
   @ApiOperation({ summary: 'Resolves init configuration' })
   @ApiNotFoundResponse({ description: 'File not found.' })
   @UseFilters(HttpExceptionFilter)
-  async serveInitFile(
-    @Param() params: GetInitDto,
-    @Res() res: Response,
-  ): Promise<any> {
+  serveInitFile(@Param() params: GetInitDto, @Res() res: Response): void {
     const fileName = sanitize(params.fileName);
     const filePath = this.initService.getFilePath(fileName);
     if (!filePath) {

@@ -21,8 +21,8 @@ export function loadJsonConfig(
         JSON.parse(
           readFileSync(jsonFilePath, options.encoding ?? 'utf-8').toString(),
         ),
-      );
+      ) as ConfigurationDto;
     }
   }
-  return <any>config;
+  return config as unknown as ConfigurationDto;
 }

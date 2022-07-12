@@ -82,7 +82,7 @@ describe('NotFoundExceptionFilter', () => {
     expect(filter).toBeDefined();
   });
 
-  it('properly serves 404 page', async () => {
+  it('properly serves 404 page', () => {
     const filter = new NotFoundExceptionFilter(configService, wwwroot);
     fs.writeFileSync(`${wwwroot}/404.html`, '404!');
     filter.catch(new NotFoundException(), mockExecutionContext);
@@ -95,7 +95,7 @@ describe('NotFoundExceptionFilter', () => {
     fs.unlinkSync(`${wwwroot}/404.html`);
   });
 
-  it('properly redirect to index html', async () => {
+  it('properly redirect to index html', () => {
     const filter = new NotFoundExceptionFilter(configService, wwwroot);
     mockConfigReturnValue({
       serveStatic: true,
@@ -107,7 +107,7 @@ describe('NotFoundExceptionFilter', () => {
     expect(mockRedirect).toHaveBeenCalledWith(303, '/');
   });
 
-  it('calls super error filter when should not resolve index.html', async () => {
+  it('calls super error filter when should not resolve index.html', () => {
     const filter = new NotFoundExceptionFilter(configService, wwwroot);
     const config = {
       serveStatic: true,
@@ -119,7 +119,7 @@ describe('NotFoundExceptionFilter', () => {
     expect(spyHttpException).toHaveBeenCalledTimes(1);
   });
 
-  it("calls super error filter when index file doesn't exist", async () => {
+  it("calls super error filter when index file doesn't exist", () => {
     const filter = new NotFoundExceptionFilter(configService, wwwroot);
     const config = {
       serveStatic: true,
@@ -131,7 +131,7 @@ describe('NotFoundExceptionFilter', () => {
     expect(spyHttpException).toHaveBeenCalledTimes(1);
   });
 
-  it('calls super error filter when serve static disabled', async () => {
+  it('calls super error filter when serve static disabled', () => {
     const filter = new NotFoundExceptionFilter(configService, wwwroot);
     mockConfigReturnValue({
       serveStatic: false,
@@ -142,7 +142,7 @@ describe('NotFoundExceptionFilter', () => {
     expect(spyHttpException).toHaveBeenCalledTimes(1);
   });
 
-  it('calls super error filter when serve static undefined', async () => {
+  it('calls super error filter when serve static undefined', () => {
     const filter = new NotFoundExceptionFilter(configService, wwwroot);
     mockConfigReturnValue(undefined);
     filter.catch(new NotFoundException(), mockExecutionContext);

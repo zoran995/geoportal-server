@@ -7,11 +7,11 @@ import {
 
 @Injectable({ scope: Scope.TRANSIENT })
 export class LoggerService extends ConsoleLogger implements NestLoggerService {
-  log(message: any) {
+  log(message: unknown) {
     super.log(message);
   }
 
-  error(message: any, trace?: string) {
+  error(message: unknown, trace?: string) {
     if (trace) {
       super.error(message, trace);
     } else {
@@ -19,14 +19,14 @@ export class LoggerService extends ConsoleLogger implements NestLoggerService {
     }
   }
 
-  warn(message: any) {
+  warn(message: unknown) {
     super.warn(message);
   }
 
-  debug(message: any) {
+  debug(message: unknown) {
     super.debug(message);
   }
-  verbose(message: any) {
+  verbose(message: unknown) {
     super.verbose(message);
   }
 }

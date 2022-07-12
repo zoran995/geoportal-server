@@ -13,17 +13,17 @@ export class EnvConfigLoader {
   public static load(
     options: EnvConfigOptions = { ignoreEnvFile: false, ignoreEnvVars: false },
   ) {
-    let config = options.ignoreEnvFile
+    let config: Record<string, string> = options.ignoreEnvFile
       ? {}
       : this.loadEnvFile(options.envFilePath);
 
     if (!options.ignoreEnvVars) {
-      config = { ...config, ...process.env };
+      config = { ...config, ...(process.env as Record<string, string>) };
     }
     return config;
   }
 
-  private static loadEnvFile(envFilePath?: string): Record<string, any> {
+  private static loadEnvFile(envFilePath?: string): Record<string, string> {
     envFilePath = envFilePath ?? resolve(process.cwd(), '.env');
 
     let config: ReturnType<typeof dotenv.parse> = {};

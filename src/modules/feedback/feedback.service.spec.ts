@@ -81,7 +81,7 @@ describe('FeedbackService', () => {
     feedbackServiceManager = module.get(FeedbackServiceManager);
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
   });
 
@@ -103,7 +103,7 @@ describe('FeedbackService', () => {
     feedbackConf.primaryId = undefined;
     configGet.mockReturnValue(feedbackConf);
     try {
-      await service.create({}, req as any);
+      await service.create({}, req as never);
     } catch (err) {
       expect(err).toBeInstanceOf(NotFoundException);
     }
@@ -115,7 +115,7 @@ describe('FeedbackService', () => {
     feedbackConf.primaryId = 'test1';
     configGet.mockReturnValue(feedbackConf);
     try {
-      await service.create({}, req as any);
+      await service.create({}, req as never);
     } catch (err) {
       expect(err).toBeInstanceOf(InternalServerErrorException);
     }
@@ -132,14 +132,14 @@ describe('FeedbackService', () => {
       'register',
     );
     mockHttpPost.mockReturnValue(of(new Observable()));
-    await service.create({}, req as any);
+    await service.create({}, req as never);
 
     expect(feedbackServiceSpy).toHaveBeenCalledTimes(1);
     expect(feedbackManagerHasSpy).toHaveBeenCalledTimes(1);
     expect(feedbackManagerCreateSpy).toHaveBeenCalledTimes(1);
     expect(feedbackManagerGetSpy).not.toHaveBeenCalled();
 
-    await service.create({}, req as any);
+    await service.create({}, req as never);
     expect(feedbackServiceSpy).toHaveBeenCalledTimes(2);
     expect(feedbackManagerHasSpy).toHaveBeenCalledTimes(2);
     expect(feedbackManagerCreateSpy).toHaveBeenCalledTimes(1);
@@ -152,7 +152,7 @@ describe('FeedbackService', () => {
     (<any>feedbackConf.options)[0].service = 'test';
     configGet.mockReturnValue(feedbackConf);
     try {
-      await service.create({}, req as any);
+      await service.create({}, req as never);
     } catch (err) {
       expect(err).toBeInstanceOf(InternalServerErrorException);
     }

@@ -50,7 +50,7 @@ describe('ShareServiceManager', () => {
     httpService = module.get<HttpService>(HttpService);
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
   });
 
@@ -62,7 +62,7 @@ describe('ShareServiceManager', () => {
     expect(httpService).toBeDefined();
   });
 
-  it('succesfully create instance and stores it', async () => {
+  it('succesfully create instance and stores it', () => {
     const share = service.create(gistConf);
     expect(share).toBeInstanceOf(GistShareService);
     expect(service.shareServices).toHaveLength(1);
@@ -80,7 +80,7 @@ describe('ShareServiceManager', () => {
     expect(service.shareServices).toHaveLength(1);
   });
 
-  it('succesfully create service instance and stores it', async () => {
+  it('succesfully create service instance and stores it', () => {
     const share = service.create(s3Conf);
     expect(share).toBeInstanceOf(S3ShareService);
     expect(service.shareServices).toHaveLength(2);
@@ -121,7 +121,7 @@ describe('ShareServiceManager', () => {
     expect.assertions(3);
     let share;
     try {
-      share = service.create(unknownService as any);
+      share = service.create(unknownService as never);
     } catch (err: any) {
       expect(share).toBeUndefined();
       expect(err).toBeDefined();

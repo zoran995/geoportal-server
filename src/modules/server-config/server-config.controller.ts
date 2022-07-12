@@ -7,8 +7,8 @@ import { ProxyListService } from '../proxy';
 export interface ISafeSettings {
   version?: string;
   allowProxyFor?: string[];
-  newShareUrlPrefix: string;
-  proxyAllDomains: boolean;
+  newShareUrlPrefix?: string;
+  proxyAllDomains?: boolean;
 }
 
 @Controller('serverConfig')
@@ -29,8 +29,10 @@ export class ServerConfigController {
   @Get()
   serverConfig() {
     const allowProxyFor = this.proxyListService.whitelist;
-    const newShareUrlPrefix = this.configService.get('share.newPrefix');
-    const proxyAllDomains = this.configService.get('proxy.proxyAllDomains');
+    const newShareUrlPrefix = this.configService.get<string>('share.newPrefix');
+    const proxyAllDomains = this.configService.get<boolean>(
+      'proxy.proxyAllDomains',
+    );
     const safeSettings: ISafeSettings = {
       newShareUrlPrefix,
       proxyAllDomains,

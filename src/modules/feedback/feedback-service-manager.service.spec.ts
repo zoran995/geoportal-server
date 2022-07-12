@@ -60,7 +60,7 @@ describe('FeedbackServiceManager', () => {
     httpService = module.get<HttpService>(HttpService);
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
   });
 
@@ -73,7 +73,7 @@ describe('FeedbackServiceManager', () => {
   });
 
   describe('github', () => {
-    it('successfully create service instance and stores it', async () => {
+    it('successfully create service instance and stores it', () => {
       const feedback = serviceManager.register(githubConf);
       expect(feedback).toBeInstanceOf(GithubFeedbackService);
       expect(serviceManager.feedbackServices).toHaveLength(1);
@@ -110,13 +110,13 @@ describe('FeedbackServiceManager', () => {
     });
   });
 
-  it('successfully create service instance and stores it', async () => {
+  it('successfully create service instance and stores it', () => {
     const feedback = serviceManager.register(mailConf);
     expect(feedback).toBeInstanceOf(MailFeedbackService);
     expect(serviceManager.feedbackServices).toHaveLength(1);
   });
 
-  it('successfully create service instance and stores it', async () => {
+  it('successfully create service instance and stores it', () => {
     const feedback = serviceManager.register(redmineConf);
     expect(feedback).toBeInstanceOf(RedmineFeedbackService);
     expect(serviceManager.feedbackServices).toHaveLength(2);

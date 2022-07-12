@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
-
 import {
   InternalServerErrorException,
   NotFoundException,
@@ -79,9 +77,9 @@ describe('GistShareService', () => {
   });
 
   describe('resolve', () => {
-    it('should resolve id', async () => {
+    it('should resolve by id', async () => {
       mockResolveObject.mockImplementationOnce(() =>
-        Promise.resolve(share_body),
+        Promise.resolve(JSON.stringify(share_body)),
       );
       const result = await service.resolve(share_id);
       expect(mockResolveObject).toHaveBeenCalledTimes(1);

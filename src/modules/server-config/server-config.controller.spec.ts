@@ -12,7 +12,7 @@ import {
   ServerConfigController,
 } from './server-config.controller';
 
-function path(obj: Record<string, any>, path: string) {
+function path(obj: Record<string, unknown>, path: string) {
   try {
     return eval('obj.' + path);
   } catch (e) {
@@ -58,7 +58,7 @@ describe('ServerConfigController', () => {
 
     beforeEach(() => {
       mockConfigGet.mockImplementation((propertyPath) => {
-        return path(defaultConfig, propertyPath);
+        return path(defaultConfig as never, propertyPath);
       });
       safeSettings = controller.serverConfig();
     });
@@ -91,7 +91,7 @@ describe('ServerConfigController', () => {
   it('when proxyAllDomains is true', () => {
     defaultConfig.proxy.proxyAllDomains = true;
     mockConfigGet.mockImplementation((propertyPath) => {
-      return path(defaultConfig, propertyPath);
+      return path(defaultConfig as never, propertyPath);
     });
     const safeSettings = controller.serverConfig();
     expect(safeSettings.proxyAllDomains).toBe(true);
@@ -101,7 +101,7 @@ describe('ServerConfigController', () => {
   it('properly resolve share prefix', () => {
     defaultConfig.share = plainToClass(ShareConfigDto, { newPrefix: 'test' });
     mockConfigGet.mockImplementation((propertyPath) => {
-      return path(defaultConfig, propertyPath);
+      return path(defaultConfig as never, propertyPath);
     });
     const safeSettings = controller.serverConfig();
     expect(safeSettings.newShareUrlPrefix).toBe('test');

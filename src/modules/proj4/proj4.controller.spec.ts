@@ -28,7 +28,7 @@ describe('Proj4Controller', () => {
     expect(controller).toBeDefined();
   });
 
-  it('calls Proj4Service getDefinition', async () => {
+  it('calls Proj4Service getDefinition', () => {
     controller.resolveCode(4326);
     expect(mockGetDefinition).toHaveBeenCalledTimes(1);
     expect(mockGetDefinition).toHaveBeenCalledWith(4326);

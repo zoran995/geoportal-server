@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-empty-function */
-
 import { LoggerService as NestLoggerService } from '@nestjs/common';
 
 import { LoggerService } from 'src/infrastructure/logger/logger.service';
@@ -9,9 +6,19 @@ export class NoopLoggerService
   extends LoggerService
   implements NestLoggerService
 {
-  log(message: any): void {}
-  error(message: any, trace?: string): void {}
-  warn(message: any): void {}
-  debug(message: any): void {}
-  verbose(message: any): void {}
+  log(): void {
+    // noop
+  }
+  error(): void {
+    // noop
+  }
+  warn(): void {
+    // noop
+  }
+  debug(): void {
+    // noop
+  }
+  verbose(): void {
+    // noop
+  }
 }

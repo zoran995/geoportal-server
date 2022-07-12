@@ -13,7 +13,7 @@ import {
  * @param value - value that of the object object should
  */
 export function arrayContainsObjectKey(
-  array: any[],
+  array: unknown[],
   key: string,
   value: string,
 ) {
@@ -30,7 +30,7 @@ export function ArrayContainsObjectKey(
   key: string,
   validationOptions?: ValidationOptions,
 ) {
-  return function (object: { [key: string]: any }, propertyName: string) {
+  return function (object: object, propertyName: string) {
     registerDecorator({
       name: 'ArrayContainsObjectKey',
       target: object.constructor,
@@ -46,15 +46,15 @@ export function ArrayContainsObjectKey(
 export class ArrayContainsObjectKeyConstraint
   implements ValidatorConstraintInterface
 {
-  validate(value: any[], args: ValidationArguments) {
+  validate(value: unknown[], args: ValidationArguments) {
     const [relatedPropertyName, key] = args.constraints;
-    const relatedValue = (args.object as any)[relatedPropertyName];
-    return arrayContainsObjectKey(value, key, relatedValue);
+    const relatedValue = (args.object as never)[relatedPropertyName];
+    return arrayContainsObjectKey(value, key as string, relatedValue as string);
   }
 
   defaultMessage(args: ValidationArguments) {
     const [relatedPropertyName, key] = args.constraints;
-    const relatedValue = (args.object as any)[relatedPropertyName];
+    const relatedValue = (args.object as never)[relatedPropertyName];
     return `array (\`${args.property}\`) must contain object with property ${key} equal to ${relatedValue}`;
   }
 }

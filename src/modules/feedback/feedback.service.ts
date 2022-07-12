@@ -33,7 +33,7 @@ export class FeedbackService {
   async create(
     feedbackData: CreateFeedbackDto,
     request: Request,
-  ): Promise<any> | never {
+  ): Promise<unknown> | never {
     const primaryId = this.feedbackConfigService.primaryId;
     if (!isDefined(primaryId)) {
       this.logger.error(
@@ -67,8 +67,11 @@ export class FeedbackService {
         } else {
           throw new InternalServerErrorException();
         }
-      } catch (err: any) {
-        this.logger.error(`An error occurred while sending feedback`, err);
+      } catch (err: unknown) {
+        this.logger.error(
+          `An error occurred while sending feedback`,
+          err as never,
+        );
         throw new InternalServerErrorException();
       }
     } else {

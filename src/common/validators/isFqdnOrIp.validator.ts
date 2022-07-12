@@ -34,7 +34,7 @@ export function isFqdnOrIp(
     {
       name: IS_FQDN_OR_IP,
       validator: {
-        validate: (value): boolean => {
+        validate: (value?: string): boolean => {
           const split = value?.split(':');
           if (split?.length === 2) {
             value = split.shift();

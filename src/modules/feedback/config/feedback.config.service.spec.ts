@@ -66,7 +66,7 @@ describe('FeedbackConfigService', () => {
     configService = module.get<ConfigService>(ConfigService);
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
   });
 

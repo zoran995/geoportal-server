@@ -1,7 +1,15 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, OnModuleInit } from '@nestjs/common';
+import { AxiosRequestConfig } from 'axios';
 
 import { LoggerService } from 'src/infrastructure/logger';
+
+type AxiosRequestConfigMetadata = AxiosRequestConfig<unknown> & {
+  metadata?: {
+    startDate?: Date;
+    endDate?: Date;
+  };
+};
 
 @Injectable()
 export class AxiosLogInterceptor implements OnModuleInit {
@@ -16,18 +24,23 @@ export class AxiosLogInterceptor implements OnModuleInit {
   private registerInterceptors() {
     const axiosInstance = this.httpService.axiosRef;
 
-    axiosInstance.interceptors.request.use(function (config: any) {
-      config['metadata'] = { ...config['metadata'], startDate: new Date() };
+    axiosInstance.interceptors.request.use(function (
+      config: AxiosRequestConfigMetadata,
+    ) {
+      config.metadata = { ...config.metadata, startDate: new Date() };
       return config;
     });
 
     axiosInstance.interceptors.response.use(
       (response) => {
-        const { config }: any = response;
-        config['metadata'] = { ...config['metadata'], endDate: new Date() };
+        const { config }: { config: AxiosRequestConfigMetadata } = response;
+        console.log(response);
+        config.metadata = { ...config.metadata, endDate: new Date() };
         const duration =
-          config['metadata'].endDate.getTime() -
-          config['metadata'].startDate.getTime();
+          config.metadata.endDate && config.metadata.startDate
+            ? config.metadata.endDate?.getTime() -
+              config.metadata.startDate?.getTime()
+            : undefined;
 
         // Log some request infos.
         this.logger.verbose(

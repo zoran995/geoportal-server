@@ -28,12 +28,14 @@ export class GistShareService extends AbstractShareService<ShareGistDto> {
   /**
    * Save share configuration using gist.
    */
-  public async save(data: any): Promise<ISaveShareResponse> {
-    const gistFile: any = {};
+  public async save(
+    data: Record<string, unknown>,
+  ): Promise<ISaveShareResponse> {
+    const gistFile: Record<string, unknown> = {};
     gistFile[this.config.fileName] = {
       content: JSON.stringify(data),
     };
-    const headers: any = {
+    const headers: Record<string, string> = {
       'User-Agent': this.config.userAgent,
       Accept: 'application/vnd.github.v3+json',
     };
@@ -42,7 +44,7 @@ export class GistShareService extends AbstractShareService<ShareGistDto> {
     }
     return lastValueFrom(
       this.httpService
-        .post(
+        .post<{ id: string }>(
           this.config.apiUrl,
           {
             files: gistFile,
@@ -54,7 +56,10 @@ export class GistShareService extends AbstractShareService<ShareGistDto> {
         .pipe(
           map((res) => {
             if (!isDefined(res.data) || !isDefined(res.data.id)) {
-              this.logger.error(`Got bad response from server: `, res.data);
+              this.logger.error(
+                `Got bad response from server: `,
+                res.data as never,
+              );
               throw new NotFoundException();
             }
             this.logger.verbose(`Created Gist with ID '${res.data.id}`);
@@ -63,8 +68,8 @@ export class GistShareService extends AbstractShareService<ShareGistDto> {
               path: `/api/share/${this.config.prefix}-${res.data.id}`,
             };
           }),
-          catchError((e) => {
-            this.logger.error(`Creating share url failed`, e);
+          catchError((e: unknown) => {
+            this.logger.error(`Creating share url failed`, e as never);
             if (e instanceof NotFoundException) {
               throw e;
             }
@@ -77,8 +82,8 @@ export class GistShareService extends AbstractShareService<ShareGistDto> {
   /**
    * Resolve saved share configuration from gist using id.
    */
-  public async resolve(id: string): Promise<any> {
-    const headers: any = {
+  public async resolve(id: string): Promise<Record<string, unknown>> {
+    const headers: Record<string, string> = {
       'User-Agent': this.config.userAgent,
       Accept: 'application/vnd.github.v3+json',
     };
@@ -87,22 +92,27 @@ export class GistShareService extends AbstractShareService<ShareGistDto> {
     }
     const getUrl = combineURLs(this.config.apiUrl, id);
     return lastValueFrom(
-      this.httpService.get(getUrl, { headers: headers }).pipe(
-        map((res) => {
-          if (
-            !isDefined(res.data.files) ||
-            Object.keys(res.data.files).length === 0
-          ) {
+      this.httpService
+        .get<{ files: Record<string, { content: Record<string, unknown> }> }>(
+          getUrl,
+          { headers: headers },
+        )
+        .pipe(
+          map((res) => {
+            if (
+              !isDefined(res.data.files) ||
+              Object.keys(res.data.files).length === 0
+            ) {
+              throw new NotFoundException();
+            }
+            this.logger.verbose(`Getting share url succeeded`);
+            return res.data.files[Object.keys(res.data.files)[0]].content;
+          }),
+          catchError((e) => {
+            this.logger.debug(`Getting share url failed with: '${e.message}'`);
             throw new NotFoundException();
-          }
-          this.logger.verbose(`Getting share url succeeded`);
-          return res.data.files[Object.keys(res.data.files)[0]].content;
-        }),
-        catchError((e) => {
-          this.logger.debug(`Getting share url failed with: '${e.message}'`);
-          throw new NotFoundException();
-        }),
-      ),
+          }),
+        ),
     );
   }
 }

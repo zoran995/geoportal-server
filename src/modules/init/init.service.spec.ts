@@ -25,7 +25,9 @@ const defaultConfig: Partial<IConfigurationType> = {
 
 const configGet = jest.fn();
 
-const mockConfigReturnValue = (config: Record<string, any> = defaultConfig) => {
+const mockConfigReturnValue = (
+  config: Record<string, unknown> = defaultConfig,
+) => {
   configGet.mockImplementation((key: string) => {
     if (key in config) {
       return config[key];
@@ -54,7 +56,7 @@ describe('InitService', () => {
     service = module.get<InitService>(InitService);
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
   });
 
@@ -62,7 +64,7 @@ describe('InitService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should properly resolve file path', async () => {
+  it('should properly resolve file path', () => {
     mockConfigReturnValue();
     const existsSyncSpy = jest.spyOn(fs, 'existsSync');
     const filePath = service.getFilePath('init.json');
@@ -70,7 +72,7 @@ describe('InitService', () => {
     expect(existsSyncSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('should properly resolve file path in multiple directories', async () => {
+  it('should properly resolve file path in multiple directories', () => {
     mockConfigReturnValue();
     const existsSyncSpy = jest.spyOn(fs, 'existsSync');
     const filePath = service.getFilePath('init1.json');
@@ -78,7 +80,7 @@ describe('InitService', () => {
     expect(existsSyncSpy).toHaveBeenCalledTimes(2);
   });
 
-  it('resolves files only from initPaths directories', async () => {
+  it('resolves files only from initPaths directories', () => {
     mockConfigReturnValue();
     const existsSyncSpy = jest.spyOn(fs, 'existsSync');
     const filePath = service.getFilePath('init2.json');
@@ -86,7 +88,7 @@ describe('InitService', () => {
     expect(existsSyncSpy).toHaveBeenCalledTimes(2);
   });
 
-  it('should properly add WWWROOT_TOKEN init location and use it as a config location', async () => {
+  it('should properly add WWWROOT_TOKEN init location and use it as a config location', () => {
     const config = { ...defaultConfig };
     config['config-file'] = 'test/test.json';
     config.initPaths = ['init', 'init/init1'];
@@ -101,7 +103,7 @@ describe('InitService', () => {
     configGet.mockClear();
   });
 
-  it("should return undefined when file doesn't exist", async () => {
+  it("should return undefined when file doesn't exist", () => {
     const config = { ...defaultConfig };
     config.initPaths = ['test/init', 'test/init/init1'];
     mockConfigReturnValue(config);

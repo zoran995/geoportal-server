@@ -18,9 +18,9 @@ export class ConfigLoader {
     });
     const jsonConfig = loadJsonConfig({ filePath: yargsConfig['config-file'] });
     const expandedConfig = ConfigLoader.expand(
-      jsonConfig,
+      jsonConfig as unknown as Record<string, unknown>,
       dotEnvConfig,
-    ) as ConfigurationDto;
+    ) as unknown as ConfigurationDto;
     const validatedConfig = validate(expandedConfig);
     const config = Object.assign(validatedConfig, yargsConfig);
 
@@ -42,15 +42,19 @@ export class ConfigLoader {
    * @param environment
    * @returns
    */
-  private static interpolate(configValue: string, environment: any): string {
+  private static interpolate(
+    configValue: string,
+    environment: Record<string, string>,
+  ): string {
     const matches = configValue.match(/(.?\${*[\w]*(?::-)?[\w]*}*)/g) || [];
-    return matches.reduce((newVal: any, match: any, index: any) => {
+    return matches.reduce((newVal: string, match: string, index: number) => {
       const parts = /(.?)\${*([\w]*(?::-)?[\w]*)?}*/g.exec(match);
       if (!parts || parts.length === 0) {
         return newVal;
       }
       const prefix = parts[1];
-      let value, replacePart;
+      let value: string;
+      let replacePart: string;
       if (prefix === '\\') {
         replacePart = parts[0];
         value = replacePart.replace('\\$', '$');
@@ -75,7 +79,7 @@ export class ConfigLoader {
   }
 
   private static expand(
-    config: Record<string, any>,
+    config: Record<string, unknown>,
     environment: Record<string, string>,
   ) {
     Object.keys(config).forEach((key) => {
@@ -86,9 +90,12 @@ export class ConfigLoader {
         for (let i = 0; i < value.length; i++) {
           const currentValue = value[i];
           if (typeof currentValue === 'string') {
-            config[key][i] = this.interpolate(currentValue, environment);
+            value[i] = this.interpolate(currentValue, environment);
           } else {
-            config[key][i] = this.expand(currentValue as any, environment);
+            value[i] = this.expand(
+              currentValue as Record<string, unknown>,
+              environment,
+            );
           }
         }
       } else if (typeof value === 'string') {

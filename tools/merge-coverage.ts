@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/require-await */
 /* SOURCE: https://github.com/facebook/jest/issues/2418#issuecomment-478932514 */
 /* tslint:disable:no-console */
 /*
@@ -5,7 +6,7 @@ ts-node ./merge-coverage.ts --report ./coverage0/coverage-final.json --report ./
 */
 
 import fs from 'fs';
-import { createCoverageMap } from 'istanbul-lib-coverage';
+import { CoverageMapData, createCoverageMap } from 'istanbul-lib-coverage';
 import libReport from 'istanbul-lib-report';
 import reports from 'istanbul-reports';
 
@@ -23,7 +24,7 @@ async function main() {
 
   reportFiles.forEach((file) => {
     const fileReport = fs.readFileSync(file, { encoding: 'utf8' });
-    map.merge(JSON.parse(fileReport));
+    map.merge(JSON.parse(fileReport) as CoverageMapData);
   });
 
   const context = libReport.createContext({

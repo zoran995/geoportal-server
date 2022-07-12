@@ -26,7 +26,7 @@ export class MailFeedbackService extends AbstractFeedbackService<MailFeedbackDto
     });
   }
 
-  async post(feedback: CreateFeedbackDto, request: Request): Promise<any> {
+  async post(feedback: CreateFeedbackDto, request: Request): Promise<unknown> {
     return this.transporter
       .sendMail({
         from: feedback.name,

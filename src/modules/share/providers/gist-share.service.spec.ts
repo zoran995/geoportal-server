@@ -26,7 +26,7 @@ const gistShareConfig = plainToClass(ShareGistDto, {
 describe('GistShareService', () => {
   let service: GistShareService;
   beforeEach(() => {
-    service = new GistShareService(gistShareConfig, httpServiceMock as any);
+    service = new GistShareService(gistShareConfig, httpServiceMock as never);
   });
 
   afterEach(() => {
@@ -62,7 +62,7 @@ describe('GistShareService', () => {
     it("don't set authorization header when there is no accessToken", async () => {
       const conf = { ...gistShareConfig };
       conf.accessToken = undefined;
-      service = new GistShareService(conf, httpServiceMock as any);
+      service = new GistShareService(conf, httpServiceMock as never);
       const responseData = { id: 'test' };
       mockHttpPost.mockReturnValue(of({ data: responseData }));
       const headers = {
@@ -148,7 +148,7 @@ describe('GistShareService', () => {
     it("don't set authorization header when there is no accessToken", async () => {
       const conf = { ...gistShareConfig };
       conf.accessToken = undefined;
-      service = new GistShareService(conf, httpServiceMock as any);
+      service = new GistShareService(conf, httpServiceMock as never);
       const responseData = {
         files: { '1st': { filename: '1st' }, '2nd': { filename: '2nd' } },
       };

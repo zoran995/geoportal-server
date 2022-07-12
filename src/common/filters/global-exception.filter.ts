@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   ArgumentsHost,
   Catch,
@@ -9,13 +10,15 @@ import { Request, Response } from 'express';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
-  catch(exception: any, host: ArgumentsHost): any {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  catch(exception: any, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
     const status =
-      (exception.getStatus && exception.getStatus() === 404) ||
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      (exception.getStatus && exception.getStatus?.() === 404) ||
       exception.statusCode === 404 ||
       exception.response?.status === 404
         ? HttpStatus.NOT_FOUND

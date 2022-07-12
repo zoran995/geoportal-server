@@ -85,7 +85,7 @@ async function sendRequest(
 }
 
 const mockConfigReturnValue = (
-  other: Record<string, any>,
+  other: Record<string, unknown>,
   proxy: ProxyConfigDto = defaultProxyConfig.proxy,
 ) => {
   mockConfigGet.mockImplementation((key: string) => {
@@ -100,7 +100,7 @@ const mockConfigReturnValue = (
 
 describe('ProxyService', () => {
   const url = 'https://example.com/blah?query=value&otherQuery=otherValue';
-  beforeEach(async () => {
+  beforeEach(() => {
     mockConfigReturnValue({});
   });
 

@@ -94,7 +94,19 @@ export class ProxyConfigDto {
 
   @IsObject()
   @NotNull()
-  proxyAuth?: Record<string, any>;
+  proxyAuth?: Record<string, ProxyAuth>;
+}
+
+export class ProxyAuth {
+  headers?: ProxyAuthHeaders[];
+  authorization?: string;
+}
+
+class ProxyAuthHeaders {
+  @IsString()
+  name!: string;
+  @IsString()
+  value!: string;
 }
 
 export class AppendParamToQueryStringDto {

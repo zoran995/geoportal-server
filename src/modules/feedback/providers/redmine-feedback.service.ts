@@ -23,7 +23,7 @@ export class RedmineFeedbackService extends AbstractFeedbackService<RedmineFeedb
     super(options);
   }
 
-  async post(feedback: CreateFeedbackDto, request: Request): Promise<any> {
+  async post(feedback: CreateFeedbackDto, request: Request): Promise<unknown> {
     return lastValueFrom(
       this.httpService
         .post(
@@ -47,9 +47,9 @@ export class RedmineFeedbackService extends AbstractFeedbackService<RedmineFeedb
           },
         )
         .pipe(
-          map((res) => res.data),
+          map((res) => res.data as Record<string, unknown>),
           catchError((e) => {
-            this.logger.error(`Creating feedback failed`, e);
+            this.logger.error(`Creating feedback failed`, e as never);
             throw new InternalServerErrorException();
           }),
         ),

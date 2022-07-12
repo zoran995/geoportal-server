@@ -28,7 +28,7 @@ export class ShareService {
    * @param body - Share data
    * @returns Share id
    */
-  async save(body: any): Promise<ISaveShareResponse> {
+  async save(body: Record<string, unknown>): Promise<ISaveShareResponse> {
     const newSharePrefix = this.configService.newPrefix;
     if (!isDefined(newSharePrefix)) {
       this.logger.error(
@@ -58,7 +58,7 @@ export class ShareService {
    * @param id - Share id
    * @returns Share data
    */
-  async resolve(id: string): Promise<string> {
+  async resolve(id: string): Promise<Record<string, unknown>> {
     const idSplit = id.match(splitPrefixRe);
     if (
       !isDefined(idSplit) ||
@@ -93,10 +93,10 @@ export class ShareService {
       }
       try {
         return this.shareServiceManager.create(shareConfig);
-      } catch (err: any) {
+      } catch (err: unknown) {
         this.logger.error(
           `An error occurred while getting share configuration`,
-          err,
+          err as never,
         );
         throw new InternalServerErrorException();
       }

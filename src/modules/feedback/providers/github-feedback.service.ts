@@ -29,7 +29,7 @@ export class GithubFeedbackService extends AbstractFeedbackService<GithubFeedbac
   /**
    * Create new issue on github with specific comment
    */
-  async post(feedback: CreateFeedbackDto, request: Request): Promise<any> {
+  async post(feedback: CreateFeedbackDto, request: Request): Promise<unknown> {
     const headers = {
       'User-Agent': this.options.userAgent,
       Accept: 'application/vnd.github.v3+json',
@@ -56,7 +56,7 @@ export class GithubFeedbackService extends AbstractFeedbackService<GithubFeedbac
             };
           }),
           catchError((e) => {
-            this.logger.error(`Creating feedback failed`, e);
+            this.logger.error(`Creating feedback failed`, e as never);
             throw new InternalServerErrorException();
           }),
         ),

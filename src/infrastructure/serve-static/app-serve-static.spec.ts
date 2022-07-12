@@ -50,7 +50,7 @@ describe('AppServeStatic', () => {
     service = module.get<AppServeStatic>(AppServeStatic);
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
   });
 

@@ -36,8 +36,8 @@ const redmineConf: RedmineFeedbackDto = {
 describe('RedmineFeedbackService', () => {
   let service: RedmineFeedbackService;
 
-  beforeEach(async () => {
-    service = new RedmineFeedbackService(redmineConf, httpServiceMock as any);
+  beforeEach(() => {
+    service = new RedmineFeedbackService(redmineConf, httpServiceMock as never);
   });
 
   afterEach(() => {
@@ -57,7 +57,7 @@ describe('RedmineFeedbackService', () => {
       password: redmineConf.password,
     };
 
-    await service.post({}, req as any);
+    await service.post({}, req as never);
     expect(mockHttpPost).toHaveBeenCalledTimes(1);
     expect(mockHttpPost).toHaveBeenCalledWith(
       redmineConf.issuesUrl,
@@ -82,7 +82,7 @@ describe('RedmineFeedbackService', () => {
     mockHttpPost.mockReturnValue(throwError(() => new Error('test error')));
 
     try {
-      await service.post({}, req as any);
+      await service.post({}, req as never);
     } catch (err) {
       expect(mockHttpPost).toHaveBeenCalledTimes(1);
       expect(mockHttpPost).toHaveBeenCalledWith(

@@ -86,8 +86,10 @@ export function loadYargs(
       if (key !== '_') {
         yargs.coerce(key, (opt) => {
           if (Array.isArray(opt) && opt.length > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return opt[opt.length - 1];
           } else {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return opt;
           }
         });

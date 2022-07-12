@@ -33,15 +33,17 @@ const requestHeaders = {
   'Proxy-Connection': 'delete me',
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const axiosRequest: any = axios.request;
 
 axios.Cancel = Cancel;
 axios.CancelToken = CancelToken;
 axiosRequest.mockImplementation(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (reqConfig: AxiosRequestConfig): Promise<AxiosResponse<any>> => {
     let status = 200;
     if (reqConfig.headers && 'x-give-response-status' in reqConfig.headers) {
-      status = reqConfig.headers['x-give-response-status'] as any as number;
+      status = reqConfig.headers['x-give-response-status'] as unknown as number;
     }
 
     return Promise.resolve({
@@ -114,7 +116,9 @@ async function buildApp(configFile: string) {
   await app.init();
 
   const agent = supertest.agent(app.getHttpServer());
-  agent.use((req) => req.set({ 'x-client-id': 'e2e-test-client' }));
+  agent.use((req) => {
+    req.set({ 'x-client-id': 'e2e-test-client' });
+  });
 
   return { app, agent };
 }

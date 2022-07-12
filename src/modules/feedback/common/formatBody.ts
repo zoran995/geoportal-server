@@ -20,6 +20,7 @@ export function formatBody(
   if (additionalParameters) {
     additionalParameters.forEach((parameter) => {
       result += `* ${parameter.descriptiveLabel}: ${
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (<any>feedback)[parameter.name] || 'Nije unešeno'
       }\n`;
     });

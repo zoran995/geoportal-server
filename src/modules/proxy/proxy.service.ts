@@ -98,7 +98,7 @@ export class ProxyService {
       remoteUrl,
       filteredReqHeaders,
       maxAge,
-      <any>proxy,
+      proxy as unknown as AxiosProxyConfig,
     );
   }
 
@@ -124,7 +124,7 @@ export class ProxyService {
     proxy?: AxiosProxyConfig,
     retryWithoutAuth = false,
     proxyAuthCredentials = false,
-  ): Promise<any> | never {
+  ): Promise<unknown> | never {
     const proxyHeaders = { ...headers };
     const authRequired = this.proxyConfigService.proxyAuth[remoteUrl.host];
 
@@ -137,7 +137,7 @@ export class ProxyService {
       }
       if (authRequired.headers) {
         // a mechanism to pass arbitrary headers.
-        authRequired.headers.forEach(function (header: any) {
+        authRequired.headers.forEach(function (header) {
           proxyHeaders[header.name] = header.value;
         });
       }
@@ -161,14 +161,14 @@ export class ProxyService {
           maxBodyLength: this.proxyConfigService.postSizeLimit,
           beforeRedirect: (options, { headers }) =>
             this.beforeRedirect(headers, remoteUrl),
-          onHttpSocketEvent: this.onHttpSocketEvent,
+          onHttpSocketEvent: (config) => this.onHttpSocketEvent(config),
         })
         .pipe(
           map((response) => {
             const maxAgeSeconds = response.status >= 400 ? undefined : maxAge;
             this.request.res?.writeHead(
               response.status,
-              <any>processHeaders(response.headers, maxAgeSeconds),
+              processHeaders(response.headers, maxAgeSeconds),
             );
 
             // have to go this way since express will add charset Content-Type
@@ -179,7 +179,7 @@ export class ProxyService {
           catchError((err) => {
             // before redirect may throw BadRequestException we catch it here
             // and throw instance of it
-            this.logger.error('An error occurred', err);
+            this.logger.error('An error occurred', err as never);
             if (
               !retryWithoutAuth &&
               (err.status === 403 ||
@@ -220,10 +220,11 @@ export class ProxyService {
               }
             }
             if (err instanceof HttpException) {
-              if ((err as any).toJSON) {
-                const errJson = (err as any).toJSON();
+              if (Object.prototype.hasOwnProperty.call(err, 'toJSON')) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
+                const errJson = (err as any)?.toJSON();
                 throw Object.create(err, {
-                  response: { value: errJson.message },
+                  response: { value: errJson.message as never },
                 });
               } else if (err.getResponse) {
                 throw Object.create(err, {
@@ -239,8 +240,9 @@ export class ProxyService {
               err.message
             ) {
               throw new HttpException(
-                err.message,
-                err.response?.status || err.response?.statusCode,
+                err.message as never,
+                (err.response?.status as never) ||
+                  (err.response?.statusCode as never),
               );
             }
             //throw err;
@@ -266,7 +268,7 @@ export class ProxyService {
   }
 
   private onHttpSocketEvent(socket: NodeJS.Socket) {
-    socket.once('lookup', (err, address) => {
+    socket.once('lookup', (err, address: string) => {
       if (this.proxyListService.addressBlacklisted(address)) {
         // ip address is blacklisted so emit an error to abort request
         socket.emit(
@@ -282,8 +284,7 @@ export class ProxyService {
    * @returns the search query
    */
   private getQuery() {
-    const baseURL =
-      this.request.protocol + '://' + this.request.headers.host + '/';
+    const baseURL = `${this.request.protocol}://${this.request.headers.host}/`;
     const reqUrl = new URL(this.request.url, baseURL);
     return reqUrl.search;
   }

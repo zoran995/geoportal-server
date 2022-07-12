@@ -36,7 +36,7 @@ const githubFeedbackConfig = plainToClass(GithubFeedbackDto, {
 describe('GithubFeedbackService', () => {
   let service: GithubFeedbackService;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     service = new GithubFeedbackService(
       githubFeedbackConfig,
       httpServiceMock as any,
@@ -68,7 +68,7 @@ describe('GithubFeedbackService', () => {
       comment: 'test',
     };
 
-    await service.post(payload, req as any);
+    await service.post(payload, req as never);
     expect(mockHttpPost).toBeCalledTimes(1);
     expect(mockHttpPost).toHaveBeenCalledWith(
       githubFeedbackConfig.issuesUrl,
@@ -87,7 +87,7 @@ describe('GithubFeedbackService', () => {
     mockHttpPost.mockReturnValue(throwError(() => new Error('test error')));
 
     try {
-      await service.post({}, req as any);
+      await service.post({}, req as never);
     } catch (err) {
       expect(mockHttpPost).toBeCalledTimes(1);
       expect(mockHttpPost).toHaveBeenCalledWith(

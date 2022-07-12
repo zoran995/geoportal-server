@@ -16,7 +16,7 @@ export class ValidationErrorsFormatter {
           isDefined(constraints)
         ) {
           p[c.property] = {
-            value: c.value,
+            value: c.value as never,
             constraints: Object.keys(constraints).map((key) => {
               const obj: Record<string, string> = {};
               obj[key] = constraints[key] + '.\u00a0';

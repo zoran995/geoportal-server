@@ -4,6 +4,7 @@ import {
   ServeStaticModuleOptions,
   ServeStaticModuleOptionsFactory,
 } from '@nestjs/serve-static';
+import { Response } from 'express';
 
 import { existsSync } from 'fs';
 import path, { extname } from 'path';
@@ -46,7 +47,7 @@ export class AppServeStatic implements ServeStaticModuleOptionsFactory {
         serveStaticOptions: {
           dotfiles: 'ignore',
           index: serveStatic.resolvePathRelativeToWwwroot,
-          setHeaders: (res, path) => {
+          setHeaders: (res: Response, path) => {
             const type = extname(path);
             if (type === '.czml' || type === '.geojson') {
               res.header('Content-type', 'application/json');

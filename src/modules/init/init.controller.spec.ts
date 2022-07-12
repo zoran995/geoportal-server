@@ -61,11 +61,11 @@ describe('InitController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should sanitize filename', async () => {
+  it('should sanitize filename', () => {
     expect.assertions(3);
     const getFilePathSpy = jest.spyOn(initService, 'getFilePath');
     try {
-      await controller.serveInitFile(
+      controller.serveInitFile(
         { fileName: '../serverconfig.json' },
         responseMock,
       );
@@ -76,18 +76,18 @@ describe('InitController', () => {
     }
   });
 
-  it('should return file', async () => {
-    await controller.serveInitFile({ fileName: 'init.json' }, responseMock);
+  it('should return file', () => {
+    controller.serveInitFile({ fileName: 'init.json' }, responseMock);
     expect(responseMock.sendFile).toBeCalledTimes(1);
     expect(responseMock.sendFile).toBeCalledWith(
       path.resolve('.', 'test/init/init.json'),
     );
   });
 
-  it('should return 404 - file not found', async () => {
+  it('should return 404 - file not found', () => {
     expect.assertions(2);
     try {
-      await controller.serveInitFile(
+      controller.serveInitFile(
         { fileName: 'init-not-found.json' },
         responseMock,
       );

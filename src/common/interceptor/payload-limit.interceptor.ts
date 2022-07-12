@@ -6,6 +6,7 @@ import {
   NestInterceptor,
   PayloadTooLargeException,
 } from '@nestjs/common';
+import { Request } from 'express';
 
 import { Observable } from 'rxjs';
 
@@ -24,9 +25,9 @@ export class PayloadLimitInterceptor implements NestInterceptor {
   intercept(
     context: ExecutionContext,
     next: CallHandler,
-  ): Observable<any> | never {
+  ): Observable<unknown> | never {
     const ctx = context.switchToHttp();
-    const request = ctx.getRequest();
+    const request = ctx.getRequest<Request>();
     const size = request.socket.bytesRead;
     if (this.postSizeLimit && size > this.postSizeLimit) {
       throw new PayloadTooLargeException();

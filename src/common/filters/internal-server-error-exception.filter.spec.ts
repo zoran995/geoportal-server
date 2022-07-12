@@ -35,7 +35,7 @@ describe('InternalServerErrorExceptionFilter', () => {
   const wwwroot = './test/mockwwwroot';
   let filter: InternalServerErrorExceptionFilter;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     filter = new InternalServerErrorExceptionFilter(wwwroot);
   });
 
@@ -47,7 +47,7 @@ describe('InternalServerErrorExceptionFilter', () => {
     expect(filter).toBeDefined();
   });
 
-  it('properly serves 500 page', async () => {
+  it('properly serves 500 page', () => {
     fs.writeFileSync(`${wwwroot}/500.html`, '500!');
     filter.catch(new InternalServerErrorException(), mockExecutionContext);
     expect(mockStatus).toHaveBeenCalledTimes(1);
@@ -59,7 +59,7 @@ describe('InternalServerErrorExceptionFilter', () => {
     fs.unlinkSync(`${wwwroot}/500.html`);
   });
 
-  it("calls super error filter when 500 page does't exist", async () => {
+  it("calls super error filter when 500 page does't exist", () => {
     filter.catch(new InternalServerErrorException(), mockExecutionContext);
     expect(spyHttpException).toHaveBeenCalledTimes(1);
   });

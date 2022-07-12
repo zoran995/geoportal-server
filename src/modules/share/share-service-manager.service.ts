@@ -10,7 +10,8 @@ import { ShareServiceDtoType } from './types/share-service-dto.type';
 
 @Injectable()
 export class ShareServiceManager {
-  readonly shareServices: any[] = [];
+  readonly shareServices: AbstractShareService<ShareS3Dto | ShareGistDto>[] =
+    [];
 
   constructor(private readonly httpService: HttpService) {}
 

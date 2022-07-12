@@ -44,7 +44,7 @@ describe('ProxyListService', () => {
     proxyConfigService = module.get<ProxyConfigService>(ProxyConfigService);
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     jest.clearAllMocks();
     service.onModuleDestroy();
   });
