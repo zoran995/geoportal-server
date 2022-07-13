@@ -22,9 +22,8 @@ export class ConfigLoader {
       dotEnvConfig,
     ) as unknown as ConfigurationDto;
     const validatedConfig = validate(expandedConfig);
-    const config = Object.assign(validatedConfig, yargsConfig);
 
-    return config;
+    return Object.assign(validatedConfig, yargsConfig);
   }
 
   /**

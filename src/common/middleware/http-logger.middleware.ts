@@ -8,7 +8,7 @@ import { LoggerService } from 'src/infrastructure/logger';
 export class HttpLoggerMiddleware implements NestMiddleware {
   private readonly logger = new LoggerService(HttpLoggerMiddleware.name);
 
-  use(req: Request, res: Response, next: NextFunction) {
+  use(req: Request, _res: Response, next: NextFunction) {
     const { body, params, query } = req;
     const requestUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
 
