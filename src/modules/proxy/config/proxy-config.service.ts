@@ -6,6 +6,7 @@ import {
   IConfigurationType,
 } from 'src/infrastructure/config';
 
+import { ProxyAuthConfigDto } from '../dto/proxy-auth-config.dto';
 import { ProxyConfigDto } from '../dto/proxy-config.dto';
 
 @Injectable()
@@ -78,7 +79,7 @@ export class ProxyConfigService {
   }
 
   get proxyAuth() {
-    return this.proxyConfig?.proxyAuth || {};
+    return this.proxyConfig?.proxyAuth || new Map<string, ProxyAuthConfigDto>();
   }
 
   private get proxyConfig() {

@@ -15,6 +15,7 @@
       ]
     },
     "basicAuthentication": {
+      "additionalProperties": false,
       "$ref": "#/definitions/BasicAuthenticationDto",
       "type": "object"
     },
@@ -38,19 +39,23 @@
       "type": "array"
     },
     "share": {
+      "additionalProperties": false,
       "$ref": "#/definitions/ShareConfigDto",
       "type": "object"
     },
     "feedback": {
+      "additionalProperties": false,
       "$ref": "#/definitions/FeedbackConfigDto",
       "type": "object"
     },
     "proxy": {
+      "additionalProperties": false,
       "$ref": "#/definitions/ProxyConfigDto",
       "type": "object"
     },
     "trustProxy": {},
     "serveStatic": {
+      "additionalProperties": false,
       "$ref": "#/definitions/ServeStaticDto",
       "type": "object"
     },
@@ -323,12 +328,15 @@
             "$ref": "#/definitions/BaseFeedbackDto",
             "oneOf": [
               {
+                "additionalProperties": false,
                 "$ref": "#/definitions/GithubFeedbackDto"
               },
               {
+                "additionalProperties": false,
                 "$ref": "#/definitions/MailFeedbackDto"
               },
               {
+                "additionalProperties": false,
                 "$ref": "#/definitions/RedmineFeedbackDto"
               }
             ]
@@ -343,6 +351,68 @@
       "required": [
         "primaryId",
         "options"
+      ]
+    },
+    "CreateFeedbackDto": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "format": "email",
+          "type": "string"
+        },
+        "shareLink": {
+          "oneOf": [
+            {
+              "format": "uri",
+              "pattern": "^(https?|wss?|ftp)://"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
+            }
+          ]
+        },
+        "comment": {
+          "minLength": 30,
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ProxyAuthConfigDto": {
+      "additionalProperties": false,
+      "properties": {
+        "headers": {
+          "items": {
+            "additionalProperties": false,
+            "$ref": "#/definitions/ProxyAuthHeaders"
+          },
+          "type": "array"
+        },
+        "authorization": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ProxyAuthHeaders": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "value"
       ]
     },
     "ProxyConfigDto": {
@@ -428,6 +498,9 @@
           "type": "object"
         },
         "proxyAuth": {
+          "additionalProperties": {
+            "$ref": "#/definitions/ProxyAuthConfigDto"
+          },
           "type": "object"
         }
       },
@@ -447,36 +520,6 @@
         "regexPattern",
         "params"
       ]
-    },
-    "ServeStaticDto": {
-      "properties": {
-        "serveStatic": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "type": "string",
-              "pattern": "^\\$.*"
-            }
-          ]
-        },
-        "resolvePathRelativeToWwwroot": {
-          "type": "string"
-        },
-        "resolveUnmatchedPathsWithIndexHtml": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "type": "string",
-              "pattern": "^\\$.*"
-            }
-          ]
-        }
-      },
-      "type": "object"
     },
     "ShareDto": {
       "properties": {
@@ -628,9 +671,11 @@
             "$ref": "#/definitions/ShareDto",
             "oneOf": [
               {
+                "additionalProperties": false,
                 "$ref": "#/definitions/ShareGistDto"
               },
               {
+                "additionalProperties": false,
                 "$ref": "#/definitions/ShareS3Dto"
               }
             ]
@@ -698,6 +743,7 @@
           "pattern": "^[0-9a-zA-Z]+$"
         },
         "rateLimit": {
+          "additionalProperties": false,
           "$ref": "#/definitions/RateLimitDto",
           "type": "object"
         }
@@ -707,6 +753,36 @@
         "username",
         "password"
       ]
+    },
+    "ServeStaticDto": {
+      "properties": {
+        "serveStatic": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
+            }
+          ]
+        },
+        "resolvePathRelativeToWwwroot": {
+          "type": "string"
+        },
+        "resolveUnmatchedPathsWithIndexHtml": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\$.*"
+            }
+          ]
+        }
+      },
+      "type": "object"
     }
   }
 }

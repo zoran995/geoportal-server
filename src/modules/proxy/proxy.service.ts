@@ -126,7 +126,7 @@ export class ProxyService {
     proxyAuthCredentials = false,
   ): Promise<unknown> | never {
     const proxyHeaders = { ...headers };
-    const authRequired = this.proxyConfigService.proxyAuth[remoteUrl.host];
+    const authRequired = this.proxyConfigService.proxyAuth.get(remoteUrl.host);
 
     if (!retryWithoutAuth && authRequired && !headers['authorization']) {
       // identify that we tried using proxy auth headers

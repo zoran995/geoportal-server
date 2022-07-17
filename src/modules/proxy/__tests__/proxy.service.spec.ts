@@ -317,9 +317,7 @@ describe('ProxyService', () => {
         authorization: 'testauth',
       };
       const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.proxyAuth = {
-        'example.com': auth,
-      };
+      proxyConf.proxyAuth = new Map([['example.com', auth]]);
       mockConfigReturnValue({}, proxyConf);
       mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
       await sendRequest(url);
@@ -336,9 +334,7 @@ describe('ProxyService', () => {
         authorization: 'testauth',
       };
       const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.proxyAuth = {
-        'example2.com': auth,
-      };
+      proxyConf.proxyAuth = new Map([['example2.com', auth]]);
       mockConfigReturnValue({}, proxyConf);
       mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
       await sendRequest(url);
@@ -355,9 +351,7 @@ describe('ProxyService', () => {
         authorization: 'testauth',
       };
       const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.proxyAuth = {
-        'example.com': auth,
-      };
+      proxyConf.proxyAuth = new Map([['example.com', auth]]);
       mockHttpRequest
         .mockReturnValueOnce(throwError(() => new ForbiddenException()))
         .mockReturnValueOnce(of({ data: 'success' }));
@@ -387,9 +381,7 @@ describe('ProxyService', () => {
       };
       try {
         const proxyConf = { ...defaultProxyConfig.proxy };
-        proxyConf.proxyAuth = {
-          'example.com': auth,
-        };
+        proxyConf.proxyAuth = new Map([['example.com', auth]]);
         mockHttpRequest.mockReturnValueOnce(
           throwError(() => new NotFoundException()),
         );
@@ -427,9 +419,7 @@ describe('ProxyService', () => {
         authorization: 'testauth',
       };
       const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.proxyAuth = {
-        'example.com': auth,
-      };
+      proxyConf.proxyAuth = new Map([['example.com', auth]]);
       mockConfigReturnValue({}, proxyConf);
       mockHttpRequest
         .mockReturnValueOnce(throwError(() => new ForbiddenException()))
@@ -453,9 +443,7 @@ describe('ProxyService', () => {
         authorization: 'testauth',
       };
       const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.proxyAuth = {
-        'example.com': auth,
-      };
+      proxyConf.proxyAuth = new Map([['example.com', auth]]);
       mockConfigReturnValue({}, proxyConf);
       mockHttpRequest
         .mockReturnValueOnce(throwError(() => new ForbiddenException()))
@@ -514,11 +502,7 @@ describe('ProxyService', () => {
         },
       ];
       const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.proxyAuth = {
-        'example.com': {
-          headers: headers,
-        },
-      };
+      proxyConf.proxyAuth = new Map([['example.com', { headers: headers }]]);
       mockConfigReturnValue({}, proxyConf);
       mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
 
@@ -547,11 +531,8 @@ describe('ProxyService', () => {
         },
       ];
       const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.proxyAuth = {
-        'example2.com': {
-          headers: headers,
-        },
-      };
+      proxyConf.proxyAuth = new Map([['example2.com', { headers: headers }]]);
+
       mockConfigReturnValue({}, proxyConf);
       mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
 

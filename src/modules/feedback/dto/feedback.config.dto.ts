@@ -45,9 +45,15 @@ export class FeedbackConfigDto {
   @JSONSchema({
     items: {
       oneOf: [
-        { $ref: '#/definitions/GithubFeedbackDto' },
-        { $ref: '#/definitions/MailFeedbackDto' },
-        { $ref: '#/definitions/RedmineFeedbackDto' },
+        {
+          additionalProperties: false,
+          $ref: '#/definitions/GithubFeedbackDto',
+        },
+        { additionalProperties: false, $ref: '#/definitions/MailFeedbackDto' },
+        {
+          additionalProperties: false,
+          $ref: '#/definitions/RedmineFeedbackDto',
+        },
       ],
     },
     type: 'array',

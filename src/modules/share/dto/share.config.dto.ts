@@ -50,8 +50,8 @@ export class ShareConfigDto {
   @JSONSchema({
     items: {
       oneOf: [
-        { $ref: '#/definitions/ShareGistDto' },
-        { $ref: '#/definitions/ShareS3Dto' },
+        { additionalProperties: false, $ref: '#/definitions/ShareGistDto' },
+        { additionalProperties: false, $ref: '#/definitions/ShareS3Dto' },
       ],
     },
     type: 'array',

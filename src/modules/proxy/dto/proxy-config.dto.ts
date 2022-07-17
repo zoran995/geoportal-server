@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -6,11 +7,13 @@ import {
   IsObject,
   IsString,
   Min,
+  ValidateNested,
 } from 'class-validator';
 
 import { NotNull, isFqdnOrIp } from 'src/common/validators';
 
 import { DEFAULT_BLACKLIST } from '../proxy.constants';
+import { ProxyAuthConfigDto } from './proxy-auth-config.dto';
 
 export class ProxyConfigDto {
   /**
@@ -94,19 +97,10 @@ export class ProxyConfigDto {
 
   @IsObject()
   @NotNull()
-  proxyAuth?: Record<string, ProxyAuth>;
-}
-
-export class ProxyAuth {
-  headers?: ProxyAuthHeaders[];
-  authorization?: string;
-}
-
-class ProxyAuthHeaders {
-  @IsString()
-  name!: string;
-  @IsString()
-  value!: string;
+  //proxyAuth?: Record<string, ProxyAuthConfigDto>;
+  @ValidateNested({ each: true })
+  @Type(() => ProxyAuthConfigDto)
+  proxyAuth?: Map<string, ProxyAuthConfigDto>;
 }
 
 export class AppendParamToQueryStringDto {
