@@ -45,7 +45,7 @@
     "@nestjs/config": "2.2.0",
     "@nestjs/core": "9.0.11",
     "@nestjs/platform-express": "9.0.11",
-    "@nestjs/serve-static": "2.2.2",
+    "@nestjs/serve-static": "3.0.0",
     "@nestjs/swagger": "5.2.1",
     "axios": "github:zoran995/axios.git#geoportal",
     "base-x": "4.0.0",
