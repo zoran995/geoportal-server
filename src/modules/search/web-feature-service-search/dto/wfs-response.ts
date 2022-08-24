@@ -5,5 +5,6 @@ export interface IWfs1_1_0Response {
 
 export interface IWfs2_0_0Response {
   member: Record<string, unknown>[];
-  numberOfFeatures: number;
+  numberReturned: number;
+  numberMatched: number;
 }

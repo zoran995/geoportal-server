@@ -1,16 +1,21 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
+import { XMLParser } from 'fast-xml-parser';
 import { lastValueFrom } from 'rxjs';
 
 import { WfsSearchConfigService } from './config/wfs-search-config.service';
 import { ISearchResponse } from './dto/response/search-response';
 import { IWfs1_1_0Response, IWfs2_0_0Response } from './dto/wfs-response';
 import { WfsSearchLayerDto } from './dto/wfs-search-layer.dto';
-import { xml2json } from './util/xml2json';
 
 @Injectable()
 export class WfsSearchService {
+  private readonly parser = new XMLParser({
+    ignoreAttributes: false,
+    attributeNamePrefix: '',
+    removeNSPrefix: true,
+  });
   constructor(
     private readonly _httpService: HttpService,
     private readonly wfsConfigService: WfsSearchConfigService,
@@ -69,12 +74,15 @@ export class WfsSearchService {
     );
 
     const xml = await lastValueFrom(this._httpService.get<string>(url.href));
-    const json: IWfs1_1_0Response | IWfs2_0_0Response = xml2json(xml.data);
+    const json: IWfs1_1_0Response | IWfs2_0_0Response = this.parser.parse(
+      xml.data,
+    ).FeatureCollection;
 
-    result.count = json.numberOfFeatures;
     if (wfsLayer.version === '1.1.0') {
+      result.count = (json as IWfs1_1_0Response).numberOfFeatures;
       result.features = (json as IWfs1_1_0Response).featureMember;
     } else if (wfsLayer.version === '2.0.0') {
+      result.count = (json as IWfs2_0_0Response).numberReturned;
       result.features = (json as IWfs2_0_0Response).member;
     }
 

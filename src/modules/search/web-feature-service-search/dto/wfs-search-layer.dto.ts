@@ -71,7 +71,7 @@ export class WfsSearchLayerDto {
   @IsString()
   @IsNotEmpty()
   @IsIn(['1.1.0', '2.0.0'])
-  version: '1.1.0' | '2.0.0' = '1.1.0';
+  version: '1.1.0' | '2.0.0' = '2.0.0';
 
   /**
    * Minimum number of characters to search for.
