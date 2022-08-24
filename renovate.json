@@ -8,5 +8,6 @@
   ],
   "labels": [
     "dependencies"
-  ]
+  ],
+  "stabilityDays": 7
 }
