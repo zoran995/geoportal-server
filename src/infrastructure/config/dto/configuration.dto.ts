@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -13,6 +14,7 @@ import { NotNull } from 'src/common/validators';
 
 import { FeedbackConfigDto } from 'src/modules/feedback';
 import { ProxyConfigDto } from 'src/modules/proxy';
+import { WfsSearchConfigDto } from 'src/modules/search/web-feature-service-search/dto/wfs-search.dto';
 import { ShareConfigDto } from 'src/modules/share';
 
 import { ServeStaticDto } from '../../serve-static/dto/serve-static.dto';
@@ -108,4 +110,9 @@ export class ConfigurationDto {
   @NotNull()
   @ValidateNested()
   serveStatic: ServeStaticDto = new ServeStaticDto();
+
+  @IsObject()
+  @ValidateNested({ each: true })
+  @Type(() => WfsSearchConfigDto)
+  wfsSearch?: WfsSearchConfigDto;
 }

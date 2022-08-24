@@ -15,6 +15,7 @@ import { InitModule } from './modules/init';
 import { PingModule } from './modules/ping';
 import { Proj4Module } from './modules/proj4';
 import { ProxyModule } from './modules/proxy';
+import { SearchModule } from './modules/search';
 import { ServerConfigModule } from './modules/server-config';
 import { ShareModule } from './modules/share';
 
@@ -31,6 +32,7 @@ import { ShareModule } from './modules/share';
     PingModule,
     Proj4Module,
     ServerConfigModule,
+    SearchModule,
   ],
 })
 export class AppModule implements NestModule {

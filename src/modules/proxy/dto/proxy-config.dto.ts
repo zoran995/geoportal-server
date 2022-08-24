@@ -97,7 +97,6 @@ export class ProxyConfigDto {
 
   @IsObject()
   @NotNull()
-  //proxyAuth?: Record<string, ProxyAuthConfigDto>;
   @ValidateNested({ each: true })
   @Type(() => ProxyAuthConfigDto)
   proxyAuth?: Map<string, ProxyAuthConfigDto>;
