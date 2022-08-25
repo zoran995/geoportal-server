@@ -22,7 +22,6 @@ export class WfsSearchController {
       query.sortBy,
       query.propertyName,
       query.maxFeatures,
-      query.bbox,
     );
   }
 }

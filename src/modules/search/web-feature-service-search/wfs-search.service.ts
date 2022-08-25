@@ -28,7 +28,6 @@ export class WfsSearchService {
     sortBy: string | undefined,
     propertyName: string | undefined,
     maxFeatures: number | undefined,
-    bbox: string | undefined,
   ): Promise<ISearchResponse | undefined> {
     if (!searchText) {
       throw new BadRequestException('Search text is required');
@@ -39,14 +38,7 @@ export class WfsSearchService {
       throw new BadRequestException(`Layer ${id} not found`);
     }
 
-    return this.doSearch(
-      layer,
-      searchText,
-      sortBy,
-      propertyName,
-      maxFeatures,
-      bbox,
-    );
+    return this.doSearch(layer, searchText, sortBy, propertyName, maxFeatures);
   }
 
   private async doSearch(
@@ -55,7 +47,6 @@ export class WfsSearchService {
     sortBy: string | undefined,
     propertyName: string | undefined,
     maxFeatures: number | undefined,
-    bbox: string | undefined,
   ): Promise<ISearchResponse | undefined> {
     const result: ISearchResponse = {
       count: 0,
@@ -71,7 +62,6 @@ export class WfsSearchService {
       sortBy,
       propertyName,
       maxFeatures,
-      bbox,
     );
 
     const headers: AxiosRequestHeaders = {};
@@ -113,7 +103,6 @@ export class WfsSearchService {
     sortBy: string | undefined = undefined,
     propertyName: string | undefined = undefined,
     maxFeatures: number | undefined = undefined,
-    bbox: string | undefined = undefined,
   ) {
     const url = new URL(wfsLayer.url);
     url.searchParams.set('service', 'WFS');
@@ -141,10 +130,6 @@ export class WfsSearchService {
 
     if (sortBy) {
       url.searchParams.set('sortBy', sortBy);
-    }
-
-    if (bbox) {
-      url.searchParams.set('bbox', bbox);
     }
 
     const filter = this.prepareFilter(wfsLayer.searchPropertyName, searchText);

@@ -1,7 +1,5 @@
 import { Type } from 'class-transformer';
 import {
-  ArrayMaxSize,
-  ArrayMinSize,
   IsArray,
   IsDefined,
   IsIn,
@@ -56,16 +54,6 @@ export class WfsSearchLayerDto {
   @IsNumber()
   @Min(1)
   maxFeatures = 10;
-
-  /**
-   * BBox of the search area.
-   */
-  @IsArray()
-  @IsNumber({}, { each: true })
-  @ArrayMinSize(4)
-  @ArrayMaxSize(4)
-  @IsOptional()
-  bbox?: [number, number, number, number];
 
   /**
    * Properties to search for.
