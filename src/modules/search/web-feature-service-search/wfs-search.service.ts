@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
+import { AxiosRequestHeaders } from 'axios';
 import { XMLParser } from 'fast-xml-parser';
 import { lastValueFrom } from 'rxjs';
 
@@ -35,7 +36,7 @@ export class WfsSearchService {
 
     const layer = this.wfsConfigService.getWfsSearchLayer(id);
     if (!layer) {
-      throw new BadRequestException('Layer not found');
+      throw new BadRequestException(`Layer ${id} not found`);
     }
 
     return this.doSearch(
@@ -73,7 +74,20 @@ export class WfsSearchService {
       bbox,
     );
 
-    const xml = await lastValueFrom(this._httpService.get<string>(url.href));
+    const headers: AxiosRequestHeaders = {};
+    const auth = wfsLayer.auth;
+    if (auth?.authorization) {
+      headers['authorization'] = auth.authorization;
+    }
+    if (auth?.headers) {
+      auth.headers.forEach(function (header) {
+        headers[header.name] = header.value;
+      });
+    }
+
+    const xml = await lastValueFrom(
+      this._httpService.get<string>(url.href, headers),
+    );
     const json: IWfs1_1_0Response | IWfs2_0_0Response = this.parser.parse(
       xml.data,
     ).FeatureCollection;
@@ -114,7 +128,7 @@ export class WfsSearchService {
       );
     } else if (wfsLayer.version === '2.0.0') {
       url.searchParams.set('typeNames', wfsLayer.searchPropertyTypeName);
-      url.searchParams.set('count', `${wfsLayer.maxFeatures}`);
+      url.searchParams.set('count', `${maxFeatures || wfsLayer.maxFeatures}`);
     }
 
     const propertyNames = this.processPropertyNames(

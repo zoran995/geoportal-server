@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   ArrayMaxSize,
   ArrayMinSize,
@@ -6,10 +7,26 @@ import {
   IsIn,
   IsNotEmpty,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
   Min,
+  ValidateNested,
 } from 'class-validator';
+
+import { NotNull } from 'src/common/validators';
+
+class WfsAuthConfigDto {
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => WfsAuthHeaders)
+  headers?: WfsAuthHeaders[];
+
+  @IsString()
+  @IsOptional()
+  authorization?: string;
+}
 
 export class WfsSearchLayerDto {
   /**
@@ -79,4 +96,16 @@ export class WfsSearchLayerDto {
   @IsNumber()
   @Min(0)
   minCharacters = 2;
+
+  @IsObject()
+  @NotNull()
+  @Type(() => WfsAuthConfigDto)
+  auth?: WfsAuthConfigDto;
+}
+
+class WfsAuthHeaders {
+  @IsString()
+  name!: string;
+  @IsString()
+  value!: string;
 }
