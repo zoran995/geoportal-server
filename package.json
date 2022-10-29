@@ -54,7 +54,7 @@
     "class-validator-jsonschema": "3.1.1",
     "compression": "1.7.4",
     "dotenv": "16.0.1",
-    "dotenv-expand": "8.0.3",
+    "dotenv-expand": "9.0.0",
     "helmet": "5.1.1",
     "nodemailer": "6.7.8",
     "proj4-cli-defs": "1.0.0",
