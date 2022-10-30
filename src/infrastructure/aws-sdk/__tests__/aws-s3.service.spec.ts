@@ -68,7 +68,7 @@ describe('AwsSdkService', () => {
       const value = 'fake key';
       const buf = Buffer.from(value);
       const stream = Readable.from(buf);
-      s3Mock.on(GetObjectCommand).resolves({ Body: stream });
+      s3Mock.on(GetObjectCommand).resolves({ Body: stream } as never);
       const response = await service.resolveObject({
         Bucket: 'aaa',
         Key: 'test-key',
