@@ -1631,12 +1631,12 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@nestjs/axios@0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/axios/-/axios-0.1.0.tgz#6cf93df11ef93b598b3c7411adb980eedd13b3e3"
-  integrity sha512-b2TT2X6BFbnNoeteiaxCIiHaFcSbVW+S5yygYqiIq5i6H77yIU3IVuLdpQkHq8/EqOWFwMopLN8jdkUT71Am9w==
+"@nestjs/axios@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/axios/-/axios-1.0.1.tgz#7a872e032b9d12037f2663a7316b81507cd7957a"
+  integrity sha512-TpoZM/0ZJ9xiC04qkRDFod93LCZ12TQARRU3ejDvBK2E8emvzM4HThOs5ePklVxce4Q1ZsnrIWqnImvoDmJYnQ==
   dependencies:
-    axios "0.27.2"
+    axios "1.2.1"
 
 "@nestjs/cli@9.1.4":
   version "9.1.4"
@@ -2484,7 +2484,7 @@ aws-sdk-client-mock@2.0.0:
     sinon "^11.1.1"
     tslib "^2.1.0"
 
-axios@0.27.2, "axios@github:zoran995/axios.git#geoportal":
+axios@1.2.1, "axios@github:zoran995/axios.git#geoportal":
   version "0.27.2"
   uid "70c1e992dc75609e0ac1d879170fd0c4fabec216"
   resolved "https://codeload.github.com/zoran995/axios/tar.gz/70c1e992dc75609e0ac1d879170fd0c4fabec216"
