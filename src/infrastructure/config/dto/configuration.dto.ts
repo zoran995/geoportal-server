@@ -108,4 +108,9 @@ export class ConfigurationDto {
   @NotNull()
   @ValidateNested()
   serveStatic: ServeStaticDto = new ServeStaticDto();
+
+  @IsArray()
+  @IsString({ each: true })
+  @NotNull()
+  cspScriptSrc: string[] = [];
 }
