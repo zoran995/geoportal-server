@@ -103,7 +103,28 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, document);
 
   const port = configService.get<number>('port', 3001);
-  await app.use(helmet()).listen(port);
+  await app
+    .use(
+      helmet({
+        contentSecurityPolicy: {
+          directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            'script-src': [
+              "'self'",
+              "'unsafe-inline'",
+              "'unsafe-eval'",
+              ...(configService.get<string[]>('cspScriptSrc') || []),
+            ],
+            'connect-src': ['*'],
+            'img-src': ['self', 'data:', '*'],
+          },
+        },
+        crossOriginEmbedderPolicy: false,
+        crossOriginOpenerPolicy: false,
+        crossOriginResourcePolicy: false,
+      }),
+    )
+    .listen(port);
   logger.log(`started listening on port: ${port}`);
 }
 
