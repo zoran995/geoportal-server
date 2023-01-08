@@ -161,7 +161,8 @@ export class ProxyService {
           maxBodyLength: this.proxyConfigService.postSizeLimit,
           beforeRedirect: (options, { headers }) =>
             this.beforeRedirect(headers, remoteUrl),
-          onHttpSocketEvent: (config) => this.onHttpSocketEvent(config),
+          onHttpSocketEvent: (config: NodeJS.Socket) =>
+            this.onHttpSocketEvent(config),
         })
         .pipe(
           map((response) => {
