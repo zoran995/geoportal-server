@@ -45,8 +45,10 @@ export class ConfigLoader {
     configValue: string,
     environment: Record<string, string>,
   ): string {
-    const matches = configValue.match(/(.?\${*[\w]*(?::-)?[\w]*}*)/g) || [];
-    return matches.reduce((newVal: string, match: string, index: number) => {
+    const matches: string[] =
+      configValue.match(/(.?\${*[\w]*(?::-)?[\w]*}*)/g) || [];
+
+    return matches?.reduce((newVal: string, match: string, index: number) => {
       const parts = /(.?)\${*([\w]*(?::-)?[\w]*)?}*/g.exec(match);
       if (!parts || parts.length === 0) {
         return newVal;

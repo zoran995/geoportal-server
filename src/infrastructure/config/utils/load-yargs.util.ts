@@ -46,12 +46,12 @@ export function loadYargs(
       boolean: true,
     })
     .option('ignore-env-file', {
-      type: 'string',
+      type: 'boolean',
       description: 'If "true", environment files (`.env`) will be ignored.',
       default: false,
     })
     .option('ignore-env-vars', {
-      type: 'string',
+      type: 'boolean',
       description:
         'If "true", predefined environment variables will be ignored',
       default: false,
