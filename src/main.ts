@@ -116,7 +116,7 @@ async function bootstrap() {
               ...(configService.get<string[]>('cspScriptSrc') || []),
             ],
             'connect-src': ['*'],
-            'img-src': ['self', 'data:', '*']
+            'img-src': ['self', 'data:', '*'],
           },
         },
         crossOriginEmbedderPolicy: false,
