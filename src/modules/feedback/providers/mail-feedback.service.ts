@@ -17,7 +17,7 @@ export class MailFeedbackService extends AbstractFeedbackService<MailFeedbackDto
     super(options);
     this.transporter = nodemailer.createTransport({
       host: this.options.smtpHost,
-      port: this.options.smtpPort,
+      port: parseInt(this.options.smtpPort, 10),
       secure: this.options.secure,
       auth: this.options.auth,
       tls: {

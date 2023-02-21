@@ -4,7 +4,6 @@ import {
   IsBoolean,
   IsEmail,
   IsIn,
-  IsInt,
   IsNotEmpty,
   IsPort,
   IsString,
@@ -47,10 +46,9 @@ export class MailFeedbackDto extends BaseFeedbackDto {
   /**
    * Port of smtp server to connect to.
    */
-  @IsInt()
   @IsNotEmpty()
   @IsPort()
-  smtpPort!: number;
+  smtpPort!: string;
 
   /**
    * Whether authentication should be done against SMPT server.

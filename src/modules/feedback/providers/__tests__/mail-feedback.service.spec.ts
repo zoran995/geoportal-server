@@ -28,7 +28,7 @@ const mailConf: MailFeedbackDto = {
   service: 'mail',
   id: 'test-mail',
   smtpHost: 'test',
-  smtpPort: 25,
+  smtpPort: '25',
   secure: true,
   email: 'example@test.com',
 };
