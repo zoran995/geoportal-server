@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { AxiosRequestConfig } from 'axios';
+import { AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 
 import { LoggerService } from 'src/infrastructure/logger';
 
@@ -28,7 +28,9 @@ export class AxiosLogInterceptor implements OnModuleInit {
       config: AxiosRequestConfigMetadata,
     ) {
       config.metadata = { ...config.metadata, startDate: new Date() };
-      return config;
+      return config as AxiosRequestConfigMetadata & {
+        headers: AxiosRequestHeaders;
+      };
     });
 
     axiosInstance.interceptors.response.use(
