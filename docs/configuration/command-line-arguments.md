@@ -29,22 +29,6 @@ yarn start --port 3003 # Start server on port 3003
 yarn start --port 3003 ./public # Start server on port 3003 using directory public as wwwroot
 ```
 
-### Using pm2
-
-```sh
-pm2 start ecosystem.config.js -- -- [options] [path/to/wwwroot]
-```
-
-_Example_
-
-```sh
-pm2 start ecosystem.config.js -- -- --port 3003 # Start server on port 3003
-```
-
-```sh
-pm2 start ecosystem.config.js -- -- --port 3003 ./public # Start server on port 3003 using directory public as wwwroot
-```
-
 ### Using node.js
 
 ```sh
