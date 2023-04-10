@@ -5,7 +5,7 @@ import { Controller, Get, INestApplication, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { Response } from 'express';
 import { DirectoryJSON, vol } from 'memfs';
 import supertest, { SuperAgentTest } from 'supertest';
@@ -40,7 +40,7 @@ axios.Cancel = Cancel;
 axios.CancelToken = CancelToken;
 axiosRequest.mockImplementation(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (reqConfig: AxiosRequestConfig): Promise<AxiosResponse<any>> => {
+  (reqConfig: InternalAxiosRequestConfig): Promise<AxiosResponse<any>> => {
     let status = 200;
     if (reqConfig.headers && 'x-give-response-status' in reqConfig.headers) {
       status = reqConfig.headers['x-give-response-status'] as unknown as number;
