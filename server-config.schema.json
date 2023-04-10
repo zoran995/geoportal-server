@@ -59,6 +59,11 @@
       "$ref": "#/definitions/ServeStaticDto",
       "type": "object"
     },
+    "csp": {
+      "additionalProperties": false,
+      "$ref": "#/definitions/ContentSecurityPolicyDto",
+      "type": "object"
+    },
     "$schema": {
       "type": "string"
     }
@@ -77,21 +82,14 @@
         }
       },
       "type": "object",
-      "required": [
-        "descriptiveLabel",
-        "name"
-      ]
+      "required": ["descriptiveLabel", "name"]
     },
     "BaseFeedbackDto": {
       "properties": {
         "service": {
           "minLength": 1,
           "type": "string",
-          "enum": [
-            "github",
-            "mail",
-            "redmine"
-          ]
+          "enum": ["github", "mail", "redmine"]
         },
         "id": {
           "minLength": 1,
@@ -105,18 +103,13 @@
         }
       },
       "type": "object",
-      "required": [
-        "service",
-        "id"
-      ]
+      "required": ["service", "id"]
     },
     "GithubFeedbackDto": {
       "properties": {
         "service": {
           "type": "string",
-          "enum": [
-            "github"
-          ],
+          "enum": ["github"],
           "minLength": 1
         },
         "issuesUrl": {
@@ -150,12 +143,7 @@
         }
       },
       "type": "object",
-      "required": [
-        "service",
-        "issuesUrl",
-        "accessToken",
-        "id"
-      ]
+      "required": ["service", "issuesUrl", "accessToken", "id"]
     },
     "MailFeedbackAuth": {
       "properties": {
@@ -169,18 +157,13 @@
         }
       },
       "type": "object",
-      "required": [
-        "user",
-        "pass"
-      ]
+      "required": ["user", "pass"]
     },
     "MailFeedbackDto": {
       "properties": {
         "service": {
           "type": "string",
-          "enum": [
-            "mail"
-          ],
+          "enum": ["mail"],
           "minLength": 1
         },
         "smtpHost": {
@@ -207,16 +190,7 @@
         },
         "smtpPort": {
           "type": "string",
-          "minLength": 1,
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "type": "string",
-              "pattern": "^\\$.*"
-            }
-          ]
+          "minLength": 1
         },
         "secure": {
           "oneOf": [
@@ -246,22 +220,13 @@
         }
       },
       "type": "object",
-      "required": [
-        "service",
-        "smtpHost",
-        "smtpPort",
-        "secure",
-        "email",
-        "id"
-      ]
+      "required": ["service", "smtpHost", "smtpPort", "secure", "email", "id"]
     },
     "RedmineFeedbackDto": {
       "properties": {
         "service": {
           "type": "string",
-          "enum": [
-            "redmine"
-          ],
+          "enum": ["redmine"],
           "minLength": 1
         },
         "project_id": {
@@ -348,10 +313,7 @@
         }
       },
       "type": "object",
-      "required": [
-        "primaryId",
-        "options"
-      ]
+      "required": ["primaryId", "options"]
     },
     "CreateFeedbackDto": {
       "properties": {
@@ -410,10 +372,7 @@
         }
       },
       "type": "object",
-      "required": [
-        "name",
-        "value"
-      ]
+      "required": ["name", "value"]
     },
     "ProxyConfigDto": {
       "properties": {
@@ -516,19 +475,13 @@
         }
       },
       "type": "object",
-      "required": [
-        "regexPattern",
-        "params"
-      ]
+      "required": ["regexPattern", "params"]
     },
     "ShareDto": {
       "properties": {
         "service": {
           "type": "string",
-          "enum": [
-            "gist",
-            "s3"
-          ],
+          "enum": ["gist", "s3"],
           "not": {
             "type": "null"
           }
@@ -542,18 +495,13 @@
         }
       },
       "type": "object",
-      "required": [
-        "service",
-        "prefix"
-      ]
+      "required": ["service", "prefix"]
     },
     "ShareGistDto": {
       "properties": {
         "service": {
           "type": "string",
-          "enum": [
-            "gist"
-          ],
+          "enum": ["gist"],
           "not": {
             "type": "null"
           }
@@ -592,20 +540,13 @@
         }
       },
       "type": "object",
-      "required": [
-        "service",
-        "apiUrl",
-        "userAgent",
-        "prefix"
-      ]
+      "required": ["service", "apiUrl", "userAgent", "prefix"]
     },
     "ShareS3Dto": {
       "properties": {
         "service": {
           "type": "string",
-          "enum": [
-            "s3"
-          ],
+          "enum": ["s3"],
           "not": {
             "type": "null"
           }
@@ -641,12 +582,7 @@
         }
       },
       "type": "object",
-      "required": [
-        "service",
-        "region",
-        "bucket",
-        "prefix"
-      ]
+      "required": ["service", "region", "bucket", "prefix"]
     },
     "ShareConfigDto": {
       "properties": {
@@ -687,10 +623,7 @@
         }
       },
       "type": "object",
-      "required": [
-        "newPrefix",
-        "availablePrefixes"
-      ]
+      "required": ["newPrefix", "availablePrefixes"]
     },
     "RateLimitDto": {
       "properties": {
@@ -749,10 +682,7 @@
         }
       },
       "type": "object",
-      "required": [
-        "username",
-        "password"
-      ]
+      "required": ["username", "password"]
     },
     "ServeStaticDto": {
       "properties": {
@@ -780,6 +710,41 @@
               "pattern": "^\\$.*"
             }
           ]
+        }
+      },
+      "type": "object"
+    },
+    "ContentSecurityPolicyDto": {
+      "properties": {
+        "scriptSrc": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "connectSrc": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "imgSrc": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "frameSrc": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "frameAncestors": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         }
       },
       "type": "object"

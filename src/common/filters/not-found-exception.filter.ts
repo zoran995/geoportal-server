@@ -13,7 +13,7 @@ import { HttpExceptionFilter } from './http-exception.filter';
 @Catch(NotFoundException)
 export class NotFoundExceptionFilter extends HttpExceptionFilter {
   constructor(
-    private readonly configService: ConfigService<IConfigurationType>,
+    private readonly configService: ConfigService<IConfigurationType, true>,
     private readonly wwwroot: string,
   ) {
     super();

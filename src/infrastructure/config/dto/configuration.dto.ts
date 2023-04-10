@@ -17,6 +17,7 @@ import { ShareConfigDto } from 'src/modules/share';
 
 import { ServeStaticDto } from '../../serve-static/dto/serve-static.dto';
 import { BasicAuthenticationDto } from './basic-authentication.dto';
+import { ContentSecurityPolicyDto } from './ContentSecurityPolicy.dto';
 
 export class ConfigurationDto {
   /* @IsEnum(Environment) NODE_ENV: Environment; */
@@ -109,8 +110,8 @@ export class ConfigurationDto {
   @ValidateNested()
   serveStatic: ServeStaticDto = new ServeStaticDto();
 
-  @IsArray()
-  @IsString({ each: true })
+  @IsObject()
   @NotNull()
-  cspScriptSrc: string[] = [];
+  @ValidateNested()
+  csp: ContentSecurityPolicyDto = new ContentSecurityPolicyDto();
 }

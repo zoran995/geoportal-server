@@ -14,8 +14,9 @@ import {
   InternalServerErrorExceptionFilter,
   NotFoundExceptionFilter,
 } from './common/filters';
-import { WWWROOT_TOKEN } from './infrastructure/config';
+import { ConfigurationDto, WWWROOT_TOKEN } from './infrastructure/config';
 import { LoggerService } from './infrastructure/logger';
+import { ContentSecurityPolicyDto } from './infrastructure/config/dto/ContentSecurityPolicy.dto';
 
 /**
  *
@@ -45,7 +46,8 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
-  const configService = app.get(ConfigService);
+  const configService =
+    app.get<ConfigService<ConfigurationDto, true>>(ConfigService);
   const logger = await app.resolve(LoggerService);
   app.useLogger(logger);
   logger.setLogLevels(getLoggerLevelByEnvironment());
@@ -103,20 +105,20 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, document);
 
   const port = configService.get<number>('port', 3001);
+
+  const cspConfig = configService.get<ContentSecurityPolicyDto>('csp');
+
   await app
     .use(
       helmet({
         contentSecurityPolicy: {
           directives: {
             ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-            'script-src': [
-              "'self'",
-              "'unsafe-inline'",
-              "'unsafe-eval'",
-              ...(configService.get<string[]>('cspScriptSrc') || []),
-            ],
-            'connect-src': ['*'],
-            'img-src': ['self', 'data:', '*'],
+            'script-src': cspConfig.scriptSrc,
+            'connect-src': cspConfig.connectSrc,
+            'img-src': cspConfig.imgSrc,
+            'frame-ancestors': cspConfig.frameAncestors,
+            'frame-src': cspConfig.frameSrc,
           },
         },
         crossOriginEmbedderPolicy: false,
