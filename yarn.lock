@@ -2571,7 +2571,7 @@ aws-sdk-client-mock@2.1.1:
     sinon "^14.0.2"
     tslib "^2.1.0"
 
-"axios@github:zoran995/axios.git#geoportal":
+"axios@github:zoran995/axios.git#826b003":
   version "1.3.5"
   resolved "https://codeload.github.com/zoran995/axios/tar.gz/826b0034871d7272e64987b91f15e16ec45c5710"
   dependencies:

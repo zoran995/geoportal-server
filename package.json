@@ -47,7 +47,7 @@
     "@nestjs/platform-express": "9.3.12",
     "@nestjs/serve-static": "3.0.1",
     "@nestjs/swagger": "6.2.1",
-    "axios": "github:zoran995/axios.git#geoportal",
+    "axios": "github:zoran995/axios.git#826b003",
     "base-x": "4.0.0",
     "class-transformer": "0.5.1",
     "class-validator": "0.14.0",
@@ -97,7 +97,7 @@
     "typescript": "4.9.5"
   },
   "resolutions": {
-    "axios": "github:zoran995/axios.git#geoportal"
+    "axios": "github:zoran995/axios.git#826b003"
   },
   "jest": {
     "moduleFileExtensions": [
