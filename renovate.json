@@ -1,13 +1,41 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "semanticCommits": true,
-  "extends": [
-    "config:base",
-    "group:allNonMajor",
-    "schedule:earlyMondays"
-  ],
-  "labels": [
-    "dependencies"
+  "rangeStrategy": "pin",
+  "semanticCommits": "enabled",
+  "extends": ["config:base", "group:allNonMajor", "schedule:earlyMondays"],
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "matchPackagePrefixes": ["@aws-sdk", "aws-sdk"],
+      "groupName": "aws-sdk",
+      "labels": ["aws-sdk"]
+    },
+    {
+      "matchPackagePrefixes": ["@nestjs"],
+      "groupName": "nestjs",
+      "labels": ["nestjs"]
+    },
+    {
+      "matchPackageNames": ["@types/eslint", "prettier"],
+      "matchPackagePrefixes": ["@typescript-eslint/", "eslint"],
+      "groupName": "lint",
+      "labels": ["linting"]
+    },
+    {
+      "matchPackagePrefixes": ["@types/"],
+      "groupName": "definitelyTyped"
+    },
+    {
+      "matchPackageNames": [
+        "jest",
+        "memfs",
+        "supertest",
+        "ts-jest",
+        "@golevelup/ts-jest",
+        "@types/jest"
+      ],
+      "groupName": "testing"
+    }
   ],
   "stabilityDays": 7
 }
