@@ -46,7 +46,7 @@
     "@nestjs/core": "9.3.12",
     "@nestjs/platform-express": "9.3.12",
     "@nestjs/serve-static": "3.0.1",
-    "@nestjs/swagger": "6.2.1",
+    "@nestjs/swagger": "7.0.6",
     "axios": "github:zoran995/axios.git#826b003",
     "base-x": "4.0.0",
     "class-transformer": "0.5.1",
