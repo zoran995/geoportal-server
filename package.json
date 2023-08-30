@@ -26,6 +26,9 @@
     "prepare": "yarn run build",
     "preversion": "yarn run format && yarn run lint && yarn run build"
   },
+  "bin": {
+    "geoportal-server": "geoportal-server.js"
+  },
   "main": "./geoportal-server.js",
   "files": [
     "dist",
