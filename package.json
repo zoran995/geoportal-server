@@ -11,8 +11,6 @@
     "format-check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start --",
-    "start:pm2": "pm2 start ecosystem.config.js --update-env --",
-    "stop:pm2": "pm2 stop ecosystem.config.js",
     "start:dev": "nest start --watch --",
     "start:debug": "nest start --debug --watch --",
     "start:prod": "node dist/main",
@@ -27,6 +25,9 @@
     "tool:merge-coverage": "ts-node --pretty --project=tools/tsconfig.tools.json tools/merge-coverage.ts",
     "prepare": "yarn run build",
     "preversion": "yarn run format && yarn run lint && yarn run build"
+  },
+  "bin": {
+    "geoportal-server": "geoportal-server.js"
   },
   "main": "./geoportal-server.js",
   "files": [
