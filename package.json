@@ -61,7 +61,7 @@
     "dotenv": "16.0.3",
     "dotenv-expand": "9.0.0",
     "helmet": "6.0.1",
-    "nodemailer": "6.9.1",
+    "nodemailer": "6.9.9",
     "proj4-cli-defs": "1.0.0",
     "range_check": "2.0.4",
     "reflect-metadata": "0.1.13",
