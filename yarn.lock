@@ -2962,12 +2962,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/nodemailer@npm:6.4.7":
-  version: 6.4.7
-  resolution: "@types/nodemailer@npm:6.4.7"
+"@types/nodemailer@npm:6.4.17":
+  version: 6.4.17
+  resolution: "@types/nodemailer@npm:6.4.17"
   dependencies:
     "@types/node": "npm:*"
-  checksum: 10c0/368ddc1faf9c393ae7192dd0f0c049e9aa38cc8214a6ec62a1ad93b8479a17c69b6f552b9ac34a57539a3070f52292d14795f0c2d066637eebd945976898cd7e
+  checksum: 10c0/689abb3005cf36cf89c2abe56f0aa4469a37e0814633a73fbeb35732e856f4b0d7ab32b6d91585038b6941f5b70db58ec2bd147ebe9f73e528eb6c99604f4e82
   languageName: node
   linkType: hard
 
@@ -3397,7 +3397,7 @@ __metadata:
     "@types/istanbul-lib-report": "npm:3.0.3"
     "@types/jest": "npm:29.5.14"
     "@types/node": "npm:22.9.3"
-    "@types/nodemailer": "npm:6.4.7"
+    "@types/nodemailer": "npm:6.4.17"
     "@types/supertest": "npm:6.0.2"
     "@types/yargs": "npm:17.0.33"
     "@typescript-eslint/eslint-plugin": "npm:5.56.0"
@@ -3418,7 +3418,7 @@ __metadata:
     istanbul-lib-report: "npm:3.0.1"
     jest: "npm:29.7.0"
     memfs: "npm:4.14.0"
-    nodemailer: "npm:6.9.1"
+    nodemailer: "npm:6.9.16"
     prettier: "npm:3.3.3"
     proj4-cli-defs: "npm:1.0.0"
     range_check: "npm:2.0.4"
@@ -7451,10 +7451,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemailer@npm:6.9.1":
-  version: 6.9.1
-  resolution: "nodemailer@npm:6.9.1"
-  checksum: 10c0/adeaef441e31025776e8b1fa818e4b260850fbb60150f6ff7210e4de443bb32f0881a8a4967c42bb108d620f68f18369a42db29fe7cdec5e4ec09b0ddd51b19c
+"nodemailer@npm:6.9.16":
+  version: 6.9.16
+  resolution: "nodemailer@npm:6.9.16"
+  checksum: 10c0/9fd73ab4ab5b81544c3c9820afbe386369aba442f997b2f58d171222a898a7aed580fc100bfe6eebc194f18ba6e169d67ee40ca64d32d69022d89e575cef97a4
   languageName: node
   linkType: hard
 
