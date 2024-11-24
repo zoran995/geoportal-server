@@ -3057,13 +3057,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/validator@npm:13.7.14":
-  version: 13.7.14
-  resolution: "@types/validator@npm:13.7.14"
-  checksum: 10c0/fd9baf51e1d3d5e75250878109554caa1dcdd57f6f3875a99806eb97c40b1db740807fc9e48b5ff4d744d5abe64d7d4fccdeac5b42c6e07d45c1ee89dab23ab7
-  languageName: node
-  linkType: hard
-
 "@types/validator@npm:^13.11.8":
   version: 13.12.2
   resolution: "@types/validator@npm:13.12.2"
@@ -3406,7 +3399,6 @@ __metadata:
     "@types/node": "npm:22.9.3"
     "@types/nodemailer": "npm:6.4.7"
     "@types/supertest": "npm:6.0.2"
-    "@types/validator": "npm:13.7.14"
     "@types/yargs": "npm:17.0.33"
     "@typescript-eslint/eslint-plugin": "npm:5.56.0"
     "@typescript-eslint/parser": "npm:5.56.0"
