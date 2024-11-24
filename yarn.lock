@@ -3423,7 +3423,7 @@ __metadata:
     proj4-cli-defs: "npm:1.0.0"
     range_check: "npm:2.0.4"
     reflect-metadata: "npm:0.2.2"
-    rxjs: "npm:7.8.0"
+    rxjs: "npm:7.8.1"
     sanitize-filename: "npm:1.6.3"
     supertest: "npm:7.0.0"
     swagger-ui-express: "npm:4.6.2"
@@ -8161,15 +8161,6 @@ __metadata:
   dependencies:
     queue-microtask: "npm:^1.2.2"
   checksum: 10c0/200b5ab25b5b8b7113f9901bfe3afc347e19bb7475b267d55ad0eb86a62a46d77510cb0f232507c9e5d497ebda569a08a9867d0d14f57a82ad5564d991588b39
-  languageName: node
-  linkType: hard
-
-"rxjs@npm:7.8.0":
-  version: 7.8.0
-  resolution: "rxjs@npm:7.8.0"
-  dependencies:
-    tslib: "npm:^2.1.0"
-  checksum: 10c0/c48833638ae5d339332f8b792e716c3c662950ba95ba04e9e97a8cfd4628d8f009129672793c6c067c872a4dab5757231d41d7256a2114a5fabbf30d8a5b9d67
   languageName: node
   linkType: hard
 
