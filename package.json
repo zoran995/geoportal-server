@@ -75,7 +75,7 @@
     "@types/express": "5.0.0",
     "@types/istanbul-lib-report": "3.0.3",
     "@types/jest": "29.5.14",
-    "@types/node": "18.15.10",
+    "@types/node": "22.9.3",
     "@types/nodemailer": "6.4.7",
     "@types/supertest": "6.0.2",
     "@types/validator": "13.7.14",
