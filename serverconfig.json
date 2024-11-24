@@ -1,11 +1,7 @@
 {
   "$schema": "./server-config.schema.json",
   "port": "${port:-3002}",
-  "initPaths": [
-    "init/",
-    "init2/",
-    "init/init3"
-  ],
+  "initPaths": ["init/", "init2/", "init/init3"],
   "proxy": {
     "allowProxyFor": [
       "127.0.0.1",
