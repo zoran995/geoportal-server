@@ -150,3 +150,13 @@ export class ConfigLoader {
     return value.replace(/\\\$/g, '$');
   }
 }
+
+// like String.prototype.search but returns the last index
+function _searchLast(str: string, rgx: RegExp) {
+  const matches = Array.from(str.matchAll(rgx));
+  return matches.length > 0 ? matches.slice(-1)[0].index : -1;
+}
+
+function _resolveEscapeSequences(value: string) {
+  return value.replace(/\\\$/g, '$');
+}
