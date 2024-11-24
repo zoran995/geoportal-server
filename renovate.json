@@ -37,5 +37,8 @@
       "groupName": "testing"
     }
   ],
-  "stabilityDays": 7
+  "stabilityDays": 7,
+  "lockFileMaintenance": {
+    "enabled": true
+  }
 }
