@@ -50,16 +50,11 @@ export function loadYargs(
       description: 'If "true", environment files (`.env`) will be ignored.',
       default: false,
     })
-    .option('ignore-env-vars', {
-      type: 'boolean',
-      description:
-        'If "true", predefined environment variables will be ignored',
-      default: false,
-    })
     .option('env-file-path', {
       type: 'string',
+      array: true,
       description:
-        'Path to .env file to be load. Not used if ignore-env-file=false',
+        'Path to .env file to be load. Not used if ignore-env-file=true',
       default: undefined,
     })
     .option('config-file', {

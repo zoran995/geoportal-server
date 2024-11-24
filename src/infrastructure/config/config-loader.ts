@@ -1,7 +1,7 @@
 import { isArray, isObject } from 'src/common/helpers';
 
 import { ConfigurationDto } from './dto/configuration.dto';
-import { EnvConfigLoader } from './utils/load-env.util';
+import { loadEnvFile } from './utils/load-env.util';
 import { loadJsonConfig } from './utils/load-json-config.util';
 import { YargsConfigType, loadYargs } from './utils/load-yargs.util';
 import { validate } from './validators/config.validator';
@@ -9,100 +9,144 @@ import { validate } from './validators/config.validator';
 export declare type IConfigurationType = ConfigurationDto & YargsConfigType;
 
 export class ConfigLoader {
-  static load(): IConfigurationType {
+  static load(validator = validate): IConfigurationType {
     const yargsConfig = loadYargs();
-    const dotEnvConfig = EnvConfigLoader.load({
+
+    const dotEnvConfig: Record<string, string> = loadEnvFile({
       ignoreEnvFile: yargsConfig['ignore-env-file'],
-      ignoreEnvVars: yargsConfig['ignore-env-vars'],
       envFilePath: yargsConfig['env-file-path'],
     });
+
     const jsonConfig = loadJsonConfig({ filePath: yargsConfig['config-file'] });
+
     const expandedConfig = ConfigLoader.expand(
       jsonConfig as unknown as Record<string, unknown>,
       dotEnvConfig,
-    ) as unknown as ConfigurationDto;
-    const validatedConfig = validate(expandedConfig);
+    ).config;
+
+    const validatedConfig = validator(
+      expandedConfig as unknown as ConfigurationDto,
+    );
 
     return Object.assign(validatedConfig, yargsConfig);
   }
 
-  /**
-   * Interpolate values in config using provided environment values. FUnction
-   * implementation is taken from dotenv-expand.
-   *
-   * Rules:
-   * - $KEY will expand any env with the name KEY
-   * - ${KEY} will expand any env with the name KEY
-   * - \$KEY will escape the $KEY rather than expand
-   * - ${KEY:-default} will first attempt to expand any env with the name KEY. If
-   *   not one, then it will return default
-   *
-   * @param configValue
-   * @param environment
-   * @returns
-   */
-  private static interpolate(
-    configValue: string,
+  private static expandValue(
+    value: string,
     environment: Record<string, string>,
-  ): string {
-    const matches: string[] =
-      configValue.match(/(.?\${*[\w]*(?::-)?[\w]*}*)/g) || [];
+    runningParsed: Record<string, unknown> = {},
+  ) {
+    const env = { ...runningParsed, ...environment }; // process.env wins
 
-    return matches?.reduce((newVal: string, match: string, index: number) => {
-      const parts = /(.?)\${*([\w]*(?::-)?[\w]*)?}*/g.exec(match);
-      if (!parts || parts.length === 0) {
-        return newVal;
-      }
-      const prefix = parts[1];
-      let value: string;
-      let replacePart: string;
-      if (prefix === '\\') {
-        replacePart = parts[0];
-        value = replacePart.replace('\\$', '$');
+    const regex = /(?<!\\)\${([^{}]+)}|(?<!\\)\$([A-Za-z_][A-Za-z0-9_]*)/g;
+
+    let result = value;
+    let match;
+    const seen = new Set(); // self-referential checker
+
+    while ((match = regex.exec(result)) !== null) {
+      seen.add(result);
+
+      const [template, bracedExpression, unbracedExpression] = match;
+      const expression = bracedExpression || unbracedExpression;
+
+      // match the operators `:+`, `+`, `:-`, and `-`
+      const opRegex = /(:\+|\+|:-|-)/;
+      // find first match
+      const opMatch = expression.match(opRegex);
+      const splitter = (opMatch ? opMatch[0] : null) as string;
+
+      const r = expression.split(splitter as never);
+
+      let defaultValue;
+      let value;
+
+      const key = r.shift() as string;
+
+      if ([':+', '+'].includes(splitter as never)) {
+        defaultValue = env[key] ? r.join(splitter as never) : '';
+        value = null;
       } else {
-        const keyParts = parts[2].split(':-');
-        const key = keyParts[0];
-        replacePart = parts[0].substring(prefix.length);
-        value = Object.prototype.hasOwnProperty.call(environment, key)
-          ? environment[key]
-          : keyParts[1] || '';
-
-        if (keyParts.length > 1 && value) {
-          const replaceNested = matches[index + 1];
-          matches[index + 1] = '';
-          newVal = newVal.replace(replaceNested, '');
-        }
-
-        value = this.interpolate(value, environment);
+        defaultValue = r.join(splitter);
+        value = env[key];
       }
-      return newVal.replace(replacePart, value);
-    }, configValue);
+
+      if (value) {
+        // self-referential check
+        if (seen.has(value)) {
+          result = result.replace(template, defaultValue);
+        } else {
+          result = result.replace(template, value as never);
+        }
+      } else {
+        result = result.replace(template, defaultValue);
+      }
+
+      // if the result equaled what was in process.env and runningParsed then stop expanding
+      if (result === runningParsed[key]) {
+        break;
+      }
+
+      regex.lastIndex = 0; // reset regex search position to re-evaluate after each replacement
+    }
+
+    return result;
   }
 
   private static expand(
     config: Record<string, unknown>,
     environment: Record<string, string>,
-  ) {
+  ): {
+    config: Record<string, unknown>;
+    runningParsed: Record<string, unknown>;
+  } {
+    // for use with progressive expansion
+    const runningParsed: Record<string, unknown> = {};
+
     Object.keys(config).forEach((key) => {
       const value = config[key];
+
       if (isObject(value)) {
-        config[key] = this.expand(value, environment);
-      } else if (isArray(value)) {
+        const expanded = this.expand(value, environment);
+        config[key] = expanded.config;
+        runningParsed[key] = expanded.runningParsed;
+        return;
+      }
+
+      if (isArray(value)) {
+        runningParsed[key] = [];
         for (let i = 0; i < value.length; i++) {
           const currentValue = value[i];
+
           if (typeof currentValue === 'string') {
-            value[i] = this.interpolate(currentValue, environment);
+            const expanded = this.resolveEscapeSequences(
+              this.expandValue(currentValue, environment, runningParsed),
+            );
+            value[i] = expanded;
           } else {
-            value[i] = this.expand(
+            const expanded = this.expand(
               currentValue as Record<string, unknown>,
               environment,
             );
+            value[i] = expanded.config;
+            (runningParsed[key] as unknown[])[i] = expanded.runningParsed;
           }
         }
-      } else if (typeof value === 'string') {
-        config[key] = this.interpolate(value, environment);
+        return;
+      }
+
+      if (typeof value === 'string') {
+        config[key] = this.resolveEscapeSequences(
+          this.expandValue(value, environment, runningParsed),
+        );
+
+        runningParsed[key] = config[key];
       }
     });
-    return config;
+    return { config, runningParsed };
+  }
+
+  private static resolveEscapeSequences(value: string) {
+    return value.replace(/\\\$/g, '$');
   }
 }

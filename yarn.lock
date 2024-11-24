@@ -3582,8 +3582,8 @@ __metadata:
     class-validator: "npm:0.14.1"
     class-validator-jsonschema: "npm:5.0.1"
     compression: "npm:1.7.5"
-    dotenv: "npm:16.0.3"
-    dotenv-expand: "npm:9.0.0"
+    dotenv: "npm:16.4.5"
+    dotenv-expand: "npm:12.0.1"
     eslint: "npm:8.36.0"
     eslint-config-prettier: "npm:8.8.0"
     helmet: "npm:8.0.0"
@@ -4860,21 +4860,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv-expand@npm:9.0.0":
-  version: 9.0.0
-  resolution: "dotenv-expand@npm:9.0.0"
-  checksum: 10c0/b689d464826c350c403f04396d5bb39dad75afff2b2451c8ea18de033f93789c7ebc31e65e397c825fc0263b2fd2461ea211539ea56b35a8f5b852db73ce17b3
+"dotenv-expand@npm:12.0.1":
+  version: 12.0.1
+  resolution: "dotenv-expand@npm:12.0.1"
+  dependencies:
+    dotenv: "npm:^16.4.5"
+  checksum: 10c0/51996bfa670073d7a441b8fbed26ac991026fba2c05e9a937a898ce7d2a2e7166f7b6ec4eb8879e576defb5d1ad399ed1300db8f803d6977577fea55b4d82dac
   languageName: node
   linkType: hard
 
-"dotenv@npm:16.0.3":
-  version: 16.0.3
-  resolution: "dotenv@npm:16.0.3"
-  checksum: 10c0/109457ac5f9e930ca8066ea33887b6f839ab24d647a7a8b49ddcd1f32662e2c35591c5e5b9819063e430148a664d0927f0cbe60cf9575d89bc524f47ff7e78f0
-  languageName: node
-  linkType: hard
-
-"dotenv@npm:16.4.5":
+"dotenv@npm:16.4.5, dotenv@npm:^16.4.5":
   version: 16.4.5
   resolution: "dotenv@npm:16.4.5"
   checksum: 10c0/48d92870076832af0418b13acd6e5a5a3e83bb00df690d9812e94b24aff62b88ade955ac99a05501305b8dc8f1b0ee7638b18493deb6fe93d680e5220936292f

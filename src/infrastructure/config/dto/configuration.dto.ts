@@ -13,7 +13,7 @@ import { NotNull } from 'src/common/validators';
 
 import { FeedbackConfigDto } from 'src/modules/feedback';
 import { ProxyConfigDto } from 'src/modules/proxy';
-import { ShareConfigDto } from 'src/modules/share';
+import { ShareConfigDto } from 'src/modules/share/dto/share.config.dto';
 
 import { ServeStaticDto } from '../../serve-static/dto/serve-static.dto';
 import { BasicAuthenticationDto } from './basic-authentication.dto';

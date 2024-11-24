@@ -1,57 +1,61 @@
-const mockLoadJsonConfig = jest.fn();
-const mockLoadYargs = jest.fn();
-const mockValidate = jest.fn((config: unknown) => {
-  return config;
-});
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const yargs = require('yargs');
 
+import { vol, DirectoryJSON } from 'memfs';
 import { ConfigLoader } from '../config-loader';
-import { EnvConfigLoader } from '../utils/load-env.util';
-import { DEFAULT_CONFIG_LOCATION } from '../utils/load-yargs.util';
 
-jest.mock('../utils/load-json-config.util', () => ({
-  loadJsonConfig: mockLoadJsonConfig,
-}));
-jest.mock('../utils/load-yargs.util', () => ({
-  loadYargs: mockLoadYargs,
-}));
-jest.mock('../validators/config.validator', () => ({
-  validate: mockValidate,
-}));
+jest.mock('fs');
+
+const volJson: DirectoryJSON = {
+  './test/serverconfig1.json': JSON.stringify({ port: 3001 }),
+  './test/serverconfig-expansion.json': JSON.stringify({
+    port: '$PORT',
+    compressResponse: '${compress}',
+    test: 'test',
+  }),
+  './test/serverconfig-complex.json': JSON.stringify({
+    port: '$UNDEFINED_ENV_KEY',
+    port1: '\\$PORT',
+    compressResponse: 'compre\\$\\$',
+    test: '\\$this$PORT\\$is$compress',
+    defaultValue: '${UNDEFINED_ENV_KEY:-3444}',
+    serveStatic: {
+      resolveUnmatchedPathsWithIndexHtml: '$compress',
+    },
+    initPaths: ['test', '$PORT', 'test2'],
+    proxy: {
+      proxyAuth: [{ a: 'b', apiKey: '$compress' }],
+    },
+  }),
+  '.env': 'PORT=4444\ncompress=true',
+  '.env.example': 'PORT=2222\ncompress=true',
+};
+
+vol.fromJSON(volJson);
 
 describe('ConfigLoader', () => {
-  afterEach(() => {
-    mockLoadYargs.mockClear();
-    mockLoadJsonConfig.mockClear();
+  const validateMock = jest.fn((config: unknown) => {
+    return config as never;
   });
 
   it('properly loads from json file', () => {
+    expect.assertions(2);
+
     const configFile = './test/serverconfig1.json';
-    mockLoadYargs.mockReturnValueOnce({
-      'config-file': configFile,
-    });
-    mockLoadJsonConfig.mockReturnValueOnce({});
-    ConfigLoader.load();
-    expect(mockLoadJsonConfig).toHaveBeenCalledWith({ filePath: configFile });
+    yargs('--config-file ' + configFile);
+
+    const config = ConfigLoader.load(validateMock);
+
+    expect(config).toBeDefined();
+    expect(config).toEqual(expect.objectContaining({ port: 3001 }));
   });
 
   describe('interprolate config values with env variables', () => {
-    beforeEach(() => {
-      jest.spyOn(EnvConfigLoader, 'load').mockReturnValueOnce({
-        PORT: '4444',
-        compress: 'true',
-      });
-    });
-
     it('expand values with default yargs config', () => {
       expect.assertions(3);
-      mockLoadYargs.mockReturnValueOnce({});
-      mockLoadJsonConfig.mockReturnValueOnce({
-        port: '$PORT',
-        compressResponse: '${compress}',
-        test: 'test',
-      });
+      yargs('--config-file ./test/serverconfig-expansion.json');
 
-      const config: any = ConfigLoader.load();
+      const config: any = ConfigLoader.load(validateMock);
       expect(config.port).toBe('4444');
       expect(config.compressResponse).toBe('true');
       expect(config.test).toBe('test');
@@ -59,90 +63,90 @@ describe('ConfigLoader', () => {
 
     it('expand missing env variables to empty string', () => {
       expect.assertions(1);
-      mockLoadYargs.mockReturnValueOnce({});
-      mockLoadJsonConfig.mockReturnValueOnce({
-        port: '$UNDEFINED_ENV_KEY',
-      });
+      yargs('--config-file ./test/serverconfig-complex.json');
 
-      const config = ConfigLoader.load();
+      const config = ConfigLoader.load(validateMock);
       expect(config.port).toBe('');
     });
 
     it("doesn't expand escaped values", () => {
       expect.assertions(1);
-      mockLoadYargs.mockReturnValueOnce({});
-      mockLoadJsonConfig.mockReturnValueOnce({
-        port: '\\$PORT',
-      });
+      yargs('--config-file ./test/serverconfig-complex.json');
 
-      const config = ConfigLoader.load();
-      expect(config.port).toBe('$PORT');
+      const config = ConfigLoader.load(validateMock) as unknown as Record<
+        string,
+        unknown
+      >;
+
+      expect(config.port1).toBe('$PORT');
     });
 
     it('does not expand inline escaped dollar sign', () => {
       expect.assertions(1);
-      mockLoadYargs.mockReturnValueOnce({});
-      mockLoadJsonConfig.mockReturnValueOnce({
-        compressResponse: 'compre\\$\\$',
-      });
+      yargs('--config-file ./test/serverconfig-complex.json');
 
-      const config = ConfigLoader.load();
+      const config = ConfigLoader.load(validateMock);
+
       expect(config.compressResponse).toBe('compre$$');
     });
 
     it('handle mixed value', () => {
       expect.assertions(1);
-      mockLoadYargs.mockReturnValueOnce({});
-      mockLoadJsonConfig.mockReturnValueOnce({
-        test: '\\$this$PORT\\$is$compress',
-      });
-      const config: any = ConfigLoader.load();
-      expect(config.test).toBe('$this4444$istrue');
+      yargs('--config-file ./test/serverconfig-complex.json');
+
+      const config: any = ConfigLoader.load(validateMock);
+
+      expect(config).toEqual(
+        expect.objectContaining({
+          test: '$this4444$istrue',
+        }),
+      );
     });
 
     it('uses default value', () => {
       expect.assertions(1);
-      mockLoadYargs.mockReturnValueOnce({});
-      mockLoadJsonConfig.mockReturnValueOnce({
-        port: '${UNDEFINED_PORT:-3444}',
-      });
-      const config = ConfigLoader.load();
-      expect(config.port).toBe('3444');
+
+      yargs('--config-file ./test/serverconfig-complex.json');
+
+      const config = ConfigLoader.load(validateMock);
+
+      expect(config).toEqual(
+        expect.objectContaining({
+          defaultValue: '3444',
+        }),
+      );
     });
 
     it('should properly expand values nested in object', () => {
       expect.assertions(1);
-      mockLoadYargs.mockReturnValueOnce({});
-      mockLoadJsonConfig.mockReturnValueOnce({
-        serveStatic: {
-          resolveUnmatchedPathsWithIndexHtml: '$compress',
-        },
-      });
-      const config = ConfigLoader.load();
-      expect(config.serveStatic.resolveUnmatchedPathsWithIndexHtml).toBe(
-        'true',
+      yargs('--config-file ./test/serverconfig-complex.json');
+
+      const config = ConfigLoader.load(validateMock);
+
+      expect(config).toEqual(
+        expect.objectContaining({
+          serveStatic: {
+            resolveUnmatchedPathsWithIndexHtml: 'true',
+          },
+        }),
       );
     });
 
     it('should properly expand value in array', () => {
       expect.assertions(1);
-      mockLoadYargs.mockReturnValueOnce({});
-      mockLoadJsonConfig.mockReturnValueOnce({
-        initPaths: ['test', '$PORT', 'test2'],
-      });
-      const config = ConfigLoader.load();
+      yargs('--config-file ./test/serverconfig-complex.json');
+
+      const config = ConfigLoader.load(validateMock);
+
       expect(config.initPaths).toStrictEqual(['test', '4444', 'test2']);
     });
 
     it('should properly expand value in array of object', () => {
       expect.assertions(1);
-      mockLoadYargs.mockReturnValueOnce({});
-      mockLoadJsonConfig.mockReturnValueOnce({
-        proxy: {
-          proxyAuth: [{ a: 'b', apiKey: '$compress' }],
-        },
-      });
-      const config = ConfigLoader.load();
+      yargs('--config-file ./test/serverconfig-complex.json');
+
+      const config = ConfigLoader.load(validateMock);
+
       expect(config.proxy.proxyAuth).toStrictEqual([
         { a: 'b', apiKey: 'true' },
       ]);
@@ -154,20 +158,11 @@ describe('ConfigLoader', () => {
   });
 
   it('properly override json config values with values from yargs', () => {
-    mockLoadYargs.mockReturnValue({
-      'config-file': DEFAULT_CONFIG_LOCATION,
-      port: 3005,
-    });
-    mockLoadJsonConfig.mockReturnValueOnce({
-      port: 3002,
-    });
-    const loadedConfig = ConfigLoader.load();
+    yargs('--config-file ./test/serverconfig-complex.json --port 3005');
+
+    const loadedConfig = ConfigLoader.load(validateMock);
 
     expect(loadedConfig).toBeDefined();
     expect(loadedConfig.port).toBe(3005);
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
   });
 });
