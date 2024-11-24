@@ -3078,12 +3078,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/yargs@npm:17.0.23":
-  version: 17.0.23
-  resolution: "@types/yargs@npm:17.0.23"
+"@types/yargs@npm:17.0.33":
+  version: 17.0.33
+  resolution: "@types/yargs@npm:17.0.33"
   dependencies:
     "@types/yargs-parser": "npm:*"
-  checksum: 10c0/246daab3a861ab82d800f75cdec0c73d2acee10a1c3fe67a6ed63fb337944db2b966b0332e41ee0d8d9f7479fe79b7d925d0b58241604d71dd4dda251a097190
+  checksum: 10c0/d16937d7ac30dff697801c3d6f235be2166df42e4a88bf730fa6dc09201de3727c0a9500c59a672122313341de5f24e45ee0ff579c08ce91928e519090b7906b
   languageName: node
   linkType: hard
 
@@ -3407,7 +3407,7 @@ __metadata:
     "@types/nodemailer": "npm:6.4.7"
     "@types/supertest": "npm:6.0.2"
     "@types/validator": "npm:13.7.14"
-    "@types/yargs": "npm:17.0.23"
+    "@types/yargs": "npm:17.0.33"
     "@typescript-eslint/eslint-plugin": "npm:5.56.0"
     "@typescript-eslint/parser": "npm:5.56.0"
     aws-sdk-client-mock: "npm:2.1.1"
@@ -3439,7 +3439,7 @@ __metadata:
     ts-node: "npm:10.9.2"
     tsconfig-paths: "npm:4.2.0"
     typescript: "npm:4.9.5"
-    yargs: "npm:17.7.1"
+    yargs: "npm:17.7.2"
   bin:
     geoportal-server: geoportal-server.js
   languageName: unknown
@@ -9474,22 +9474,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs@npm:17.7.1":
-  version: 17.7.1
-  resolution: "yargs@npm:17.7.1"
-  dependencies:
-    cliui: "npm:^8.0.1"
-    escalade: "npm:^3.1.1"
-    get-caller-file: "npm:^2.0.5"
-    require-directory: "npm:^2.1.1"
-    string-width: "npm:^4.2.3"
-    y18n: "npm:^5.0.5"
-    yargs-parser: "npm:^21.1.1"
-  checksum: 10c0/0ed3b7694d94da777f3591f1d786d947ed2e59b897da0a0c30e541109ae087979ac26b4ec39557f5e9c4592f19806447963fb132049b9806a1d416bcdd24d2b4
-  languageName: node
-  linkType: hard
-
-"yargs@npm:^17.3.1":
+"yargs@npm:17.7.2, yargs@npm:^17.3.1":
   version: 17.7.2
   resolution: "yargs@npm:17.7.2"
   dependencies:
