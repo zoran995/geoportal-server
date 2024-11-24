@@ -39,8 +39,7 @@
     "url": "https://github.com/zoran995/geoportal-server.git"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.299.0",
-    "@aws-sdk/node-http-handler": "3.296.0",
+    "@aws-sdk/client-s3": "3.699.0",
     "@nestjs/axios": "3.1.2",
     "@nestjs/common": "10.4.8",
     "@nestjs/config": "3.3.0",
@@ -48,6 +47,7 @@
     "@nestjs/platform-express": "10.4.8",
     "@nestjs/serve-static": "4.0.2",
     "@nestjs/swagger": "8.0.7",
+    "@smithy/node-http-handler": "3.3.1",
     "axios": "github:zoran995/axios.git#geoportal",
     "base-x": "5.0.0",
     "class-transformer": "0.5.1",
@@ -80,7 +80,7 @@
     "@types/yargs": "17.0.33",
     "@typescript-eslint/eslint-plugin": "5.56.0",
     "@typescript-eslint/parser": "5.56.0",
-    "aws-sdk-client-mock": "2.1.1",
+    "aws-sdk-client-mock": "4.1.0",
     "eslint": "8.36.0",
     "eslint-config-prettier": "8.8.0",
     "istanbul-lib-coverage": "3.2.2",

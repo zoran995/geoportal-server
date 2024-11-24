@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 
 import { PutObjectCommandInput } from '@aws-sdk/client-s3';
-import { NodeHttpHandler } from '@aws-sdk/node-http-handler';
+import { NodeHttpHandler } from '@smithy/node-http-handler';
 import baseX from 'base-x';
 import * as crypto from 'crypto';
 import http from 'http';
