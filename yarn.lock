@@ -3426,7 +3426,6 @@ __metadata:
     rxjs: "npm:7.8.1"
     sanitize-filename: "npm:1.6.3"
     supertest: "npm:7.0.0"
-    swagger-ui-express: "npm:4.6.2"
     ts-jest: "npm:29.2.5"
     ts-node: "npm:10.9.2"
     tsconfig-paths: "npm:4.2.0"
@@ -8685,24 +8684,6 @@ __metadata:
   dependencies:
     "@scarf/scarf": "npm:=1.4.0"
   checksum: 10c0/254f0d0b14766d505e69c36ea656afe838c32eefe1317aa4a8a2ffae06f1e53c55333130c6cea2f57bb47825b0cc465436f3f7af41254bd24b0601e56f914dba
-  languageName: node
-  linkType: hard
-
-"swagger-ui-dist@npm:>=4.11.0":
-  version: 4.15.5
-  resolution: "swagger-ui-dist@npm:4.15.5"
-  checksum: 10c0/7c6fe480f0fc4c55d3522af20dcb69f18a720fa4f257dcd4604c9e3d7b5465f2de92c6faa9b2aa81d83d52efb2d83c90881ef07e11c7fc322bb062db2b9c571b
-  languageName: node
-  linkType: hard
-
-"swagger-ui-express@npm:4.6.2":
-  version: 4.6.2
-  resolution: "swagger-ui-express@npm:4.6.2"
-  dependencies:
-    swagger-ui-dist: "npm:>=4.11.0"
-  peerDependencies:
-    express: ">=4.0.0"
-  checksum: 10c0/76e8866703fe957e265016beb8a9b096347968d00c23bbb9ecdf404e4fe9df7080905d45f19640a31b8a14790b60f92b476ea92392c7b107db409e1306723091
   languageName: node
   linkType: hard
 
