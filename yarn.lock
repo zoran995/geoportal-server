@@ -3140,7 +3140,7 @@ __metadata:
     jest: "npm:29.5.0"
     memfs: "npm:3.4.13"
     nodemailer: "npm:6.9.1"
-    prettier: "npm:2.8.7"
+    prettier: "npm:3.3.3"
     proj4-cli-defs: "npm:1.0.0"
     range_check: "npm:2.0.4"
     reflect-metadata: "npm:0.1.13"
@@ -7221,12 +7221,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:2.8.7":
-  version: 2.8.7
-  resolution: "prettier@npm:2.8.7"
+"prettier@npm:3.3.3":
+  version: 3.3.3
+  resolution: "prettier@npm:3.3.3"
   bin:
-    prettier: bin-prettier.js
-  checksum: 10c0/84c5b62f7d4909ae5b18b1a4cee67f6a30a548244c8919e67158dee1453f4fa4ff4d291c6f2e41e21d443a0c405f03ec27690502d4ad90c3a7c59bcaf38b51ba
+    prettier: bin/prettier.cjs
+  checksum: 10c0/b85828b08e7505716324e4245549b9205c0cacb25342a030ba8885aba2039a115dbcf75a0b7ca3b37bc9d101ee61fab8113fc69ca3359f2a226f1ecc07ad2e26
   languageName: node
   linkType: hard
 

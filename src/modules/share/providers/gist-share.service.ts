@@ -93,10 +93,9 @@ export class GistShareService extends AbstractShareService<ShareGistDto> {
     const getUrl = combineURLs(this.config.apiUrl, id);
     return lastValueFrom(
       this.httpService
-        .get<{ files: Record<string, { content: Record<string, unknown> }> }>(
-          getUrl,
-          { headers: headers },
-        )
+        .get<{
+          files: Record<string, { content: Record<string, unknown> }>;
+        }>(getUrl, { headers: headers })
         .pipe(
           map((res) => {
             if (
