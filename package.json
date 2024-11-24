@@ -3,7 +3,6 @@
   "version": "0.0.1-alpha",
   "description": "A rewrite of TerriJS-Server using NestJS",
   "author": "Zoran Kokeza",
-  "private": false,
   "license": "MIT",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
@@ -30,9 +29,7 @@
     "prepare": "yarn run build",
     "preversion": "yarn run format && yarn run lint && yarn run build"
   },
-  "bin": {
-    "geoportal-server": "geoportal-server.js"
-  },
+  "bin": "geoportal-server.js",
   "main": "./geoportal-server.js",
   "files": [
     "dist",
