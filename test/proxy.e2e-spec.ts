@@ -116,9 +116,9 @@ async function buildApp(configFile: string) {
   await app.init();
 
   const agent = supertest.agent(app.getHttpServer());
-  agent.use((req) => {
-    req.set({ 'x-client-id': 'e2e-test-client' });
-  });
+  // agent.use((req) => {
+  //   req.set({ 'x-client-id': 'e2e-test-client' });
+  // });
 
   return { app, agent };
 }
@@ -154,7 +154,7 @@ describe('Proxy (e2e)', () => {
 function doCommonTest(verb: 'GET' | 'POST') {
   const methodName = verb === 'GET' ? 'get' : 'post';
   let app: INestApplication;
-  let agent: SuperAgentTest;
+  let agent: ReturnType<typeof supertest.agent>;
   beforeEach(async () => {
     ({ app, agent } = await buildApp('./serverconfig.json'));
   });

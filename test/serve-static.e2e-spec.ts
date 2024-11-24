@@ -102,7 +102,7 @@ async function buildApp(configFile: string, wwwrootPath?: string) {
 
 describe('Serve static (e2e)', () => {
   let app: INestApplication;
-  let agent: SuperAgentTest;
+  let agent: ReturnType<typeof supertest.agent>;
 
   describe('should return 404', () => {
     it('with bad wwwroot', async () => {
