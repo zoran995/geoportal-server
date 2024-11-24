@@ -15,7 +15,7 @@ export class ContentSecurityPolicyDto {
   @IsArray()
   @IsString({ each: true })
   @NotNull()
-  imgSrc: string[] = ['self', 'data:', '*'];
+  imgSrc: string[] = ["'self'", 'data:', '*'];
 
   @IsArray()
   @IsString({ each: true })

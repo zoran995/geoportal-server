@@ -3413,7 +3413,7 @@ __metadata:
     dotenv-expand: "npm:9.0.0"
     eslint: "npm:8.36.0"
     eslint-config-prettier: "npm:8.8.0"
-    helmet: "npm:6.0.1"
+    helmet: "npm:8.0.0"
     istanbul-lib-coverage: "npm:3.2.2"
     istanbul-lib-report: "npm:3.0.1"
     jest: "npm:29.7.0"
@@ -5722,10 +5722,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"helmet@npm:6.0.1":
-  version: 6.0.1
-  resolution: "helmet@npm:6.0.1"
-  checksum: 10c0/b9739a08ff4286d52c72e03c66c7f288b89bab92371d9b6d815be4aa8e27928c7bc48a20155fc94e75d17191de6bf8343a457ef1a4cb5328ff2f4f1dfe373ea8
+"helmet@npm:8.0.0":
+  version: 8.0.0
+  resolution: "helmet@npm:8.0.0"
+  checksum: 10c0/c3d273df206cbb4e5e830ea68afdbd3d0f8e055b2707f67f651ebb4b679c7fd4d6ac77ce6188a2cee32e853d4e24aa00548f787989bbe6e5f98ebfb703855d09
   languageName: node
   linkType: hard
 
