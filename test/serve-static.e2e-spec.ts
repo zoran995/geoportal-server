@@ -12,7 +12,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 
 import { DirectoryJSON, fs, vol } from 'memfs';
-import supertest, { SuperAgentTest } from 'supertest';
+import supertest from 'supertest';
 
 import { AppModule } from 'src/app.module';
 import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';

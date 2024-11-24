@@ -8,7 +8,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { Response } from 'express';
 import { DirectoryJSON, vol } from 'memfs';
-import supertest, { SuperAgentTest } from 'supertest';
+import supertest from 'supertest';
 
 import { AppModule } from 'src/app.module';
 import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
