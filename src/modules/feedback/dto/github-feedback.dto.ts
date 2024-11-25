@@ -1,45 +1,26 @@
-import {
-  Equals,
-  IsIn,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUrl,
-} from 'class-validator';
+import { z } from 'zod';
+import { baseFeedback } from './base-feedback.dto';
 
-import { FeedbackServiceType } from '../types/feedback-service.type';
-import { BaseFeedbackDto } from './base-feedback.dto';
+export const githubFeedback = baseFeedback.extend({
+  service: z.literal('github'),
 
-export class GithubFeedbackDto extends BaseFeedbackDto {
-  /**
-   * {@inheritdoc}
-   */
-  @IsString()
-  @Equals('github')
-  @IsIn(['github'])
-  readonly service: FeedbackServiceType = 'github';
+  issuesUrl: z
+    .string()
+    .url()
+    .describe(
+      'Github API issues url. See https://docs.github.com/en/rest/reference/issues#create-an-issue for details',
+    ),
 
-  /**
-   * Github API issues url.
-   *
-   * See
-   * {@link https://docs.github.com/en/rest/reference/issues#create-an-issue | Github API create an issue}
-   * for details.
-   */
-  @IsUrl()
-  issuesUrl!: string;
+  accessToken: z
+    .string()
+    .min(1)
+    .describe('Github access token with permission to create issue.'),
 
-  /**
-   * Github access token with permission to create issue.
-   */
-  @IsString()
-  @IsNotEmpty()
-  accessToken!: string;
+  userAgent: z
+    .string()
+    .optional()
+    .default('TerriaJS-Bot')
+    .describe('Http user agent.'),
+});
 
-  /**
-   * Http user agent.
-   */
-  @IsString()
-  @IsOptional()
-  userAgent = 'TerriaJS-Bot';
-}
+export type GithubFeedbackType = z.infer<typeof githubFeedback>;

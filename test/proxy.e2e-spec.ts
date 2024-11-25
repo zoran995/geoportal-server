@@ -17,7 +17,7 @@ import { NotFoundExceptionFilter } from 'src/common/filters/not-found-exception.
 import { WWWROOT_TOKEN } from 'src/infrastructure/config/app-config.module';
 import { LoggerService } from 'src/infrastructure/logger/logger.service';
 
-import { ProxyConfigDto } from 'src/modules/proxy/dto/proxy-config.dto';
+import { ProxyConfigType } from 'src/modules/proxy/dto/proxy-config.dto';
 
 import { Cancel, CancelToken } from './helpers/axios-cancel';
 import { NoopLoggerService } from './noop-logger.service';
@@ -56,7 +56,7 @@ axiosRequest.mockImplementation(
   },
 );
 
-const openProxyConfig: Partial<ProxyConfigDto> = {
+const openProxyConfig: Partial<ProxyConfigType> = {
   proxyAllDomains: true,
 };
 

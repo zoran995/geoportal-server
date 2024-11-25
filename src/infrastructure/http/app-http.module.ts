@@ -4,7 +4,6 @@ import { Global, Module } from '@nestjs/common';
 import http from 'http';
 import https from 'https';
 
-import { AppHttpService } from './app-http.service';
 import { AxiosLogInterceptor } from './axios-log-interceptors';
 
 const agentConfig: https.AgentOptions = {
@@ -22,7 +21,7 @@ const agentConfig: https.AgentOptions = {
       httpsAgent: new https.Agent(agentConfig),
     }),
   ],
-  providers: [AxiosLogInterceptor, AppHttpService],
-  exports: [BaseHttpModule, AppHttpService],
+  providers: [AxiosLogInterceptor],
+  exports: [BaseHttpModule],
 })
 export class AppHttpModule extends BaseHttpModule {}

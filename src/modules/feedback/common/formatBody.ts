@@ -1,12 +1,12 @@
 import { Request } from 'express';
 
-import { AdditionalParametersDto } from '../dto/additional-parameters.dto';
+import { AdditionalParametersType } from '../dto/additional-parameters.dto';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
 
 export function formatBody(
   feedback: CreateFeedbackDto,
   req: Request,
-  additionalParameters: AdditionalParametersDto[] = [],
+  additionalParameters: AdditionalParametersType[] = [],
 ): string {
   let result = '';
   result += feedback.comment;

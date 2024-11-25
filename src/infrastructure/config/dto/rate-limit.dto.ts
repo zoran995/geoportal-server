@@ -1,25 +1,17 @@
-import { IsInt } from 'class-validator';
+import { z } from 'zod';
 
-import { NotNull } from 'src/common/validators';
-
-export class RateLimitDto {
+export const rateLimit = z.object({
   /**
    * The number of retries the user gets before they need to start waiting.
    */
-  @IsInt()
-  @NotNull()
-  freeRetries = 2;
-
+  freeRetries: z.number().int().min(0).default(2),
   /**
-   * The initial wait time (in milliseconds) after the free retries above.
+   * The initial wait time (in milliseconds) after the free retries above
+   * have been used.
    */
-  @IsInt()
-  @NotNull()
-  minWait = 200;
+  minWait: z.number().int().min(0).default(200),
   /**
    * The maximum time that the user will need to wait.
    */
-  @IsInt()
-  @NotNull()
-  maxWait = 6000;
-}
+  maxWait: z.number().int().min(0).default(6000),
+});

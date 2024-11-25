@@ -50,20 +50,19 @@
     "@smithy/node-http-handler": "3.3.1",
     "axios": "github:zoran995/axios.git#geoportal",
     "base-x": "5.0.0",
-    "class-transformer": "0.5.1",
-    "class-validator": "0.14.1",
-    "class-validator-jsonschema": "5.0.1",
     "compression": "1.7.5",
     "dotenv": "16.4.5",
     "dotenv-expand": "12.0.1",
     "helmet": "8.0.0",
+    "nestjs-zod": "^4.2.0",
     "nodemailer": "6.9.16",
     "proj4-cli-defs": "1.0.0",
     "range_check": "2.0.4",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.1",
     "sanitize-filename": "1.6.3",
-    "yargs": "17.7.2"
+    "yargs": "17.7.2",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@golevelup/ts-jest": "0.6.1",
@@ -74,6 +73,7 @@
     "@types/express": "5.0.0",
     "@types/istanbul-lib-report": "3.0.3",
     "@types/jest": "29.5.14",
+    "@types/lodash": "^4.17.13",
     "@types/node": "22.9.3",
     "@types/nodemailer": "6.4.17",
     "@types/supertest": "6.0.2",
@@ -92,7 +92,8 @@
     "ts-jest": "29.2.5",
     "ts-node": "10.9.2",
     "tsconfig-paths": "4.2.0",
-    "typescript": "4.9.5"
+    "typescript": "4.9.5",
+    "zod-to-json-schema": "^3.23.5"
   },
   "resolutions": {
     "axios": "github:zoran995/axios.git#geoportal"

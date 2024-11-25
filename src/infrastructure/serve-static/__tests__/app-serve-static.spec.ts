@@ -1,35 +1,37 @@
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 
-import { plainToClass } from 'class-transformer';
 import { vol } from 'memfs';
 import path from 'path';
 
 import { WWWROOT_TOKEN } from '../../config';
 import { AppServeStatic } from '../app-serve-static';
-import { ServeStaticDto } from '../dto/serve-static.dto';
+import { serveStatic, type ServeStaticType } from '../dto/serve-static.dto';
 
 jest.mock('fs');
 const mockConfigGet = jest.fn();
 
-const defaultConfig = plainToClass(ServeStaticDto, {});
 vol.fromJSON({
   'testwwwroot/index.html': 'index.html',
 });
 
 const mockConfigReturnValue = (
-  serveStaticConfig: ServeStaticDto | undefined,
+  serveStaticConfig: ServeStaticType | undefined,
 ) => {
   mockConfigGet.mockImplementation((key) => {
     if (key === 'serveStatic') {
       return serveStaticConfig;
     }
+
     return undefined;
   });
 };
 
 describe('AppServeStatic', () => {
+  const defaultConfig = serveStatic.parse({});
+
   let service: AppServeStatic;
+
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [

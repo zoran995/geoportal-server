@@ -1,117 +1,64 @@
-import {
-  IsArray,
-  IsBoolean,
-  IsInt,
-  IsObject,
-  IsString,
-  Max,
-  Min,
-  ValidateNested,
-} from 'class-validator';
+import { proxyConfig } from 'src/modules/proxy';
+import { shareConfig } from 'src/modules/share/dto/share.config.dto';
 
-import { NotNull } from 'src/common/validators';
+import { createZodDto } from 'nestjs-zod';
+import { feedbackConfig } from 'src/modules/feedback/dto/feedback.config.dto';
+import { z } from 'zod';
+import { serveStatic } from '../../serve-static/dto/serve-static.dto';
+import { basicAuthentication } from './basic-authentication.dto';
+import { contentSecurityPolicy } from './ContentSecurityPolicy.dto';
 
-import { FeedbackConfigDto } from 'src/modules/feedback';
-import { ProxyConfigDto } from 'src/modules/proxy';
-import { ShareConfigDto } from 'src/modules/share/dto/share.config.dto';
+export const configuration = z.object({
+  compressResponse: z.boolean().default(true).describe(`
+    Use the compression middleware package to enable gzip compression of
+    responses. For high-traffic websites in production, it is strongly
+    recommended to offload compression from the application server typically in
+    a reverse proxy (e.g., Nginx). In that case, you should not use compression
+    middleware.`),
 
-import { ServeStaticDto } from '../../serve-static/dto/serve-static.dto';
-import { BasicAuthenticationDto } from './basic-authentication.dto';
-import { ContentSecurityPolicyDto } from './ContentSecurityPolicy.dto';
+  basicAuthentication: z.optional(basicAuthentication),
 
-export class ConfigurationDto {
-  /* @IsEnum(Environment) NODE_ENV: Environment; */
+  port: z.coerce.number().int().min(0).max(65535).default(3001).describe(`
+    Port to listen on. Overridden by the --port command line setting.`),
 
-  /**
-   * Use the compression middleware package to enable gzip compression of
-   * responses. For high-traffic websites in production, it is strongly
-   * recommended to offload compression from the application server typically in
-   * a reverse proxy (e.g., Nginx). In that case, you should not use compression
-   * middleware.
-   */
-  @IsBoolean()
-  @NotNull()
-  compressResponse: boolean = true;
+  initPaths: z.array(z.string()).default([]).describe(`
+    List of directories where init (catalog) files will be sought, before
+    defaulting to wwwroot/init. This helps with managing catalog files
+    separately from the main codebase.`),
 
-  @IsObject()
-  @NotNull()
-  @ValidateNested()
-  basicAuthentication?: BasicAuthenticationDto;
+  share: z
+    .optional(shareConfig)
+    .describe(
+      'Configuration for the share service. If not defined share service will be disabled.',
+    ),
 
-  /**
-   * Port to listen on. Overridden by the --port command line setting.
-   */
-  @IsInt()
-  @Min(0)
-  @Max(65535)
-  @NotNull()
-  port: number = 3001;
+  feedback: feedbackConfig
+    .optional()
+    .describe(
+      `Configuration for the feedback service. If not defined feedback service will be disabled.`,
+    ),
 
-  /**
-   * List of directories where init (catalog) files will be sought, before
-   * defaulting to wwwroot/init. This helps with managing catalog files
-   * separately from the main codebase.
-   */
-  @IsArray()
-  @IsString({ each: true })
-  @NotNull()
-  initPaths: string[] = [];
+  proxy: proxyConfig
+    .default(proxyConfig.parse({}))
+    .describe('Configuration for the proxy service.'),
 
-  /**
-   * Configuration for the share service. If not defined share service will be
-   * disabled.
-   */
-  @IsObject()
-  @NotNull()
-  @ValidateNested()
-  share?: ShareConfigDto;
+  trustProxy: z
+    .union([z.boolean(), z.string(), z.array(z.string()), z.number()])
+    .default(false).describe(`
+    The value of the Express "trust proxy" application setting. Set this to
+    true if you want to provide publicly usable URLs behind a reverse proxy
+    For more details read
+    http://expressjs.com/en/guide/behind-proxies.html
+    http://expressjs.com/en/api.html#trust.proxy.options.table`),
 
-  /**
-   * Configuration for the feedback service. If not defined feedback service
-   * will be disabled.
-   * @example
-   * This service accepts posted JSON like
-   * ```
-   * {
-   *   "name":"My Name",
-   *   "email":"myemail@example.com",
-   *   "comment":"This thing is so great! yeah!"
-   * }
-   * ```
-   */
-  @IsObject()
-  @NotNull()
-  @ValidateNested()
-  feedback?: FeedbackConfigDto;
+  serveStatic: serveStatic
+    .optional()
+    .describe('Configuration for serving static files.'),
 
-  /**
-   * Configuration for the proxy service.
-   */
-  @IsObject()
-  @NotNull()
-  @ValidateNested()
-  proxy: ProxyConfigDto = new ProxyConfigDto();
+  csp: contentSecurityPolicy
+    .describe('Configuration for the Content Security Policy.')
+    .default(contentSecurityPolicy.parse({})),
+});
 
-  /**
-   * The value of the Express "trust proxy" application setting. Set this to
-   * true if you want to provide publicly usable URLs behind a reverse proxy For
-   * more details read
-   * {@link http://expressjs.com/en/guide/behind-proxies.html | express behind proxies}
-   * {@link http://expressjs.com/en/api.html#trust.proxy.options.table | Trust proxy options}
-   */
-  @NotNull()
-  trustProxy: boolean | string | string[] | number = false;
-
-  /**
-   * Configuration for serving static files.
-   */
-  @IsObject()
-  @NotNull()
-  @ValidateNested()
-  serveStatic: ServeStaticDto = new ServeStaticDto();
-
-  @IsObject()
-  @NotNull()
-  @ValidateNested()
-  csp: ContentSecurityPolicyDto = new ContentSecurityPolicyDto();
-}
+export type ConfigurationType = z.infer<typeof configuration>;
+export class ConfigurationDto extends createZodDto(configuration) {}

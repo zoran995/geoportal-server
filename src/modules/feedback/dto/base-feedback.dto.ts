@@ -1,36 +1,18 @@
-import { Type } from 'class-transformer';
-import {
-  IsIn,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { z } from 'zod';
 
-import {
-  FeedbackServiceType,
-  FeedbackServiceTypeArr,
-} from '../types/feedback-service.type';
-import { AdditionalParametersDto } from './additional-parameters.dto';
+import { FeedbackServiceType } from '../types/feedback-service.type';
+import { additionalParameters } from './additional-parameters.dto';
 
-export class BaseFeedbackDto {
+export const baseFeedback = z.object({
   /**
    * Service to use.
    */
-  @IsString()
-  @IsIn(FeedbackServiceTypeArr)
-  @IsNotEmpty()
-  readonly service!: FeedbackServiceType;
-
+  service: z.enum(FeedbackServiceType),
   /**
    * Id of feedback service.
    */
-  @IsString()
-  @IsNotEmpty()
-  readonly id!: string;
+  id: z.string().min(1),
+  additionalParameters: z.array(additionalParameters).optional(),
+});
 
-  @ValidateNested({ each: true })
-  @IsOptional()
-  @Type(() => AdditionalParametersDto)
-  readonly additionalParameters?: AdditionalParametersDto[];
-}
+export type BaseFeedbackType = z.infer<typeof baseFeedback>;

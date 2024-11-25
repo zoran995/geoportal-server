@@ -2,12 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import {
-  BasicAuthenticationDto,
+  BasicAuthenticationType,
   IConfigurationType,
 } from 'src/infrastructure/config';
 
-import { ProxyAuthConfigDto } from '../dto/proxy-auth-config.dto';
-import { ProxyConfigDto } from '../dto/proxy-config.dto';
+import { ProxyConfigType } from '../dto/proxy-config.dto';
 
 @Injectable()
 export class ProxyConfigService {
@@ -16,28 +15,28 @@ export class ProxyConfigService {
   ) {}
 
   /**
-   * {@link ProxyConfigDto.postSizeLimit}
+   * {@link ProxyConfigType.postSizeLimit}
    */
   get postSizeLimit() {
     return this.proxyConfig?.postSizeLimit;
   }
 
   /**
-   * {@link ProxyConfigDto.proxyAllDomains}
+   * {@link ProxyConfigType.proxyAllDomains}
    */
   get proxyAllDomains() {
     return this.proxyConfig?.proxyAllDomains;
   }
 
   /**
-   * {@link ProxyConfigDto.allowProxyFor}
+   * {@link ProxyConfigType.allowProxyFor}
    */
   get proxyDomains() {
     return this.proxyConfig?.allowProxyFor;
   }
 
   /**
-   * {@link ProxyConfigDto.blacklistedAddresses}
+   * {@link ProxyConfigType.blacklistedAddresses}
    */
   get blacklist() {
     return this.proxyConfig?.blacklistedAddresses;
@@ -52,37 +51,37 @@ export class ProxyConfigService {
   }
 
   /**
-   * {@link ProxyConfigDto.upstreamProxy}
+   * {@link ProxyConfigType.upstreamProxy}
    */
   get upstreamProxy() {
     return this.proxyConfig?.upstreamProxy;
   }
 
   /**
-   * {@link ProxyConfigDto.bypassUpstreamProxyHosts}
+   * {@link ProxyConfigType.bypassUpstreamProxyHosts}
    */
   get bypassUpstreamProxyHosts() {
     return this.proxyConfig?.bypassUpstreamProxyHosts;
   }
 
   /**
-   * {@link ProxyConfigDto.appendParamToQueryString}
+   * {@link ProxyConfigType.appendParamToQueryString}
    */
   get appendParamToQueryString() {
     return this.proxyConfig?.appendParamToQueryString;
   }
 
   get basicAuthentication() {
-    return this.configService.get<BasicAuthenticationDto>(
+    return this.configService.get<BasicAuthenticationType>(
       'basicAuthentication',
     );
   }
 
   get proxyAuth() {
-    return this.proxyConfig?.proxyAuth || new Map<string, ProxyAuthConfigDto>();
+    return this.proxyConfig?.proxyAuth || {};
   }
 
   private get proxyConfig() {
-    return this.configService.get<ProxyConfigDto>('proxy');
+    return this.configService.get<ProxyConfigType>('proxy');
   }
 }

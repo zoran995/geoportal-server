@@ -1,10 +1,8 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { z } from 'zod';
 
-export class GetInitDto {
-  /**
-   * Name of the requested file.
-   */
-  @IsString()
-  @IsNotEmpty()
-  fileName!: string;
-}
+export const getInit = z.object({
+  fileName: z.string().min(1),
+});
+
+export class GetInitDto extends createZodDto(getInit) {}

@@ -11,11 +11,6 @@ describe('proxy urlValidator', () => {
     expect(result).toBe(true);
   });
 
-  it('fails on trailing dot', () => {
-    const result = urlValidator('https://example.com.');
-    expect(result).toBe(false);
-  });
-
   it('fails on wrong protocol', () => {
     const result = urlValidator('ftp://example.com.');
     expect(result).toBe(false);

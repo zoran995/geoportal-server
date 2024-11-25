@@ -3,7 +3,7 @@ import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 import { createMock } from '@golevelup/ts-jest';
 import { of, throwError } from 'rxjs';
 
-import { RedmineFeedbackDto } from '../../dto/redmine-feedback.dto';
+import { RedmineFeedbackType } from '../../dto/redmine-feedback.dto';
 import { RedmineFeedbackService } from '../redmine-feedback.service';
 
 const mockHttpPost = jest.fn();
@@ -24,7 +24,7 @@ const mockExecutionContext = createMock<ExecutionContext>({
 
 const req = mockExecutionContext.switchToHttp().getRequest();
 
-const redmineConf: RedmineFeedbackDto = {
+const redmineConf: RedmineFeedbackType = {
   service: 'redmine',
   id: 'test-redmine',
   project_id: 12,

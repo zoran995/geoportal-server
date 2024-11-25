@@ -1,8 +1,9 @@
-import { isURL } from 'class-validator';
+import { z } from 'zod';
 
 export const urlValidator = (url: string) => {
-  return isURL(url, {
-    protocols: ['http', 'https'],
-    require_protocol: false,
-  });
+  return z
+    .string()
+    .url()
+    .regex(/^(http:|https:)/)
+    .safeParse(url).success;
 };

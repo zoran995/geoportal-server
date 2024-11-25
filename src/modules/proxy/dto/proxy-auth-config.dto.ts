@@ -1,21 +1,11 @@
-import { Type } from 'class-transformer';
-import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { z } from 'zod';
 
-export class ProxyAuthConfigDto {
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ProxyAuthHeaders)
-  headers?: ProxyAuthHeaders[];
+const proxyAuthHeaders = z.object({
+  name: z.string(),
+  value: z.string(),
+});
 
-  @IsString()
-  @IsOptional()
-  authorization?: string;
-}
-
-class ProxyAuthHeaders {
-  @IsString()
-  name!: string;
-  @IsString()
-  value!: string;
-}
+export const proxyAuthConfig = z.object({
+  headers: z.array(proxyAuthHeaders).optional(),
+  authorization: z.string().optional(),
+});

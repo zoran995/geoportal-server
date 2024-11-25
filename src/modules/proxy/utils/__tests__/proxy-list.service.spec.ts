@@ -4,7 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { fs, vol } from 'memfs';
 
 import { ProxyConfigService } from '../../config/proxy-config.service';
-import { ProxyConfigDto } from '../../dto/proxy-config.dto';
+import { proxyConfig } from '../../dto/proxy-config.dto';
 import { DEFAULT_BLACKLIST } from '../../proxy.constants';
 import { ProxyListService } from '../proxy-list.service';
 
@@ -15,9 +15,7 @@ vol.fromJSON({
   './test/whitelist': 'whitelist',
 });
 
-const defaultProxyConfig: { proxy: ProxyConfigDto } = {
-  proxy: new ProxyConfigDto(),
-};
+const defaultProxyConfig = proxyConfig.parse({});
 const mockConfigGet = jest.fn();
 
 class ConfigServiceMock {
@@ -58,7 +56,7 @@ describe('ProxyListService', () => {
   });
 
   it('should call file watcher on whitelist', () => {
-    const proxyConf = { ...defaultProxyConfig.proxy };
+    const proxyConf = { ...defaultProxyConfig };
     proxyConf.whitelistPath = './test/whitelist';
     mockConfigGet.mockReturnValue(proxyConf);
     const watchSpy = jest.spyOn(fs, 'watch');
@@ -70,7 +68,7 @@ describe('ProxyListService', () => {
   });
 
   it('should resolve `allowProxyFor` on invalid path', () => {
-    const proxyConf = { ...defaultProxyConfig.proxy };
+    const proxyConf = { ...defaultProxyConfig };
     proxyConf.whitelistPath = './test/whitelist-bad';
     proxyConf.allowProxyFor = ['allowProxyFor'];
     mockConfigGet.mockReturnValue(proxyConf);
@@ -80,7 +78,7 @@ describe('ProxyListService', () => {
   });
 
   it('should resolve `allowProxyFor` when whitelistPath not defined', () => {
-    const proxyConf = { ...defaultProxyConfig.proxy };
+    const proxyConf = { ...defaultProxyConfig };
     proxyConf.allowProxyFor = ['allowProxyFor'];
     mockConfigGet.mockReturnValue(proxyConf);
     service.onModuleInit();
@@ -89,7 +87,7 @@ describe('ProxyListService', () => {
   });
 
   it('should call file watcher on blacklist', () => {
-    const proxyConf = { ...defaultProxyConfig.proxy };
+    const proxyConf = { ...defaultProxyConfig };
     proxyConf.blacklistPath = './test/blacklist';
     mockConfigGet.mockReturnValue(proxyConf);
     const watchSpy = jest.spyOn(fs, 'watch');
@@ -101,7 +99,7 @@ describe('ProxyListService', () => {
   });
 
   it('should resolve default blacklist on invalid path and no blacklist in config', () => {
-    const proxyConf = { ...defaultProxyConfig.proxy };
+    const proxyConf = { ...defaultProxyConfig };
     proxyConf.blacklistPath = './test/blacklist-bad';
     mockConfigGet.mockReturnValue(proxyConf);
     service.onModuleInit();
@@ -110,7 +108,7 @@ describe('ProxyListService', () => {
   });
 
   it('should resolve default blacklist when blacklistPath not defined and no blacklist in config', () => {
-    const proxyConf = { ...defaultProxyConfig.proxy };
+    const proxyConf = { ...defaultProxyConfig };
     mockConfigGet.mockReturnValue(proxyConf);
     service.onModuleInit();
     expect(service.blacklist).toEqual(DEFAULT_BLACKLIST);
@@ -118,7 +116,7 @@ describe('ProxyListService', () => {
   });
 
   it('should resolve `blacklistAddresses` on invalid path', () => {
-    const proxyConf = { ...defaultProxyConfig.proxy };
+    const proxyConf = { ...defaultProxyConfig };
     proxyConf.blacklistPath = './test/blacklist-bad';
     proxyConf.blacklistedAddresses = ['blacklistedAddresses'];
     mockConfigGet.mockReturnValue(proxyConf);
@@ -128,7 +126,7 @@ describe('ProxyListService', () => {
   });
 
   it('should resolve `blacklistAddresses` when blacklistPath not defined', () => {
-    const proxyConf = { ...defaultProxyConfig.proxy };
+    const proxyConf = { ...defaultProxyConfig };
     proxyConf.blacklistedAddresses = ['blacklistedAddresses'];
     mockConfigGet.mockReturnValue(proxyConf);
     service.onModuleInit();
@@ -138,7 +136,7 @@ describe('ProxyListService', () => {
 
   describe('addressBlacklisted', () => {
     it('should return true for blacklisted address', () => {
-      const proxyConf = { ...defaultProxyConfig.proxy };
+      const proxyConf = { ...defaultProxyConfig };
       proxyConf.blacklistedAddresses = ['192.163.0.1'];
       mockConfigGet.mockReturnValue(proxyConf);
       service.onModuleInit();
@@ -148,7 +146,7 @@ describe('ProxyListService', () => {
     });
 
     it('should return false for non blacklisted address', () => {
-      const proxyConf = { ...defaultProxyConfig.proxy };
+      const proxyConf = { ...defaultProxyConfig };
       proxyConf.blacklistedAddresses = ['192.163.0.1'];
       mockConfigGet.mockReturnValue(proxyConf);
       service.onModuleInit();
@@ -158,7 +156,7 @@ describe('ProxyListService', () => {
     });
 
     it('should not use port when checking blacklisted address', () => {
-      const proxyConf = { ...defaultProxyConfig.proxy };
+      const proxyConf = { ...defaultProxyConfig };
       proxyConf.blacklistedAddresses = ['192.163.0.1'];
       mockConfigGet.mockReturnValue(proxyConf);
       service.onModuleInit();
@@ -170,7 +168,7 @@ describe('ProxyListService', () => {
 
   describe('file changes', () => {
     it('should listen to file changes in whitelist', async () => {
-      const proxyConf = { ...defaultProxyConfig.proxy };
+      const proxyConf = { ...defaultProxyConfig };
       proxyConf.whitelistPath = './test/whitelist';
       proxyConf.blacklistPath = './test/blacklist';
       mockConfigGet.mockReturnValue(proxyConf);
@@ -190,7 +188,7 @@ describe('ProxyListService', () => {
     });
 
     it('should listen to file changes in blacklist', async () => {
-      const proxyConf = { ...defaultProxyConfig.proxy };
+      const proxyConf = { ...defaultProxyConfig };
       proxyConf.whitelistPath = './test/whitelist';
       proxyConf.blacklistPath = './test/blacklist';
       mockConfigGet.mockReturnValue(proxyConf);
@@ -210,7 +208,7 @@ describe('ProxyListService', () => {
     });
 
     it('should reinit on file delete', async () => {
-      const proxyConf = { ...defaultProxyConfig.proxy };
+      const proxyConf = { ...defaultProxyConfig };
       proxyConf.whitelistPath = './test/whitelist';
       proxyConf.allowProxyFor = ['allowProxyFor'];
       mockConfigGet.mockReturnValue(proxyConf);

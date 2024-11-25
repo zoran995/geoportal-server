@@ -1,119 +1,93 @@
-import { Type } from 'class-transformer';
-import {
-  IsArray,
-  IsBoolean,
-  IsFQDN,
-  IsInt,
-  IsObject,
-  IsString,
-  Min,
-  ValidateNested,
-} from 'class-validator';
+import { z } from 'zod';
 
-import { NotNull, isFqdnOrIp } from 'src/common/validators';
+import { fqdnOrIp } from 'src/common/validators/fqdnOrIp.schema';
 
 import { DEFAULT_BLACKLIST } from '../proxy.constants';
-import { ProxyAuthConfigDto } from './proxy-auth-config.dto';
+import { proxyAuthConfig } from './proxy-auth-config.dto';
+import { createZodDto } from 'nestjs-zod';
 
-export class ProxyConfigDto {
-  /**
-   * The largest size, in bytes, of data that the proxy will send in a POST
-   * request.
-   */
-  @IsInt()
-  @NotNull()
-  @Min(0)
-  postSizeLimit: number = 102400;
+export const appendParamToQueryString = z.object({
+  regexPattern: z
+    .string()
+    .describe(
+      "A regex pattern used to test whether parameters should be attached. Set to '.' to match everything.",
+    ),
 
-  /**
-   * If this setting is true, the allowProxyFor list is ignored, and all
-   * requests are accepted.
-   */
-  @IsBoolean()
-  @NotNull()
-  proxyAllDomains: boolean = false;
+  params: z
+    .record(z.string())
+    .describe('Parameters that should be appended to the request.'),
+});
 
-  /**
-   * List of domains which the server is willing to proxy for. Subdomains are
-   * included automatically.
-   * It will be ignored if {@link ProxyConfigDto.whitelistPath} is defined and file exists.
-   */
-  @IsArray()
-  @IsString({ each: true })
-  @isFqdnOrIp({ each: true })
-  @NotNull()
-  allowProxyFor: string[] = [];
+export const proxyConfig = z.object({
+  postSizeLimit: z
+    .number()
+    .int()
+    .min(0)
+    .default(102400)
+    .describe(
+      'The largest size, in bytes, of data that the proxy will send in a POST request.',
+    ),
 
-  /**
-   * IP addresses to refuse to proxy for, even if they're resolved from a hostname that we would ordinarily allow.
-   * It will be ignored if {@link ProxyConfigDto.blacklistPath} is defined and file exists.
-   */
-  @IsArray()
-  @IsString({ each: true })
-  @NotNull()
-  blacklistedAddresses: string[] = DEFAULT_BLACKLIST;
+  proxyAllDomains: z
+    .boolean()
+    .default(false)
+    .describe(
+      'If this setting is true, the allowProxyFor list is ignored, and all requests are accepted.',
+    ),
 
-  /**
-   * Location of the file containing the list of domains which the server is
-   * willing to proxy for. Subdomains are included automatically. Each domain
-   * should be in its own row.
-   */
-  @IsString()
-  @NotNull()
-  whitelistPath?: string;
+  allowProxyFor: z
+    .array(fqdnOrIp())
+    .optional()
+    .default([])
+    .describe(
+      'List of domains which the server is willing to proxy for. Subdomains are included automatically. It will be ignored if whitelistPath is defined and file exists.',
+    ),
 
-  /**
-   * Location of the file containing the list of IP addresses to refuse to proxy
-   * for, even if they're resolved from a hostname that would ordinarily be
-   * proxied. Each IP address should be in its own row. If your server has
-   * access to an IP range that is not accessible to clients of the proxy, and
-   * you want to ensure that the client can't get access to it through the
-   * proxy, it is vital that you add that IP range to this list. Any change to
-   * file content will be picked up automatically without restarting server.
-   */
-  @IsString()
-  @NotNull()
-  blacklistPath?: string;
+  blacklistedAddresses: z
+    .array(z.string())
+    .default(DEFAULT_BLACKLIST)
+    .describe(
+      "IP addresses to refuse to proxy for, even if they're resolved from a hostname that we would ordinarily allow. It will be ignored if blacklistPath is defined and file exists.",
+    ),
 
-  /**
-   * Pass requests through to another proxy upstream.
-   */
-  @IsFQDN()
-  @NotNull()
-  upstreamProxy?: string;
+  whitelistPath: z
+    .string()
+    .optional()
+    .describe(
+      'Location of the file containing the list of domains which the server is willing to proxy for. Subdomains are included automatically. Each domain should be in its own row.',
+    ),
 
-  @IsObject()
-  @NotNull()
-  @IsBoolean({ each: true })
-  bypassUpstreamProxyHosts?: Map<string, boolean>;
+  blacklistPath: z
+    .string()
+    .optional()
+    .describe(
+      "Location of the file containing the list of IP addresses to refuse to proxy for, even if they're resolved from a hostname that would ordinarily be proxied. Each IP address should be in its own row. If your server has access to an IP range that is not accessible to clients of the proxy, and you want to ensure that the client can't get access to it through the proxy, it is vital that you add that IP range to this list. Any change to file content will be picked up automatically without restarting server.",
+    ),
 
-  /**
-   * An array of options which you to inform which additional parameters are
-   * appended to the url querystring.
-   */
-  @IsObject()
-  @NotNull()
-  appendParamToQueryString?: Map<string, AppendParamToQueryStringDto[]>;
+  upstreamProxy: fqdnOrIp()
+    .optional()
+    .describe('Pass requests through to another proxy upstream.'),
 
-  @IsObject()
-  @NotNull()
-  //proxyAuth?: Record<string, ProxyAuthConfigDto>;
-  @ValidateNested({ each: true })
-  @Type(() => ProxyAuthConfigDto)
-  proxyAuth?: Map<string, ProxyAuthConfigDto>;
-}
+  bypassUpstreamProxyHosts: z
+    .map(z.string(), z.boolean())
+    .optional()
+    .describe('A list of hosts that should bypass the upstream proxy.'),
 
-export class AppendParamToQueryStringDto {
-  /**
-   * A regex pattern used to test whether parameters should be attached. Set to
-   * '.' to match everything.
-   */
-  @IsString()
-  regexPattern?: string;
+  appendParamToQueryString: z
+    .map(z.string(), z.array(appendParamToQueryString))
+    .optional()
+    .describe(
+      'An array of options which you to inform which additional parameters are appended to the url querystring.',
+    ),
 
-  /**
-   * Parameters that should be appended to the request.
-   */
-  @IsObject()
-  params?: Record<string, string>;
-}
+  proxyAuth: z
+    .record(z.string(), proxyAuthConfig)
+    .optional()
+    .describe('A map of proxy authentication configurations.'),
+});
+
+export class AppendParamToQueryStringDto extends createZodDto(
+  appendParamToQueryString,
+) {}
+
+export type ProxyConfigType = z.infer<typeof proxyConfig>;

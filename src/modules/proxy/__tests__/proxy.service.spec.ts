@@ -15,7 +15,7 @@ import { of, throwError } from 'rxjs';
 import { POST_SIZE_LIMIT } from 'src/common/interceptor';
 
 import { ProxyConfigService } from '../config/proxy-config.service';
-import { ProxyConfigDto } from '../dto/proxy-config.dto';
+import { proxyConfig } from '../dto/proxy-config.dto';
 import { ProxyService } from '../proxy.service';
 import { ProxyListService } from '../utils/proxy-list.service';
 
@@ -24,11 +24,9 @@ const requestData: any = {
   protocol: 'http',
   headers: { hostname: '127.0.0.1' },
 };
-const defaultProxyConfig: { proxy: ProxyConfigDto } = {
-  proxy: new ProxyConfigDto(),
-};
-defaultProxyConfig.proxy.allowProxyFor = ['example.com'];
-defaultProxyConfig.proxy.blacklistedAddresses = ['192.163.0.1'];
+const defaultProxyConfig = proxyConfig.parse({});
+defaultProxyConfig.allowProxyFor = ['example.com'];
+defaultProxyConfig.blacklistedAddresses = ['192.163.0.1'];
 const mockHttpRequest = jest.fn();
 const mockHttpGet = jest.fn();
 const mockHttpPost = jest.fn();
@@ -86,7 +84,7 @@ async function sendRequest(
 
 const mockConfigReturnValue = (
   other: Record<string, unknown>,
-  proxy: ProxyConfigDto = defaultProxyConfig.proxy,
+  proxy = defaultProxyConfig,
 ) => {
   mockConfigGet.mockImplementation((key: string) => {
     if (key === 'proxy') {
@@ -174,7 +172,7 @@ describe('ProxyService', () => {
   });
 
   it('should not block a domain if proxyAllDomains is true', async () => {
-    const proxyConf = { ...defaultProxyConfig.proxy };
+    const proxyConf = { ...defaultProxyConfig };
     proxyConf.proxyAllDomains = true;
     proxyConf.allowProxyFor = ['example2.com'];
     mockConfigReturnValue({}, proxyConf);
@@ -244,7 +242,7 @@ describe('ProxyService', () => {
     });
     it('used when one is specified', async () => {
       const proxy = 'http://proxy/';
-      const proxyConf = { ...defaultProxyConfig.proxy };
+      const proxyConf = { ...defaultProxyConfig };
       proxyConf.upstreamProxy = proxy;
       mockConfigGet.mockClear();
       mockConfigReturnValue({}, proxyConf);
@@ -260,7 +258,7 @@ describe('ProxyService', () => {
 
     it('non used when none is specified', async () => {
       const proxy = undefined;
-      const proxyConf = { ...defaultProxyConfig.proxy };
+      const proxyConf = { ...defaultProxyConfig };
       proxyConf.upstreamProxy = proxy;
       mockConfigReturnValue({}, proxyConf);
       mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
@@ -275,7 +273,7 @@ describe('ProxyService', () => {
 
     it('not used when host is in bypassUpstreamProxyHosts', async () => {
       const proxy = 'http://proxy/';
-      const proxyConf = { ...defaultProxyConfig.proxy };
+      const proxyConf = { ...defaultProxyConfig };
       proxyConf.upstreamProxy = proxy;
       proxyConf.bypassUpstreamProxyHosts = new Map();
       proxyConf.bypassUpstreamProxyHosts.set('example.com', true);
@@ -292,7 +290,7 @@ describe('ProxyService', () => {
 
     it('still used when bypassUpstreamProxyHosts is defined but host is not in it', async () => {
       const proxy = 'http://proxy/';
-      const proxyConf = { ...defaultProxyConfig.proxy };
+      const proxyConf = { ...defaultProxyConfig };
       proxyConf.upstreamProxy = proxy;
       proxyConf.bypassUpstreamProxyHosts = new Map();
       proxyConf.bypassUpstreamProxyHosts.set('example2.com', true);
@@ -316,8 +314,8 @@ describe('ProxyService', () => {
       const auth = {
         authorization: 'testauth',
       };
-      const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.proxyAuth = new Map([['example.com', auth]]);
+      const proxyConf = { ...defaultProxyConfig };
+      proxyConf.proxyAuth = { 'example.com': auth };
       mockConfigReturnValue({}, proxyConf);
       mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
       await sendRequest(url);
@@ -333,8 +331,8 @@ describe('ProxyService', () => {
       const auth = {
         authorization: 'testauth',
       };
-      const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.proxyAuth = new Map([['example2.com', auth]]);
+      const proxyConf = { ...defaultProxyConfig };
+      proxyConf.proxyAuth = { 'example2.com': auth };
       mockConfigReturnValue({}, proxyConf);
       mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
       await sendRequest(url);
@@ -350,8 +348,8 @@ describe('ProxyService', () => {
       const auth = {
         authorization: 'testauth',
       };
-      const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.proxyAuth = new Map([['example.com', auth]]);
+      const proxyConf = { ...defaultProxyConfig };
+      proxyConf.proxyAuth = { 'example.com': auth };
       mockHttpRequest
         .mockReturnValueOnce(throwError(() => new ForbiddenException()))
         .mockReturnValueOnce(of({ data: 'success' }));
@@ -380,8 +378,8 @@ describe('ProxyService', () => {
         authorization: 'testauth',
       };
       try {
-        const proxyConf = { ...defaultProxyConfig.proxy };
-        proxyConf.proxyAuth = new Map([['example.com', auth]]);
+        const proxyConf = { ...defaultProxyConfig };
+        proxyConf.proxyAuth = { 'example.com': auth };
         mockHttpRequest.mockReturnValueOnce(
           throwError(() => new NotFoundException()),
         );
@@ -418,8 +416,8 @@ describe('ProxyService', () => {
       const auth = {
         authorization: 'testauth',
       };
-      const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.proxyAuth = new Map([['example.com', auth]]);
+      const proxyConf = { ...defaultProxyConfig };
+      proxyConf.proxyAuth = { 'example.com': auth };
       mockConfigReturnValue({}, proxyConf);
       mockHttpRequest
         .mockReturnValueOnce(throwError(() => new ForbiddenException()))
@@ -442,8 +440,8 @@ describe('ProxyService', () => {
       const auth = {
         authorization: 'testauth',
       };
-      const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.proxyAuth = new Map([['example.com', auth]]);
+      const proxyConf = { ...defaultProxyConfig };
+      proxyConf.proxyAuth = { 'example.com': auth };
       mockConfigReturnValue({}, proxyConf);
       mockHttpRequest
         .mockReturnValueOnce(throwError(() => new ForbiddenException()))
@@ -472,7 +470,7 @@ describe('ProxyService', () => {
 
     it('should not retry when no auth specified in request and no auth for domain', async () => {
       expect.assertions(2);
-      const proxyConf = { ...defaultProxyConfig.proxy };
+      const proxyConf = { ...defaultProxyConfig };
       mockConfigReturnValue({}, proxyConf);
       mockHttpRequest.mockReturnValueOnce(
         throwError(() => new ForbiddenException()),
@@ -501,8 +499,8 @@ describe('ProxyService', () => {
           value: 'XYZ',
         },
       ];
-      const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.proxyAuth = new Map([['example.com', { headers: headers }]]);
+      const proxyConf = { ...defaultProxyConfig };
+      proxyConf.proxyAuth = { 'example.com': { headers: headers } };
       mockConfigReturnValue({}, proxyConf);
       mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
 
@@ -530,8 +528,8 @@ describe('ProxyService', () => {
           value: 'XYZ',
         },
       ];
-      const proxyConf = { ...defaultProxyConfig.proxy };
-      proxyConf.proxyAuth = new Map([['example2.com', { headers: headers }]]);
+      const proxyConf = { ...defaultProxyConfig };
+      proxyConf.proxyAuth = { 'example2.com': { headers: headers } };
 
       mockConfigReturnValue({}, proxyConf);
       mockHttpRequest.mockReturnValueOnce(of({ data: 'success' }));
@@ -553,7 +551,7 @@ describe('ProxyService', () => {
     });
     it('should append params for specified domain', async () => {
       const proxyUrl = 'example.com';
-      const proxyConf = { ...defaultProxyConfig.proxy };
+      const proxyConf = { ...defaultProxyConfig };
       proxyConf.appendParamToQueryString = new Map<string, any>();
       proxyConf.appendParamToQueryString.set('example.com', [
         {
@@ -574,7 +572,7 @@ describe('ProxyService', () => {
 
     it('should append params for specified domain using specified regex', async () => {
       const proxyUrl = 'example.com/something/else';
-      const proxyConf = { ...defaultProxyConfig.proxy };
+      const proxyConf = { ...defaultProxyConfig };
       proxyConf.appendParamToQueryString = new Map<string, any>();
       proxyConf.appendParamToQueryString.set('example.com', [
         {
@@ -595,7 +593,7 @@ describe('ProxyService', () => {
 
     it('no params appended when mismatch in regex', async () => {
       const proxyUrl = 'example.com/nothing/else';
-      const proxyConf = { ...defaultProxyConfig.proxy };
+      const proxyConf = { ...defaultProxyConfig };
       proxyConf.appendParamToQueryString = new Map<string, any>();
       proxyConf.appendParamToQueryString.set('example.com', [
         {
@@ -617,7 +615,7 @@ describe('ProxyService', () => {
 
     it('propperly interpret regex when multiple params specified', async () => {
       const proxyUrl = 'example.com/nothing/else';
-      const proxyConf = { ...defaultProxyConfig.proxy };
+      const proxyConf = { ...defaultProxyConfig };
       proxyConf.appendParamToQueryString = new Map<string, any>();
       proxyConf.appendParamToQueryString.set('example.com', [
         {
@@ -646,7 +644,7 @@ describe('ProxyService', () => {
 
     it('propperly interpret regex when multiple params specified', async () => {
       const proxyUrl = 'example.com';
-      const proxyConf = { ...defaultProxyConfig.proxy };
+      const proxyConf = { ...defaultProxyConfig };
       proxyConf.appendParamToQueryString = new Map<string, any>();
       proxyConf.appendParamToQueryString.set('example.com', [
         {
@@ -670,7 +668,7 @@ describe('ProxyService', () => {
     it('should combine with existing query', async () => {
       const query = '?already=here';
       const proxyUrl = `example.com${query}`;
-      const proxyConf = { ...defaultProxyConfig.proxy };
+      const proxyConf = { ...defaultProxyConfig };
       proxyConf.appendParamToQueryString = new Map<string, any>();
       proxyConf.appendParamToQueryString.set('example.com', [
         {
@@ -692,7 +690,7 @@ describe('ProxyService', () => {
 
     it("doesn't append params to the querystring for other domains", async () => {
       const proxyUrl = 'example.com?already=here';
-      const proxyConf = { ...defaultProxyConfig.proxy };
+      const proxyConf = { ...defaultProxyConfig };
       proxyConf.appendParamToQueryString = new Map<string, any>();
       proxyConf.appendParamToQueryString.set('example2.com', [
         {

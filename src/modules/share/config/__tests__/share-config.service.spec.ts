@@ -1,26 +1,23 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { plainToClass } from 'class-transformer';
-
-import { ShareConfigDto } from '../../dto/share.config.dto';
+import { shareConfig as shareConfigSchema } from '../../dto/share.config.dto';
 import { ShareConfigService } from '../share-config.service';
 
-const shareConfig = plainToClass(ShareConfigDto, {
+const shareConfig = shareConfigSchema.parse({
   newPrefix: 'test',
   maxRequestSize: 200,
   availablePrefixes: [
     {
       service: 'gist',
       prefix: 'test',
-      apiUrl: '',
-      accessToken: '',
+      accessToken: 'test-access-token',
     },
     {
       service: 's3',
       prefix: 'test',
-      region: '',
-      bucket: '',
+      region: 'test-region',
+      bucket: 'test-bucket',
       keyLength: 54,
     },
   ],

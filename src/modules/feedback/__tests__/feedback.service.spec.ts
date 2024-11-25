@@ -8,17 +8,16 @@ import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { createMock } from '@golevelup/ts-jest';
-import { plainToClass } from 'class-transformer';
 import { Observable, of } from 'rxjs';
 
 import { LoggerModule } from 'src/infrastructure/logger';
 
 import { FeedbackConfigService } from '../config/feedback.config.service';
-import { FeedbackConfigDto } from '../dto/feedback.config.dto';
+import { feedbackConfig } from '../dto/feedback.config.dto';
 import { FeedbackServiceManager } from '../feedback-service-manager.service';
 import { FeedbackService } from '../feedback.service';
 
-const feedbackConfig = plainToClass(FeedbackConfigDto, {
+const config = feedbackConfig.parse({
   primaryId: 'test',
   options: [
     {
@@ -99,7 +98,7 @@ describe('FeedbackService', () => {
 
   it('should throw a NotFoundException when no primary key', async () => {
     expect.assertions(1);
-    const feedbackConf = { ...feedbackConfig };
+    const feedbackConf = { ...config };
     feedbackConf.primaryId = undefined;
     configGet.mockReturnValue(feedbackConf);
     try {
@@ -111,7 +110,7 @@ describe('FeedbackService', () => {
 
   it("should throw an InternalServerErrorException when corresponding feedback doesn't exist", async () => {
     expect.assertions(1);
-    const feedbackConf = { ...feedbackConfig };
+    const feedbackConf = { ...config };
     feedbackConf.primaryId = 'test1';
     configGet.mockReturnValue(feedbackConf);
     try {
@@ -122,7 +121,7 @@ describe('FeedbackService', () => {
   });
 
   it('should reuse connection', async () => {
-    configGet.mockReturnValue(feedbackConfig);
+    configGet.mockReturnValue(config);
     const feedbackServiceSpy = jest.spyOn(service, 'create');
     const feedbackManagerHasSpy = jest.spyOn(feedbackServiceManager, 'has');
 
@@ -148,7 +147,7 @@ describe('FeedbackService', () => {
 
   it('should throw InternalServerErrorException when unknown service', async () => {
     expect.assertions(1);
-    const feedbackConf = { ...feedbackConfig };
+    const feedbackConf = { ...config };
     (<any>feedbackConf.options)[0].service = 'test';
     configGet.mockReturnValue(feedbackConf);
     try {

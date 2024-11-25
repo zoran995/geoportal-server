@@ -1,9 +1,9 @@
 import { Request } from 'express';
 
-import { BaseFeedbackDto } from '../dto/base-feedback.dto';
+import { BaseFeedbackType } from '../dto/base-feedback.dto';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
 
-export abstract class AbstractFeedbackService<T extends BaseFeedbackDto> {
+export abstract class AbstractFeedbackService<T extends BaseFeedbackType> {
   readonly id: string;
 
   constructor(protected readonly options: T) {

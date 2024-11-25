@@ -1,47 +1,38 @@
-import { Equals, IsIn, IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { z } from 'zod';
 
-import { NotNull } from 'src/common/validators';
+import { share } from './share.dto';
 
-import { ShareType } from '../types/share.type';
-import { ShareDto } from './share.dto';
+export const shareGist = share.extend({
+  service: z.literal('gist'),
+  apiUrl: z
+    .string()
+    .url()
+    .default('https://api.github.com/gists')
+    .describe('Url of gist api.'),
 
-export class ShareGistDto extends ShareDto {
-  @IsString()
-  @Equals('gist')
-  @IsIn(['gist'])
-  readonly service: ShareType = 'gist';
+  accessToken: z
+    .string()
+    .min(1)
+    .optional()
+    .describe('Github access token with access to create gist.'),
 
-  /**
-   * Url of gist api.
-   */
-  @IsUrl()
-  apiUrl = 'https://api.github.com/gists';
+  userAgent: z
+    .string()
+    .optional()
+    .default('TerriaJS-Server')
+    .describe('User agent HTTP Header to set'),
 
-  /**
-   * Github access token with access to create gist.
-   */
-  @NotNull()
-  @IsString()
-  @IsNotEmpty()
-  accessToken?: string;
+  fileName: z
+    .string()
+    .optional()
+    .default('usercatalog.json')
+    .describe('The filename to give to the gist file'),
 
-  /**
-   * User agent HTTP Header to set
-   */
-  @IsString()
-  userAgent = 'TerriaJS-Server';
+  description: z
+    .string()
+    .optional()
+    .default('User-created catalog')
+    .describe('The description attached to each Gist'),
+});
 
-  /**
-   * The filename to give to the gist file
-   */
-  @IsString()
-  @NotNull()
-  fileName = 'usercatalog.json';
-
-  /**
-   * The description attached to each Gist
-   */
-  @IsString()
-  @NotNull()
-  description = 'User-created catalog';
-}
+export type ShareGistType = z.infer<typeof shareGist>;

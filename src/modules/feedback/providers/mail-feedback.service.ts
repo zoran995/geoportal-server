@@ -1,29 +1,28 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 import { Request } from 'express';
-import nodemailer, { Transporter } from 'nodemailer';
-import SMTPTransport from 'nodemailer/lib/smtp-transport';
+import nodemailer from 'nodemailer';
 
 import { formatBody } from '../common/formatBody';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
-import { MailFeedbackDto } from '../dto/mail-feedback.dto';
+import { MailFeedbackType } from '../dto/mail-feedback.dto';
 import { AbstractFeedbackService } from './abstract-feedback.service';
 
 @Injectable({})
-export class MailFeedbackService extends AbstractFeedbackService<MailFeedbackDto> {
-  private readonly transporter: Transporter<SMTPTransport.SentMessageInfo>;
-
-  constructor(protected readonly options: MailFeedbackDto) {
-    super(options);
-    this.transporter = nodemailer.createTransport({
-      host: this.options.smtpHost,
-      port: parseInt(this.options.smtpPort, 10),
-      secure: this.options.secure,
-      auth: this.options.auth,
+export class MailFeedbackService extends AbstractFeedbackService<MailFeedbackType> {
+  constructor(
+    protected readonly options: MailFeedbackType,
+    private readonly transporter = nodemailer.createTransport({
+      host: options.smtpHost,
+      port: options.smtpPort,
+      secure: options.secure,
+      auth: options.auth,
       tls: {
         rejectUnauthorized: false,
       },
-    });
+    }),
+  ) {
+    super(options);
   }
 
   async post(feedback: CreateFeedbackDto, request: Request): Promise<unknown> {

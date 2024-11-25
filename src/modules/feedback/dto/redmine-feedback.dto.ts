@@ -1,46 +1,30 @@
-import {
-  Equals,
-  IsIn,
-  IsInt,
-  IsNotEmpty,
-  IsString,
-  IsUrl,
-  Min,
-} from 'class-validator';
+import { z } from 'zod';
 
-import { FeedbackServiceType } from '../types/feedback-service.type';
-import { BaseFeedbackDto } from './base-feedback.dto';
+import { baseFeedback } from './base-feedback.dto';
 
-export class RedmineFeedbackDto extends BaseFeedbackDto {
-  @IsString()
-  @Equals('redmine')
-  @IsIn(['redmine'])
-  readonly service: FeedbackServiceType = 'redmine';
+export const redmineFeedback = baseFeedback.extend({
+  service: z.literal('redmine'),
 
-  /**
-   * Id of redmine project.
-   */
-  @IsInt()
-  @Min(1)
-  project_id!: number;
+  project_id: z.number().int().min(1).describe('Id of redmine project.'),
 
-  /**
-   * Redmine API url for creating issues.
-   */
-  @IsUrl()
-  issuesUrl!: string;
+  issuesUrl: z
+    .string()
+    .url()
+    .describe(
+      'Redmine API url for creating issues. See https://www.redmine.org/projects/redmine/wiki/Rest_Issues for details',
+    ),
 
-  /**
-   * Username that will be used for authenticating on redmine and creating new issues.
-   */
-  @IsString()
-  @IsNotEmpty()
-  username!: string;
+  username: z
+    .string()
+    .min(1)
+    .describe(
+      'Username that will be used for authenticating on redmine and creating new issues.',
+    ),
 
-  /**
-   * Password for authenticating on redmine.
-   */
-  @IsString()
-  @IsNotEmpty()
-  password!: string;
-}
+  password: z
+    .string()
+    .min(1)
+    .describe('Password for authenticating on redmine.'),
+});
+
+export type RedmineFeedbackType = z.infer<typeof redmineFeedback>;

@@ -1,20 +1,10 @@
-import { IsAlphanumeric, IsDefined, IsIn, IsString } from 'class-validator';
+import { z } from 'zod';
 
-import { ShareType, ShareTypeArr } from '../types/share.type';
+import { ShareTypeArr } from '../types/share.type';
 
-export class ShareDto {
-  /**
-   * Identification of the service to be used
-   */
-  @IsString()
-  @IsDefined()
-  @IsIn(ShareTypeArr)
-  service!: ShareType;
+export const share = z.object({
+  service: z.enum(ShareTypeArr),
+  prefix: z.string().min(1),
+});
 
-  /**
-   * Prefix for this service
-   */
-  @IsAlphanumeric()
-  @IsDefined()
-  prefix!: string;
-}
+export type ShareType = z.infer<typeof share>;

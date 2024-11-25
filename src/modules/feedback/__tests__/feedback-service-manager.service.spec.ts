@@ -1,30 +1,28 @@
 import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { plainToClass } from 'class-transformer';
-
-import { GithubFeedbackDto } from '../dto/github-feedback.dto';
-import { MailFeedbackDto } from '../dto/mail-feedback.dto';
-import { RedmineFeedbackDto } from '../dto/redmine-feedback.dto';
+import { githubFeedback } from '../dto/github-feedback.dto';
+import { mailFeedback } from '../dto/mail-feedback.dto';
+import { redmineFeedback } from '../dto/redmine-feedback.dto';
 import { FeedbackServiceManager } from '../feedback-service-manager.service';
 import { GithubFeedbackService } from '../providers/github-feedback.service';
 import { MailFeedbackService } from '../providers/mail-feedback.service';
 import { RedmineFeedbackService } from '../providers/redmine-feedback.service';
 
-const githubConf = plainToClass(GithubFeedbackDto, {
+const githubConf = githubFeedback.parse({
   service: 'github',
   id: 'test-git',
   accessToken: 'test',
   issuesUrl: 'https://example.com',
 });
-const mailConf = plainToClass(MailFeedbackDto, {
+const mailConf = mailFeedback.parse({
   service: 'mail',
   id: 'test-mail',
   smtpHost: 'test',
   smtpPort: 25,
   email: 'example@test.com',
 });
-const redmineConf = plainToClass(RedmineFeedbackDto, {
+const redmineConf = redmineFeedback.parse({
   service: 'redmine',
   id: 'test-redmine',
   project_id: 12,

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { ShareDto } from '../dto/share.dto';
+import { ShareType } from '../dto/share.dto';
 import { ISaveShareResponse } from '../interfaces/save-share-response.interface';
 
 @Injectable()
-export abstract class AbstractShareService<T extends ShareDto> {
+export abstract class AbstractShareService<T extends ShareType> {
   readonly id: string;
 
   constructor(protected readonly config: T) {

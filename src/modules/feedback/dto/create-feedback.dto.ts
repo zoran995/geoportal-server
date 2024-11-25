@@ -1,41 +1,27 @@
-import { IsEmail, IsString, IsUrl, MinLength } from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { z } from 'zod';
 
-import { NotNull } from 'src/common/validators';
-
-export class CreateFeedbackDto {
+export const createFeedback = z.object({
   /**
    * Title of the feedback.
    */
-  @IsString()
-  @NotNull()
-  readonly title?: string = 'User feedback';
-
+  title: z.string().default('User feedback').optional(),
   /**
    * Name of the user sending the feedback.
    */
-  @IsString()
-  @NotNull()
-  readonly name?: string = 'No name';
-
+  name: z.string().default('No name').optional(),
   /**
    * Email of the user sending the feedback.
    */
-  @IsEmail()
-  @NotNull()
-  readonly email?: string = 'No email';
-
+  email: z.string().email().default('No email').optional(),
   /**
    * Map share url.
    */
-  @IsUrl()
-  @NotNull()
-  readonly shareLink?: string;
-
+  shareLink: z.string().url().optional(),
   /**
    * Actual feedback.
    */
-  @IsString()
-  @MinLength(30)
-  @NotNull()
-  readonly comment?: string = 'No comment';
-}
+  comment: z.string().min(30).default('No comment').optional(),
+});
+
+export class CreateFeedbackDto extends createZodDto(createFeedback) {}

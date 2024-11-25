@@ -1,29 +1,17 @@
-import {
-  IsAlphanumeric,
-  IsNotEmpty,
-  IsObject,
-  ValidateNested,
-} from 'class-validator';
+import { z } from 'zod';
 
-import { NotNull } from 'src/common/validators';
+import { rateLimit } from './rate-limit.dto';
+import { createZodDto } from 'nestjs-zod';
 
-import { RateLimitDto } from './rate-limit.dto';
-
-export class BasicAuthenticationDto {
-  /**
-   * Username of the user that is used for login.
-   */
-  @IsAlphanumeric()
-  @IsNotEmpty()
-  username!: string;
-
-  /**
-   * Password of the user that is used for login.
-   */
-  @IsAlphanumeric()
-  @IsNotEmpty()
-  password!: string;
-
+export const basicAuthentication = z.object({
+  username: z
+    .string()
+    .min(1)
+    .describe('Username of the user that is used for login.'),
+  password: z
+    .string()
+    .min(1)
+    .describe('Password of the user that is used for login.'),
   /**
    * Rate limits basic authentication requests. Note that this uses simple
    * in-memory storage of requests, which means that the actual allowed rate
@@ -31,8 +19,7 @@ export class BasicAuthenticationDto {
    * times after `freeRetries` are `minWait`. Successive wait times are the sum
    * of the two previous wait times, up to `maxWait`.
    */
-  @IsObject()
-  @NotNull()
-  @ValidateNested()
-  rateLimit?: RateLimitDto;
-}
+  rateLimit: rateLimit,
+});
+
+export type BasicAuthenticationType = z.infer<typeof basicAuthentication>;

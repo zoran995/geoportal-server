@@ -9,15 +9,15 @@ import { LoggerService } from 'src/infrastructure/logger';
 
 import { formatBody } from '../common/formatBody';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
-import { RedmineFeedbackDto } from '../dto/redmine-feedback.dto';
+import { RedmineFeedbackType } from '../dto/redmine-feedback.dto';
 import { AbstractFeedbackService } from './abstract-feedback.service';
 
 @Injectable()
-export class RedmineFeedbackService extends AbstractFeedbackService<RedmineFeedbackDto> {
+export class RedmineFeedbackService extends AbstractFeedbackService<RedmineFeedbackType> {
   logger = new LoggerService(RedmineFeedbackService.name);
 
   constructor(
-    protected readonly options: RedmineFeedbackDto,
+    protected readonly options: RedmineFeedbackType,
     private readonly httpService: HttpService,
   ) {
     super(options);

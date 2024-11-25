@@ -1,11 +1,10 @@
 import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 
 import { createMock } from '@golevelup/ts-jest';
-import { plainToClass } from 'class-transformer';
 import { of, throwError } from 'rxjs';
 
 import { CreateFeedbackDto } from '../../dto/create-feedback.dto';
-import { GithubFeedbackDto } from '../../dto/github-feedback.dto';
+import { githubFeedback } from '../../dto/github-feedback.dto';
 import { GithubFeedbackService } from '../github-feedback.service';
 
 const mockHttpPost = jest.fn();
@@ -26,7 +25,7 @@ const mockExecutionContext = createMock<ExecutionContext>({
 
 const req = mockExecutionContext.switchToHttp().getRequest();
 
-const githubFeedbackConfig = plainToClass(GithubFeedbackDto, {
+const githubFeedbackConfig = githubFeedback.parse({
   id: 'github',
   service: 'github',
   issuesUrl: 'http://example.co',

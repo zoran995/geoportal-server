@@ -1,17 +1,14 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 
-import { ShareGistDto } from './dto/share-gist.dto';
-import { ShareS3Dto } from './dto/share-s3.dto';
 import { AbstractShareService } from './providers/abstract-share.service';
 import { GistShareService } from './providers/gist-share.service';
 import { S3ShareService } from './providers/s3-share.service';
-import { ShareServiceDtoType } from './types/share-service-dto.type';
+import { ShareServiceType } from './types/share-service-dto.type';
 
 @Injectable()
 export class ShareServiceManager {
-  readonly shareServices: AbstractShareService<ShareS3Dto | ShareGistDto>[] =
-    [];
+  readonly shareServices: AbstractShareService<ShareServiceType>[] = [];
 
   constructor(private readonly httpService: HttpService) {}
 
@@ -29,7 +26,7 @@ export class ShareServiceManager {
    * @returns Instance of the share service.
    * @throws {@link Error} if share service with given name was not found.
    */
-  get(id: string): AbstractShareService<ShareServiceDtoType> {
+  get(id: string): AbstractShareService<ShareServiceType> {
     const shareService = this.shareServices.find((share) => share.id === id);
     if (!shareService)
       throw new Error(`Share service with id "${id}" was not found`);
@@ -57,8 +54,8 @@ export class ShareServiceManager {
    * @throws {@link Error} Unknown share service specified.
    */
   create(
-    options: ShareServiceDtoType,
-  ): AbstractShareService<ShareServiceDtoType> | never {
+    options: ShareServiceType,
+  ): AbstractShareService<ShareServiceType> | never {
     const existingShare = this.shareServices.find(
       (option) => option.id === (options.prefix || 'default'),
     );
@@ -66,19 +63,16 @@ export class ShareServiceManager {
       this.shareServices.splice(this.shareServices.indexOf(existingShare), 1);
     }
     if (options.service === 'gist') {
-      const share = new GistShareService(
-        <ShareGistDto>options,
-        this.httpService,
-      );
+      const share = new GistShareService(options, this.httpService);
       this.shareServices.push(share);
       return share;
     } else if (options.service === 's3') {
-      const share = new S3ShareService(<ShareS3Dto>options);
+      const share = new S3ShareService(options);
       this.shareServices.push(share);
       return share;
     } else {
       throw new Error(
-        `Unknown feedback service "${options.service}" specified`,
+        `Unknown feedback service "${(options as Record<string, unknown>).service}" specified`,
       );
     }
   }

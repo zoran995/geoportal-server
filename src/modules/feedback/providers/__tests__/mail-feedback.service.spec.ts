@@ -1,13 +1,9 @@
-import { HttpModule } from '@nestjs/axios';
 import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
 
 import { createMock } from '@golevelup/ts-jest';
 
-import { MailFeedbackDto } from '../../dto/mail-feedback.dto';
+import { MailFeedbackType } from '../../dto/mail-feedback.dto';
 import { MailFeedbackService } from '../mail-feedback.service';
-
-import * as nodemailer from 'nodemailer';
 
 jest.mock('nodemailer');
 
@@ -24,41 +20,20 @@ const mockExecutionContext = createMock<ExecutionContext>({
 
 const req = mockExecutionContext.switchToHttp().getRequest();
 
-const mailConf: MailFeedbackDto = {
+const mailConf: MailFeedbackType = {
   service: 'mail',
   id: 'test-mail',
   smtpHost: 'test',
-  smtpPort: '25',
+  smtpPort: 25,
   secure: true,
   email: 'example@test.com',
 };
 
 describe('MailFeedbackService', () => {
-  let service: MailFeedbackService;
   const sendMailMock = jest.fn();
-
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [HttpModule],
-      providers: [
-        { provide: MailFeedbackDto, useValue: mailConf },
-        MailFeedbackService,
-      ],
-    }).compile();
-    service = module.get<MailFeedbackService>(MailFeedbackService);
-
-    jest.spyOn(nodemailer, 'createTransport').mockReturnValue({
-      sendMail: sendMailMock,
-    } as never);
-  });
-
-  afterEach(() => {
-    sendMailMock.mockClear();
-  });
-
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
+  const service: MailFeedbackService = new MailFeedbackService(mailConf, {
+    sendMail: sendMailMock,
+  } as never);
 
   it('should properly send feedback', async () => {
     const message = 'test mail success';

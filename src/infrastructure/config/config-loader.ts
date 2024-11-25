@@ -1,12 +1,12 @@
 import { isArray, isObject } from 'src/common/helpers';
 
-import { ConfigurationDto } from './dto/configuration.dto';
+import { ConfigurationType } from './dto/configuration.dto';
 import { loadEnvFile } from './utils/load-env.util';
 import { loadJsonConfig } from './utils/load-json-config.util';
-import { YargsConfigType, loadYargs } from './utils/load-yargs.util';
+import { loadYargs, YargsConfigType } from './utils/load-yargs.util';
 import { validate } from './validators/config.validator';
 
-export declare type IConfigurationType = ConfigurationDto & YargsConfigType;
+export declare type IConfigurationType = ConfigurationType & YargsConfigType;
 
 export class ConfigLoader {
   static load(validator = validate): IConfigurationType {
@@ -24,11 +24,9 @@ export class ConfigLoader {
       dotEnvConfig,
     ).config;
 
-    const validatedConfig = validator(
-      expandedConfig as unknown as ConfigurationDto,
-    );
+    const validatedConfig = validator(expandedConfig as never);
 
-    return Object.assign(validatedConfig, yargsConfig);
+    return Object.assign(validatedConfig, yargsConfig) as never;
   }
 
   private static expandValue(

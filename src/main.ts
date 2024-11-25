@@ -14,9 +14,10 @@ import {
   InternalServerErrorExceptionFilter,
   NotFoundExceptionFilter,
 } from './common/filters';
-import { ConfigurationDto, WWWROOT_TOKEN } from './infrastructure/config';
+import { ConfigurationType, WWWROOT_TOKEN } from './infrastructure/config';
 import { LoggerService } from './infrastructure/logger';
-import { ContentSecurityPolicyDto } from './infrastructure/config/dto/ContentSecurityPolicy.dto';
+import { ContentSecurityPolicyType } from './infrastructure/config/dto/ContentSecurityPolicy.dto';
+import { patchNestJsSwagger } from 'nestjs-zod';
 
 /**
  *
@@ -47,7 +48,7 @@ async function bootstrap() {
   });
 
   const configService =
-    app.get<ConfigService<ConfigurationDto, true>>(ConfigService);
+    app.get<ConfigService<ConfigurationType, true>>(ConfigService);
   const logger = await app.resolve(LoggerService);
   app.useLogger(logger);
   logger.setLogLevels(getLoggerLevelByEnvironment());
@@ -99,6 +100,8 @@ async function bootstrap() {
     .setDescription('The geoportal server API description')
     .setVersion('0.1')
     .build();
+
+  patchNestJsSwagger();
   const document = SwaggerModule.createDocument(app, openApiConfig, {
     ignoreGlobalPrefix: false,
   });
@@ -106,7 +109,7 @@ async function bootstrap() {
 
   const port = configService.get<number>('port', 3001);
 
-  const cspConfig = configService.get<ContentSecurityPolicyDto>('csp');
+  const cspConfig = configService.get<ContentSecurityPolicyType>('csp');
 
   await app
     .use(

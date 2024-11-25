@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { FeedbackConfigDto } from '../dto/feedback.config.dto';
+import { FeedbackConfigType } from '../dto/feedback.config.dto';
 
 @Injectable()
 export class FeedbackConfigService {
@@ -16,6 +16,6 @@ export class FeedbackConfigService {
   }
 
   private get feedbackConfig() {
-    return this.configService.get<FeedbackConfigDto>('feedback');
+    return this.configService.get<FeedbackConfigType>('feedback');
   }
 }

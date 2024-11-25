@@ -1,12 +1,10 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { plainToClass } from 'class-transformer';
-
-import { ConfigurationDto } from 'src/infrastructure/config';
+import { configuration } from 'src/infrastructure/config';
 
 import { ProxyConfigService, ProxyListService } from '../../proxy';
-import { ShareConfigDto } from '../../share';
+import { ShareConfigType } from '../../share';
 import {
   ISafeSettings,
   ServerConfigController,
@@ -20,7 +18,7 @@ function path(obj: Record<string, unknown>, path: string) {
   }
 }
 
-const defaultConfig = plainToClass(ConfigurationDto, {});
+const defaultConfig = configuration.parse({});
 
 const mockConfigGet = jest.fn();
 
@@ -99,7 +97,7 @@ describe('ServerConfigController', () => {
   });
 
   it('properly resolve share prefix', () => {
-    defaultConfig.share = plainToClass(ShareConfigDto, { newPrefix: 'test' });
+    defaultConfig.share = { newPrefix: 'test' } as ShareConfigType;
     mockConfigGet.mockImplementation((propertyPath) => {
       return path(defaultConfig as never, propertyPath);
     });

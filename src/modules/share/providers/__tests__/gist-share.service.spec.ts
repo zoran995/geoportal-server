@@ -3,10 +3,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { plainToClass } from 'class-transformer';
 import { of, throwError } from 'rxjs';
 
-import { ShareGistDto } from '../../dto/share-gist.dto';
+import { shareGist } from '../../dto/share-gist.dto';
 import { GistShareService } from '../gist-share.service';
 
 const mockHttpPost = jest.fn();
@@ -16,11 +15,11 @@ const httpServiceMock = {
   post: mockHttpPost,
 };
 
-const gistShareConfig = plainToClass(ShareGistDto, {
+const gistShareConfig = shareGist.parse({
   service: 'gist',
   prefix: 'test',
   apiUrl: 'http://example.co',
-  accessToken: '',
+  accessToken: 'aa',
 });
 
 describe('GistShareService', () => {

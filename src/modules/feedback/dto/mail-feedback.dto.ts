@@ -1,69 +1,42 @@
-import { Type } from 'class-transformer';
-import {
-  Equals,
-  IsBoolean,
-  IsEmail,
-  IsIn,
-  IsNotEmpty,
-  IsPort,
-  IsString,
-} from 'class-validator';
+import { z } from 'zod';
 
-import { NotNull, isFqdnOrIp } from 'src/common/validators';
+import { fqdnOrIp } from 'src/common/validators';
 
-import { FeedbackServiceType } from '../types/feedback-service.type';
-import { BaseFeedbackDto } from './base-feedback.dto';
+import { baseFeedback } from './base-feedback.dto';
 
-export class MailFeedbackAuth {
-  /**
-   * Name of the user that will be used to connect to smtpServer.
-   */
-  @IsString()
-  @IsNotEmpty()
-  user!: string;
-  /**
-   * Password of the user that will be used to connect to smtpServer.
-   */
-  @IsString()
-  @IsNotEmpty()
-  pass!: string;
-}
+export const mailFeedbackAuth = z.object({
+  user: z
+    .string()
+    .min(1)
+    .describe('Name of the user that will be used to connect to smtpServer.'),
+  pass: z
+    .string()
+    .min(1)
+    .describe(
+      'Password of the user that will be used to connect to smtpServer.',
+    ),
+});
 
-export class MailFeedbackDto extends BaseFeedbackDto {
-  @IsString()
-  @Equals('mail')
-  @IsIn(['mail'])
-  readonly service: FeedbackServiceType = 'mail';
+export const mailFeedback = baseFeedback.extend({
+  service: z.literal('mail'),
+  smtpHost: fqdnOrIp().describe(
+    'Hostname or IP address of smtp server to connect to.',
+  ),
 
-  /**
-   * Hostname or IP address of smtp server to connect to.
-   */
-  @IsString()
-  @IsNotEmpty()
-  @isFqdnOrIp()
-  smtpHost!: string;
+  smtpPort: z.coerce
+    .number()
+    .min(0)
+    .max(65535)
+    .describe('Port of smtp server to connect to.'),
 
-  /**
-   * Port of smtp server to connect to.
-   */
-  @IsNotEmpty()
-  @IsPort()
-  smtpPort!: string;
+  secure: z
+    .boolean()
+    .default(false)
+    .describe('Whether authentication should be done against SMPT server.'),
 
-  /**
-   * Whether authentication should be done against SMPT server.
-   */
-  @IsBoolean()
-  secure = false;
+  auth: z.optional(mailFeedbackAuth).describe('Authentication data.'),
 
-  //@ValidateIf((o: MailFeedbackDto) => o.secure)
-  @NotNull()
-  @Type(() => MailFeedbackAuth)
-  auth?: MailFeedbackAuth;
+  email: z.string().email().describe('Email to which feedback will be sent.'),
+});
 
-  /**
-   * Email to which feedback will be sent.
-   */
-  @IsEmail()
-  email!: string;
-}
+export type MailFeedbackType = z.infer<typeof mailFeedback>;

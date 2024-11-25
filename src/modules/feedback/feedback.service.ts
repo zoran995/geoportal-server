@@ -7,7 +7,6 @@ import {
 import { Request } from 'express';
 
 import { isDefined } from 'src/common/helpers';
-import { arrayContainsObjectKey } from 'src/common/validators';
 import { LoggerService } from 'src/infrastructure/logger';
 
 import { FeedbackConfigService } from './config/feedback.config.service';
@@ -44,10 +43,8 @@ export class FeedbackService {
       );
     } else if (
       !isDefined(this.feedbackConfigService.options) ||
-      !arrayContainsObjectKey(
-        this.feedbackConfigService.options,
-        'id',
-        primaryId,
+      !this.feedbackConfigService.options.some(
+        (option) => option.id === primaryId,
       )
     ) {
       this.logger.error(

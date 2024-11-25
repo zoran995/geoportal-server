@@ -12,7 +12,7 @@ import path, { extname } from 'path';
 import { isDefined } from 'src/common/helpers';
 
 import { IConfigurationType, WWWROOT_TOKEN } from '../config';
-import { ServeStaticDto } from './dto/serve-static.dto';
+import { ServeStaticType } from './dto/serve-static.dto';
 
 @Injectable()
 export class AppServeStatic implements ServeStaticModuleOptionsFactory {
@@ -22,7 +22,7 @@ export class AppServeStatic implements ServeStaticModuleOptionsFactory {
   ) {}
 
   createLoggerOptions(): ServeStaticModuleOptions[] {
-    const serveStatic = this.configService.get<ServeStaticDto>('serveStatic');
+    const serveStatic = this.configService.get<ServeStaticType>('serveStatic');
     // check if the index file actually exists so we can share. If the file
     // doesn't exist disable serve static, so we don't receive error on each
     // access.

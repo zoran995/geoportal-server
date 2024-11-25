@@ -1,60 +1,23 @@
-import { Type } from 'class-transformer';
-import {
-  IsAlphanumeric,
-  IsArray,
-  IsDefined,
-  IsNotEmpty,
-  IsNumber,
-  ValidateNested,
-} from 'class-validator';
-import { JSONSchema } from 'class-validator-jsonschema';
+import { z } from 'zod';
 
-import { ArrayContainsObjectKey, NotNull } from 'src/common/validators';
+import { shareGist } from './share-gist.dto';
+import { shareS3 } from './share-s3.dto';
 
-import { ShareGistDto } from './share-gist.dto';
-import { ShareS3Dto } from './share-s3.dto';
-import { ShareDto } from './share.dto';
+export const shareConfig = z.object({
+  newPrefix: z
+    .string()
+    .min(1)
+    .optional()
+    .describe('Which service should be used when new URLs are requested.'),
+  maxRequestSize: z
+    .number()
+    .int()
+    .positive()
+    .default(200)
+    .describe('Max payload size for share in kb.'),
 
-export class ShareConfigDto {
-  /**
-   * Which service (of those defined in {@link ShareConfigDto.availablePrefixes}) should be used when
-   * new URLs are requested.
-   */
-  @IsAlphanumeric()
-  @IsNotEmpty()
-  newPrefix?: string;
-
-  /**
-   * Max payload size for share in kb.
-   */
-  @IsNumber()
-  @NotNull()
-  maxRequestSize: number = 200;
-
-  /**
-   * List of available configurations for share urls.
-   */
-  @IsDefined()
-  @IsArray()
-  @ArrayContainsObjectKey('newPrefix', 'prefix')
-  @ValidateNested({ each: true })
-  @Type(() => ShareDto, {
-    discriminator: {
-      property: 'service',
-      subTypes: [
-        { value: ShareGistDto, name: 'gist' },
-        { value: ShareS3Dto, name: 's3' },
-      ],
-    },
-  })
-  @JSONSchema({
-    items: {
-      oneOf: [
-        { additionalProperties: false, $ref: '#/definitions/ShareGistDto' },
-        { additionalProperties: false, $ref: '#/definitions/ShareS3Dto' },
-      ],
-    },
-    type: 'array',
-  })
-  availablePrefixes!: (ShareGistDto | ShareS3Dto)[];
-}
+  availablePrefixes: z
+    .array(z.union([shareGist, shareS3]))
+    .describe('List of available configurations for share urls.'),
+});
+export type ShareConfigType = z.infer<typeof shareConfig>;

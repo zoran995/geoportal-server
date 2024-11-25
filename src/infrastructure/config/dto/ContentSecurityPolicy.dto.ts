@@ -1,29 +1,13 @@
-import { IsArray, IsString } from 'class-validator';
-import { NotNull } from 'src/common/validators';
+import { z } from 'zod';
 
-export class ContentSecurityPolicyDto {
-  @IsArray()
-  @IsString({ each: true })
-  @NotNull()
-  scriptSrc: string[] = ["'self'", "'unsafe-inline'", "'unsafe-eval'"];
+export const contentSecurityPolicy = z.object({
+  scriptSrc: z
+    .array(z.string())
+    .default(["'self'", "'unsafe-inline'", "'unsafe-eval'"]),
+  connectSrc: z.array(z.string()).default(['*']),
+  imgSrc: z.array(z.string()).default(["'self'", 'data:', '*']),
+  frameSrc: z.array(z.string()).default([]),
+  frameAncestors: z.array(z.string()).default([]),
+});
 
-  @IsArray()
-  @IsString({ each: true })
-  @NotNull()
-  connectSrc: string[] = ['*'];
-
-  @IsArray()
-  @IsString({ each: true })
-  @NotNull()
-  imgSrc: string[] = ["'self'", 'data:', '*'];
-
-  @IsArray()
-  @IsString({ each: true })
-  @NotNull()
-  frameSrc: string[] = [];
-
-  @IsArray()
-  @IsString({ each: true })
-  @NotNull()
-  frameAncestors: string[] = [];
-}
+export type ContentSecurityPolicyType = z.infer<typeof contentSecurityPolicy>;

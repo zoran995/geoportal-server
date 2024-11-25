@@ -1,12 +1,10 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { plainToClass } from 'class-transformer';
-
-import { FeedbackConfigDto } from '../../dto/feedback.config.dto';
+import { feedbackConfig } from '../../dto/feedback.config.dto';
 import { FeedbackConfigService } from '../feedback.config.service';
 
-const feedbackConfig = plainToClass(FeedbackConfigDto, {
+const config = feedbackConfig.parse({
   primaryId: 'test',
   options: [
     {
@@ -41,7 +39,7 @@ const feedbackConfig = plainToClass(FeedbackConfigDto, {
 });
 
 const configGet = jest.fn(() => {
-  return feedbackConfig;
+  return config;
 });
 
 class ConfigServiceMock {

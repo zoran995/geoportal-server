@@ -1,11 +1,8 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { z } from 'zod';
 
-export class AdditionalParametersDto {
-  @IsString()
-  @IsNotEmpty()
-  descriptiveLabel!: string;
+export const additionalParameters = z.object({
+  descriptiveLabel: z.string().min(1),
+  name: z.string().min(1),
+});
 
-  @IsString()
-  @IsNotEmpty()
-  name!: string;
-}
+export type AdditionalParametersType = z.infer<typeof additionalParameters>;

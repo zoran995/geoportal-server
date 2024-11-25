@@ -6,7 +6,7 @@ import { createMock } from '@golevelup/ts-jest';
 import { DirectoryJSON, fs, vol } from 'memfs';
 import path from 'path';
 
-import { ServeStaticDto } from 'src/infrastructure/serve-static';
+import { ServeStaticType } from 'src/infrastructure/serve-static';
 
 import { HttpExceptionFilter } from '../http-exception.filter';
 import { NotFoundExceptionFilter } from '../not-found-exception.filter';
@@ -41,7 +41,7 @@ class MockConfigService {
 }
 
 const mockConfigReturnValue = (
-  serveStaticConfig: ServeStaticDto | undefined,
+  serveStaticConfig: ServeStaticType | undefined,
 ) => {
   mockConfigGet.mockImplementation((key) => {
     if (key === 'serveStatic') {

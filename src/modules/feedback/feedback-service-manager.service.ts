@@ -1,9 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 
-import { GithubFeedbackDto } from './dto/github-feedback.dto';
-import { MailFeedbackDto } from './dto/mail-feedback.dto';
-import { RedmineFeedbackDto } from './dto/redmine-feedback.dto';
 import { AbstractFeedbackService } from './providers/abstract-feedback.service';
 import { GithubFeedbackService } from './providers/github-feedback.service';
 import { MailFeedbackService } from './providers/mail-feedback.service';
@@ -76,26 +73,20 @@ export class FeedbackServiceManager {
       );
     }
     if (options.service === 'github') {
-      const feedback = new GithubFeedbackService(
-        <GithubFeedbackDto>options,
-        this.httpService,
-      );
+      const feedback = new GithubFeedbackService(options, this.httpService);
       this.feedbackServices.push(feedback);
       return feedback;
     } else if (options.service === 'mail') {
-      const feedback = new MailFeedbackService(<MailFeedbackDto>options);
+      const feedback = new MailFeedbackService(options);
       this.feedbackServices.push(feedback);
       return feedback;
     } else if (options.service === 'redmine') {
-      const feedback = new RedmineFeedbackService(
-        <RedmineFeedbackDto>options,
-        this.httpService,
-      );
+      const feedback = new RedmineFeedbackService(options, this.httpService);
       this.feedbackServices.push(feedback);
       return feedback;
     } else {
       throw new Error(
-        `Unknown feedback service "${options.service}" specified`,
+        `Unknown feedback service "${(options as Record<string, unknown>).service}" specified`,
       );
     }
   }
