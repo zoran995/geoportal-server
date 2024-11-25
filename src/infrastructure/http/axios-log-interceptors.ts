@@ -36,7 +36,6 @@ export class AxiosLogInterceptor implements OnModuleInit {
     axiosInstance.interceptors.response.use(
       (response) => {
         const { config }: { config: AxiosRequestConfigMetadata } = response;
-        console.log(response);
         config.metadata = { ...config.metadata, endDate: new Date() };
         const duration =
           config.metadata.endDate && config.metadata.startDate
