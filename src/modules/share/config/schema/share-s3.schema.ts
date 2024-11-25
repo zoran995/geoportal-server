@@ -33,4 +33,4 @@ export const shareS3 = share.extend({
     ),
 });
 
-export type ShareS3Type = z.infer<typeof shareS3>;
+export type ShareS3Config = z.infer<typeof shareS3>;

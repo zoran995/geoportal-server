@@ -4,11 +4,14 @@ import { Injectable } from '@nestjs/common';
 import { AbstractShareService } from './providers/abstract-share.service';
 import { GistShareService } from './providers/gist-share.service';
 import { S3ShareService } from './providers/s3-share.service';
-import { ShareServiceType } from './types/share-service-dto.type';
+import type { ShareGistConfig } from './config/schema/share-gist.schema';
+import type { ShareS3Config } from './config/schema/share-s3.schema';
 
 @Injectable()
 export class ShareServiceManager {
-  readonly shareServices: AbstractShareService<ShareServiceType>[] = [];
+  readonly shareServices: AbstractShareService<
+    ShareGistConfig | ShareS3Config
+  >[] = [];
 
   constructor(private readonly httpService: HttpService) {}
 
@@ -26,7 +29,7 @@ export class ShareServiceManager {
    * @returns Instance of the share service.
    * @throws {@link Error} if share service with given name was not found.
    */
-  get(id: string): AbstractShareService<ShareServiceType> {
+  get(id: string): AbstractShareService<ShareGistConfig | ShareS3Config> {
     const shareService = this.shareServices.find((share) => share.id === id);
     if (!shareService)
       throw new Error(`Share service with id "${id}" was not found`);
@@ -54,8 +57,8 @@ export class ShareServiceManager {
    * @throws {@link Error} Unknown share service specified.
    */
   create(
-    options: ShareServiceType,
-  ): AbstractShareService<ShareServiceType> | never {
+    options: ShareGistConfig | ShareS3Config,
+  ): AbstractShareService<ShareGistConfig | ShareS3Config> | never {
     const existingShare = this.shareServices.find(
       (option) => option.id === (options.prefix || 'default'),
     );

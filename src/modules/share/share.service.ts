@@ -12,7 +12,8 @@ import { ShareConfigService } from './config/share-config.service';
 import { ISaveShareResponse } from './interfaces/save-share-response.interface';
 import { AbstractShareService } from './providers/abstract-share.service';
 import { ShareServiceManager } from './share-service-manager.service';
-import { ShareServiceType } from './types/share-service-dto.type';
+import type { ShareGistConfig } from './config/schema/share-gist.schema';
+import type { ShareS3Config } from './config/schema/share-s3.schema';
 
 @Injectable()
 export class ShareService {
@@ -47,7 +48,7 @@ export class ShareService {
       );
     }
 
-    const shareService: AbstractShareService<ShareServiceType> =
+    const shareService: AbstractShareService<ShareGistConfig | ShareS3Config> =
       this.createOrGetShareService(newSharePrefix);
 
     return shareService.save(body);
@@ -73,7 +74,7 @@ export class ShareService {
     const prefix = idSplit[2];
     const shareId = idSplit[3];
 
-    const shareService: AbstractShareService<ShareServiceType> =
+    const shareService: AbstractShareService<ShareGistConfig | ShareS3Config> =
       this.createOrGetShareService(prefix);
 
     return shareService.resolve(shareId);

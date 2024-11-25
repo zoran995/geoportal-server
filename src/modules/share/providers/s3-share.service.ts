@@ -14,7 +14,7 @@ import https from 'https';
 import { AwsS3Service } from 'src/infrastructure/aws-sdk';
 import { LoggerService } from 'src/infrastructure/logger';
 
-import { ShareS3Type } from '../config/schema/share-s3.schema';
+import { ShareS3Config } from '../config/schema/share-s3.schema';
 import { ISaveShareResponse } from '../interfaces/save-share-response.interface';
 import { AbstractShareService } from './abstract-share.service';
 
@@ -32,11 +32,11 @@ const agentConfig: https.AgentOptions = {
 };
 
 @Injectable()
-export class S3ShareService extends AbstractShareService<ShareS3Type> {
+export class S3ShareService extends AbstractShareService<ShareS3Config> {
   private readonly logger = new S3Logger(S3ShareService.name);
   private readonly awsS3Service: AwsS3Service;
 
-  constructor(protected readonly config: ShareS3Type) {
+  constructor(protected readonly config: ShareS3Config) {
     super(config);
     this.awsS3Service = new AwsS3Service({
       credentials: config.credentials,

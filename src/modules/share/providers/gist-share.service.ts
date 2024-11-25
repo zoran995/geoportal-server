@@ -10,15 +10,15 @@ import { catchError, map } from 'rxjs/operators';
 import { combineURLs, isDefined } from 'src/common/helpers';
 import { LoggerService } from 'src/infrastructure/logger';
 
-import { ShareGistType } from '../config/schema/share-gist.schema';
+import { ShareGistConfig } from '../config/schema/share-gist.schema';
 import { ISaveShareResponse } from '../interfaces/save-share-response.interface';
 import { AbstractShareService } from './abstract-share.service';
 
-export class GistShareService extends AbstractShareService<ShareGistType> {
+export class GistShareService extends AbstractShareService<ShareGistConfig> {
   private readonly logger = new LoggerService(GistShareService.name);
 
   constructor(
-    protected readonly config: ShareGistType,
+    protected readonly config: ShareGistConfig,
     private readonly httpService: HttpService,
   ) {
     super(config);

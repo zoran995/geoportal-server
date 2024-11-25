@@ -35,4 +35,4 @@ export const shareGist = share.extend({
     .describe('The description attached to each Gist'),
 });
 
-export type ShareGistType = z.infer<typeof shareGist>;
+export type ShareGistConfig = z.infer<typeof shareGist>;
