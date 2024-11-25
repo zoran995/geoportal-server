@@ -4,7 +4,8 @@ import { Test } from '@nestjs/testing';
 import { vol } from 'memfs';
 import path from 'path';
 
-import { WWWROOT_TOKEN } from '../../config';
+import { WWWROOT_TOKEN } from 'src/common/utils';
+
 import { AppServeStatic } from '../app-serve-static';
 import {
   serveStatic,

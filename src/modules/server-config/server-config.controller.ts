@@ -43,6 +43,6 @@ export class ServerConfigController {
     }
     safeSettings.version = process.env.npm_package_version;
 
-    return serverConfigResponse.strip().safeParse(safeSettings).data;
+    return serverConfigResponse.strip().parse(safeSettings);
   }
 }

@@ -10,7 +10,7 @@ import { catchError, map } from 'rxjs/operators';
 import { combineURLs, isDefined } from 'src/common/helpers';
 import { LoggerService } from 'src/infrastructure/logger';
 
-import { ShareGistType } from '../dto/share-gist.dto';
+import { ShareGistType } from '../config/schema/share-gist.schema';
 import { ISaveShareResponse } from '../interfaces/save-share-response.interface';
 import { AbstractShareService } from './abstract-share.service';
 

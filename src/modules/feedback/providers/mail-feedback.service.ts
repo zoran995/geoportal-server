@@ -5,7 +5,7 @@ import nodemailer from 'nodemailer';
 
 import { formatBody } from '../common/formatBody';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
-import { MailFeedbackType } from '../dto/mail-feedback.dto';
+import { MailFeedbackType } from '../config/schema/mail-feedback.schema';
 import { AbstractFeedbackService } from './abstract-feedback.service';
 
 @Injectable({})

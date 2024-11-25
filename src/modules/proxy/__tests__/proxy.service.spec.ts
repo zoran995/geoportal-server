@@ -15,7 +15,7 @@ import { of, throwError } from 'rxjs';
 import { POST_SIZE_LIMIT } from 'src/common/interceptor';
 
 import { ProxyConfigService } from '../config/proxy-config.service';
-import { proxyConfig } from '../dto/proxy-config.dto';
+import { proxyConfig } from '../config/schema/proxy-config.dto';
 import { ProxyService } from '../proxy.service';
 import { ProxyListService } from '../utils/proxy-list.service';
 

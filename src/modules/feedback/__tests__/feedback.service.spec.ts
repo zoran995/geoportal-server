@@ -13,7 +13,7 @@ import { Observable, of } from 'rxjs';
 import { LoggerModule } from 'src/infrastructure/logger';
 
 import { FeedbackConfigService } from '../config/feedback.config.service';
-import { feedbackConfig } from '../dto/feedback.config.dto';
+import { feedbackConfig } from '../config/schema/feedback.config.schema';
 import { FeedbackServiceManager } from '../feedback-service-manager.service';
 import { FeedbackService } from '../feedback.service';
 

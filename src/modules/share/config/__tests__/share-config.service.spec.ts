@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { shareConfig as shareConfigSchema } from '../../dto/share.config.dto';
+import { shareConfig as shareConfigSchema } from '../schema/share.config.schema';
 import { ShareConfigService } from '../share-config.service';
 
 const shareConfig = shareConfigSchema.parse({

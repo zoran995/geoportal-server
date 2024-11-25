@@ -1,6 +1,6 @@
-import { GithubFeedbackType } from '../dto/github-feedback.dto';
-import { MailFeedbackType } from '../dto/mail-feedback.dto';
-import { RedmineFeedbackType } from '../dto/redmine-feedback.dto';
+import { GithubFeedbackType } from '../config/schema/github-feedback.schema';
+import { MailFeedbackType } from '../config/schema/mail-feedback.schema';
+import { RedmineFeedbackType } from '../config/schema/redmine-feedback.schema';
 
 export const FeedbackServiceType = ['github', 'mail', 'redmine'] as const;
 

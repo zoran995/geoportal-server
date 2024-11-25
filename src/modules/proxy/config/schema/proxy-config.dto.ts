@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import { fqdnOrIp } from 'src/common/validators/fqdnOrIp.schema';
+import { fqdnOrIp } from 'src/common/validators';
 
-import { DEFAULT_BLACKLIST, DEFAULT_MAX_SIZE } from '../proxy.constants';
+import { DEFAULT_BLACKLIST, DEFAULT_MAX_SIZE } from '../../proxy.constants';
 import { proxyAuthConfig } from './proxy-auth-config.dto';
 import { createZodDto } from 'nestjs-zod';
 

@@ -2,7 +2,7 @@ import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 
 import { createMock } from '@golevelup/ts-jest';
 
-import { MailFeedbackType } from '../../dto/mail-feedback.dto';
+import { MailFeedbackType } from '../../config/schema/mail-feedback.schema';
 import { MailFeedbackService } from '../mail-feedback.service';
 
 jest.mock('nodemailer');

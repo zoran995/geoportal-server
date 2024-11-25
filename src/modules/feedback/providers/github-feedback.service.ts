@@ -9,7 +9,7 @@ import { LoggerService } from 'src/infrastructure/logger';
 
 import { formatBody } from '../common/formatBody';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
-import { GithubFeedbackType } from '../dto/github-feedback.dto';
+import { GithubFeedbackType } from '../config/schema/github-feedback.schema';
 import { AbstractFeedbackService } from './abstract-feedback.service';
 
 /**

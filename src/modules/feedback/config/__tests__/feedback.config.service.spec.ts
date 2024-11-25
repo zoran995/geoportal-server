@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { feedbackConfig } from '../../dto/feedback.config.dto';
+import { feedbackConfig } from '../schema/feedback.config.schema';
 import { FeedbackConfigService } from '../feedback.config.service';
 
 const config = feedbackConfig.parse({

@@ -1,4 +1,4 @@
-import { ShareGistType } from '../dto/share-gist.dto';
-import { ShareS3Type } from '../dto/share-s3.dto';
+import { ShareGistType } from '../config/schema/share-gist.schema';
+import { ShareS3Type } from '../config/schema/share-s3.schema';
 
 export type ShareServiceType = ShareGistType | ShareS3Type;

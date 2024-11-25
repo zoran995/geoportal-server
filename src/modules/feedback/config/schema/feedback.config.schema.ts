@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import { githubFeedback } from './github-feedback.dto';
-import { mailFeedback } from './mail-feedback.dto';
-import { redmineFeedback } from './redmine-feedback.dto';
+import { githubFeedback } from './github-feedback.schema';
+import { mailFeedback } from './mail-feedback.schema';
+import { redmineFeedback } from './redmine-feedback.schema';
 
 export const feedbackConfig = z
   .object({

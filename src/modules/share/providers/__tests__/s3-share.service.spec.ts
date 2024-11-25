@@ -3,7 +3,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { shareS3 } from '../../dto/share-s3.dto';
+import { shareS3 } from '../../config/schema/share-s3.schema';
 import { idToObject, S3ShareService, shortId } from '../s3-share.service';
 
 const mockSave = jest.fn();

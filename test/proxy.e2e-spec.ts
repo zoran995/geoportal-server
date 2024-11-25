@@ -17,7 +17,7 @@ import { NotFoundExceptionFilter } from 'src/common/filters/not-found-exception.
 import { WWWROOT_TOKEN } from 'src/modules/config/app-config.module';
 import { LoggerService } from 'src/infrastructure/logger/logger.service';
 
-import { ProxyConfigType } from 'src/modules/proxy/dto/proxy-config.dto';
+import { ProxyConfigType } from 'src/modules/proxy/config/schema/proxy-config.dto';
 
 import { Cancel, CancelToken } from './helpers/axios-cancel';
 import { NoopLoggerService } from './noop-logger.service';

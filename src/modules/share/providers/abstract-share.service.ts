@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { ShareType } from '../dto/share.dto';
+import { ShareType } from '../config/schema/share.schema';
 import { ISaveShareResponse } from '../interfaces/save-share-response.interface';
 
 @Injectable()

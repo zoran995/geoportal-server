@@ -9,7 +9,7 @@ import { LoggerService } from 'src/infrastructure/logger';
 
 import { formatBody } from '../common/formatBody';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
-import { RedmineFeedbackType } from '../dto/redmine-feedback.dto';
+import { RedmineFeedbackType } from '../config/schema/redmine-feedback.schema';
 import { AbstractFeedbackService } from './abstract-feedback.service';
 
 @Injectable()

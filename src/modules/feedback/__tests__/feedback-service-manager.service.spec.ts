@@ -1,9 +1,9 @@
 import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { githubFeedback } from '../dto/github-feedback.dto';
-import { mailFeedback } from '../dto/mail-feedback.dto';
-import { redmineFeedback } from '../dto/redmine-feedback.dto';
+import { githubFeedback } from '../config/schema/github-feedback.schema';
+import { mailFeedback } from '../config/schema/mail-feedback.schema';
+import { redmineFeedback } from '../config/schema/redmine-feedback.schema';
 import { FeedbackServiceManager } from '../feedback-service-manager.service';
 import { GithubFeedbackService } from '../providers/github-feedback.service';
 import { MailFeedbackService } from '../providers/mail-feedback.service';

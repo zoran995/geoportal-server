@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { baseFeedback } from './base-feedback.dto';
+import { baseFeedback } from './base-feedback.schema';
 
 export const githubFeedback = baseFeedback.extend({
   service: z.literal('github'),

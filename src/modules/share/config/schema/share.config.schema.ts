@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { shareGist } from './share-gist.dto';
-import { shareS3 } from './share-s3.dto';
+import { shareGist } from './share-gist.schema';
+import { shareS3 } from './share-s3.schema';
 
 export const shareConfig = z.object({
   newPrefix: z
@@ -20,4 +20,5 @@ export const shareConfig = z.object({
     .array(z.union([shareGist, shareS3]))
     .describe('List of available configurations for share urls.'),
 });
+
 export type ShareConfigType = z.infer<typeof shareConfig>;

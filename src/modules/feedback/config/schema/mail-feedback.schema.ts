@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { fqdnOrIp } from 'src/common/validators';
 
-import { baseFeedback } from './base-feedback.dto';
+import { baseFeedback } from './base-feedback.schema';
 
 const mailFeedbackAuth = z.object({
   user: z

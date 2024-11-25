@@ -1,2 +1,2 @@
-export { FeedbackConfigType } from './dto/feedback.config.dto';
+export { FeedbackConfigType } from './config/schema/feedback.config.schema';
 export { FeedbackModule } from './feedback.module';

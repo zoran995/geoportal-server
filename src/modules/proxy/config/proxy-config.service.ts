@@ -3,8 +3,6 @@ import { ConfigService } from '@nestjs/config';
 
 import { IConfigurationType } from '../../config';
 
-import { ProxyConfigType } from '../dto/proxy-config.dto';
-
 @Injectable()
 export class ProxyConfigService {
   constructor(

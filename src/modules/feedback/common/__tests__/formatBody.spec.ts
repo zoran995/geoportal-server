@@ -27,8 +27,8 @@ const feedbackPayload: CreateFeedbackDto = {
 };
 
 let expected = 'everything works correctly';
-expected += '\n\n### Detalji o korisniku\n';
-expected += `* Ime: ${feedbackPayload.name} \n`;
+expected += '\n\n### User details\n';
+expected += `* Name: ${feedbackPayload.name} \n`;
 expected += `* Email: ${feedbackPayload.email}\n`;
 expected += `* IP Address: ${req.ip}\n`;
 expected += `* User Agent: ${req.header('User-Agent')}\n`;

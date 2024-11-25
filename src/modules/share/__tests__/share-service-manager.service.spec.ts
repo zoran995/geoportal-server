@@ -1,8 +1,8 @@
 import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { shareGist } from '../dto/share-gist.dto';
-import { shareS3 } from '../dto/share-s3.dto';
+import { shareGist } from '../config/schema/share-gist.schema';
+import { shareS3 } from '../config/schema/share-s3.schema';
 import { GistShareService } from '../providers/gist-share.service';
 import { S3ShareService } from '../providers/s3-share.service';
 import { ShareServiceManager } from '../share-service-manager.service';

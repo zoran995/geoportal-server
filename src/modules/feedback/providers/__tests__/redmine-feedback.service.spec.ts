@@ -3,7 +3,7 @@ import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 import { createMock } from '@golevelup/ts-jest';
 import { of, throwError } from 'rxjs';
 
-import { RedmineFeedbackType } from '../../dto/redmine-feedback.dto';
+import { RedmineFeedbackType } from '../../config/schema/redmine-feedback.schema';
 import { RedmineFeedbackService } from '../redmine-feedback.service';
 
 const mockHttpPost = jest.fn();

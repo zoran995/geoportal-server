@@ -12,11 +12,11 @@ import { of } from 'rxjs';
 import { POST_SIZE_LIMIT } from 'src/common/interceptor';
 
 import { ShareConfigService } from '../config/share-config.service';
-import { shareGist } from '../dto/share-gist.dto';
+import { shareGist } from '../config/schema/share-gist.schema';
 import {
   shareConfig as shareConfigSchema,
   ShareConfigType,
-} from '../dto/share.config.dto';
+} from '../config/schema/share.config.schema';
 import { ShareServiceManager } from '../share-service-manager.service';
 import { ShareService } from '../share.service';
 

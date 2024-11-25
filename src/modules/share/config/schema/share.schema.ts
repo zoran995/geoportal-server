@@ -1,9 +1,7 @@
 import { z } from 'zod';
 
-import { ShareType } from '../types/share.type';
-
 export const share = z.object({
-  service: z.enum(ShareType),
+  service: z.enum(['gist', 's3'] as const),
   prefix: z.string().min(1),
 });
 

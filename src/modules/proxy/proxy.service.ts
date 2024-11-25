@@ -22,7 +22,7 @@ import { isDefined } from 'src/common/helpers';
 import { LoggerService } from 'src/infrastructure/logger';
 
 import { ProxyConfigService } from './config/proxy-config.service';
-import { AppendParamToQueryStringDto } from './dto/proxy-config.dto';
+import { AppendParamToQueryStringDto } from './config/schema/proxy-config.dto';
 import { DEFAULT_MAX_AGE_SECONDS, PROTOCOL_REGEX } from './proxy.constants';
 import { filterHeaders } from './utils/filterHeaders';
 import { processDuration } from './utils/processDuration';

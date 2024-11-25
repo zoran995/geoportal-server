@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { share } from './share.dto';
+import { share } from './share.schema';
 
 export const shareS3 = share.extend({
   service: z.literal('s3'),

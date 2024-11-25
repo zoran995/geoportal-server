@@ -4,7 +4,7 @@ import { createMock } from '@golevelup/ts-jest';
 import { of, throwError } from 'rxjs';
 
 import { CreateFeedbackDto } from '../../dto/create-feedback.dto';
-import { githubFeedback } from '../../dto/github-feedback.dto';
+import { githubFeedback } from '../../config/schema/github-feedback.schema';
 import { GithubFeedbackService } from '../github-feedback.service';
 
 const mockHttpPost = jest.fn();

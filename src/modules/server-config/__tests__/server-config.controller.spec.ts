@@ -1,3 +1,4 @@
+import type { z } from 'zod';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
@@ -5,10 +6,8 @@ import { configuration } from '../../config';
 
 import { ProxyConfigService, ProxyListService } from '../../proxy';
 import { ShareConfigType } from '../../share';
-import {
-  ISafeSettings,
-  ServerConfigController,
-} from '../server-config.controller';
+import { ServerConfigController } from '../server-config.controller';
+import type { serverConfigResponse } from '../schema/safe-settings.schema';
 
 function path(obj: Record<string, unknown>, path: string) {
   try {
@@ -52,13 +51,13 @@ describe('ServerConfigController', () => {
   });
 
   describe('default config', () => {
-    let safeSettings: ISafeSettings;
+    let safeSettings: z.infer<typeof serverConfigResponse>;
 
     beforeEach(() => {
       mockConfigGet.mockImplementation((propertyPath) => {
         return path(defaultConfig as never, propertyPath);
       });
-      safeSettings = controller.serverConfig();
+      safeSettings = controller.serverConfig()!;
     });
 
     afterEach(() => {

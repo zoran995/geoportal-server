@@ -10,8 +10,8 @@ export function formatBody(
 ): string {
   let result = '';
   result += feedback.comment;
-  result += '\n\n### Detalji o korisniku\n';
-  result += `* Ime: ${feedback.name} \n`;
+  result += '\n\n### User details\n';
+  result += `* Name: ${feedback.name} \n`;
   result += `* Email: ${feedback.email}\n`;
   result += `* IP Address: ${req.ip}\n`;
   result += `* User Agent: ${req.header('User-Agent')}\n`;
@@ -21,7 +21,7 @@ export function formatBody(
     additionalParameters.forEach((parameter) => {
       result += `* ${parameter.descriptiveLabel}: ${
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (<any>feedback)[parameter.name] || 'Nije unešeno'
+        (<any>feedback)[parameter.name] || 'Not provided'
       }\n`;
     });
   }

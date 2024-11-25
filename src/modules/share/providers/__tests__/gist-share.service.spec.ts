@@ -5,7 +5,7 @@ import {
 
 import { of, throwError } from 'rxjs';
 
-import { shareGist } from '../../dto/share-gist.dto';
+import { shareGist } from '../../config/schema/share-gist.schema';
 import { GistShareService } from '../gist-share.service';
 
 const mockHttpPost = jest.fn();

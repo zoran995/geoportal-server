@@ -4,10 +4,10 @@ import { createZodDto } from 'nestjs-zod';
 
 import { portSchema } from 'src/common/validators';
 
-import { feedbackConfig } from '../../feedback/dto/feedback.config.dto';
+import { feedbackConfig } from '../../feedback/config/schema/feedback.config.schema';
 import { proxyConfig } from '../../proxy';
 import { serveStatic } from '../../serve-static';
-import { shareConfig } from '../../share/dto/share.config.dto';
+import { shareConfig } from '../../share/config/schema/share.config.schema';
 
 import { basicAuthentication } from './basic-authentication.schema';
 import { contentSecurityPolicy } from './ContentSecurityPolicy.schema';
