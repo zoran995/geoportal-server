@@ -15,4 +15,10 @@ describe('proxy urlValidator', () => {
     const result = urlValidator('ftp://example.com.');
     expect(result).toBe(false);
   });
+
+  it('fails on missing domain', () => {
+    const result = urlValidator('http://example');
+
+    expect(result).toBe(false);
+  });
 });

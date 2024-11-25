@@ -14,7 +14,7 @@ import { AppModule } from 'src/app.module';
 import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
 import { InternalServerErrorExceptionFilter } from 'src/common/filters/internal-server-error-exception.filter';
 import { NotFoundExceptionFilter } from 'src/common/filters/not-found-exception.filter';
-import { WWWROOT_TOKEN } from 'src/modules/config/app-config.module';
+import { WWWROOT_TOKEN } from 'src/common/utils';
 import { LoggerService } from 'src/infrastructure/logger/logger.service';
 
 import { ProxyConfigType } from 'src/modules/proxy/config/schema/proxy-config.dto';
@@ -23,7 +23,6 @@ import { Cancel, CancelToken } from './helpers/axios-cancel';
 import { NoopLoggerService } from './noop-logger.service';
 
 // mock our logger service so there is no logs when testing
-jest.mock('src/infrastructure/logger/logger.service');
 jest.mock('axios');
 jest.mock('fs');
 const data = 'success';

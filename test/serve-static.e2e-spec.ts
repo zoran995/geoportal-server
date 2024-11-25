@@ -18,20 +18,20 @@ import { AppModule } from 'src/app.module';
 import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
 import { InternalServerErrorExceptionFilter } from 'src/common/filters/internal-server-error-exception.filter';
 import { NotFoundExceptionFilter } from 'src/common/filters/not-found-exception.filter';
-import { WWWROOT_TOKEN } from 'src/modules/config/app-config.module';
-import { ServeStaticDto } from 'src/modules/serve-static/config/serve-static.scheme';
+import { WWWROOT_TOKEN } from 'src/common/utils';
+import { ServeStaticType } from 'src/modules/serve-static/config/serve-static.scheme';
 
 import { NoopLoggerService } from './noop-logger.service';
 
 jest.mock('fs');
 jest.mock('src/infrastructure/logger/logger.service');
 
-const routingOff: Partial<ServeStaticDto> = {
+const routingOff: Partial<ServeStaticType> = {
   serveStatic: true,
   resolveUnmatchedPathsWithIndexHtml: false,
 };
 
-const routingOn: Partial<ServeStaticDto> = {
+const routingOn: Partial<ServeStaticType> = {
   serveStatic: true,
   resolveUnmatchedPathsWithIndexHtml: false,
   resolvePathRelativeToWwwroot: '/index.html',

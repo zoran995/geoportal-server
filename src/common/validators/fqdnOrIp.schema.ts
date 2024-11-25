@@ -1,9 +1,7 @@
 import { z } from 'zod';
 
 import { portSchema } from './port.schema';
-
-const hostNameRegex =
-  /^(?!-)(?!.*--)(?!.*\.\.)(?!.*\.$)[a-zA-Z0-9-]{1,63}(?<!-)(\.[a-zA-Z0-9-]{1,63})*$/;
+import { fqdn } from './fqdn.schema';
 
 const ipWithPort = (ipVersion?: 'v4' | 'v6') => {
   return z.custom<string>(
@@ -20,7 +18,7 @@ const ipWithPort = (ipVersion?: 'v4' | 'v6') => {
       const ip = split[0];
       return (
         z.string().ip(ipVersion).safeParse(ip).success ||
-        z.string().regex(hostNameRegex).safeParse(ip).success
+        fqdn.safeParse(ip).success
       );
     },
     { fatal: false },
@@ -28,13 +26,6 @@ const ipWithPort = (ipVersion?: 'v4' | 'v6') => {
 };
 
 export const fqdnOrIp = (ipVersion?: 'v4' | 'v6') =>
-  z.union(
-    [
-      z.string().regex(hostNameRegex),
-      ipWithPort(ipVersion),
-      z.string().ip(ipVersion),
-    ],
-    {
-      message: 'Property must be an IP address or fqdn',
-    },
-  );
+  z.union([fqdn, ipWithPort(ipVersion), z.string().ip(ipVersion)], {
+    message: 'Property must be an IP address or fqdn',
+  });
