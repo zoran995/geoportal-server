@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
 
-import { FeedbackConfigService } from './config/feedback.config.service';
-import { FeedbackServiceManager } from './feedback-service-manager.service';
+import { feedbackServiceFactory } from './feeback-service.factory';
 import { FeedbackController } from './feedback.controller';
-import { FeedbackService } from './feedback.service';
 
 @Module({
   controllers: [FeedbackController],
-  providers: [FeedbackService, FeedbackServiceManager, FeedbackConfigService],
+  providers: [feedbackServiceFactory],
 })
 export class FeedbackModule {}

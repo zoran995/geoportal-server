@@ -3,63 +3,54 @@ import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 import { createMock } from '@golevelup/ts-jest';
 import { of, throwError } from 'rxjs';
 
-import { RedmineFeedbackType } from '../../config/schema/redmine-feedback.schema';
+import { redmineFeedback } from '../../config/schema/redmine-feedback.schema';
 import { RedmineFeedbackService } from '../redmine-feedback.service';
 
-const mockHttpPost = jest.fn();
-const httpServiceMock = {
-  post: mockHttpPost,
-};
-
-const mockExecutionContext = createMock<ExecutionContext>({
-  switchToHttp: () => ({
-    getRequest: () => ({
-      ip: '127.0.0.1',
-      header: () => {
-        return 'test';
-      },
-    }),
-  }),
-});
-
-const req = mockExecutionContext.switchToHttp().getRequest();
-
-const redmineConf: RedmineFeedbackType = {
-  service: 'redmine',
-  id: 'test-redmine',
-  project_id: 12,
-  issuesUrl: 'https://example.com',
-  username: 'test',
-  password: 'test',
-};
-
 describe('RedmineFeedbackService', () => {
-  let service: RedmineFeedbackService;
-
-  beforeEach(() => {
-    service = new RedmineFeedbackService(redmineConf, httpServiceMock as never);
+  const redmineConf = redmineFeedback.parse({
+    service: 'redmine',
+    id: 'test-redmine',
+    project_id: 12,
+    issuesUrl: 'https://example.com',
+    username: 'test',
+    password: 'test',
   });
 
-  afterEach(() => {
-    mockHttpPost.mockClear();
+  const mockExecutionContext = createMock<ExecutionContext>({
+    switchToHttp: () => ({
+      getRequest: () => ({
+        ip: '127.0.0.1',
+        header: () => {
+          return 'test';
+        },
+      }),
+    }),
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
+  const req = mockExecutionContext.switchToHttp().getRequest();
 
   it('should send post request', async () => {
-    mockHttpPost.mockReturnValue(
-      of({ ok: true, status_code: 200, message: 'Successful' }),
-    );
+    const httpPostMock = jest
+      .fn()
+      .mockReturnValue(
+        of({ ok: true, status_code: 200, message: 'Successful' }),
+      );
     const auth = {
       username: redmineConf.username,
       password: redmineConf.password,
     };
 
+    const service = new RedmineFeedbackService(
+      redmineConf,
+      {
+        post: httpPostMock,
+      } as never,
+      { error: jest.fn() } as never,
+    );
     await service.post({}, req as never);
-    expect(mockHttpPost).toHaveBeenCalledTimes(1);
-    expect(mockHttpPost).toHaveBeenCalledWith(
+
+    expect(httpPostMock).toHaveBeenCalledTimes(1);
+    expect(httpPostMock).toHaveBeenCalledWith(
       redmineConf.issuesUrl,
       {
         issue: {
@@ -79,13 +70,23 @@ describe('RedmineFeedbackService', () => {
       password: redmineConf.password,
     };
 
-    mockHttpPost.mockReturnValue(throwError(() => new Error('test error')));
+    const httpPostMock = jest
+      .fn()
+      .mockReturnValue(throwError(() => new Error('test error')));
+
+    const service = new RedmineFeedbackService(
+      redmineConf,
+      {
+        post: httpPostMock,
+      } as never,
+      { error: jest.fn() } as never,
+    );
 
     try {
       await service.post({}, req as never);
     } catch (err) {
-      expect(mockHttpPost).toHaveBeenCalledTimes(1);
-      expect(mockHttpPost).toHaveBeenCalledWith(
+      expect(httpPostMock).toHaveBeenCalledTimes(1);
+      expect(httpPostMock).toHaveBeenCalledWith(
         redmineConf.issuesUrl,
         {
           issue: {

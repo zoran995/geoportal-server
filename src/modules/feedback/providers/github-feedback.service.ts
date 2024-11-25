@@ -9,19 +9,18 @@ import { LoggerService } from 'src/infrastructure/logger';
 
 import { formatBody } from '../common/formatBody';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
-import { GithubFeedbackType } from '../config/schema/github-feedback.schema';
+import { GithubFeedbackConfigType } from '../config/schema/github-feedback.schema';
 import { AbstractFeedbackService } from './abstract-feedback.service';
 
 /**
  * Create a new issue on github.
  */
 @Injectable()
-export class GithubFeedbackService extends AbstractFeedbackService<GithubFeedbackType> {
-  logger = new LoggerService(GithubFeedbackService.name);
-
+export class GithubFeedbackService extends AbstractFeedbackService<GithubFeedbackConfigType> {
   constructor(
-    protected readonly options: GithubFeedbackType,
+    protected readonly options: GithubFeedbackConfigType,
     private readonly httpService: HttpService,
+    private readonly logger: LoggerService,
   ) {
     super(options);
   }

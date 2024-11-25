@@ -3,39 +3,28 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { createMock } from '@golevelup/ts-jest';
 
-import { CreateFeedbackDto } from '../dto/create-feedback.dto';
+import { FeedbackService } from '../common/feedback-service';
 import { FeedbackController } from '../feedback.controller';
-import { FeedbackService } from '../feedback.service';
-
-const mockCreate = jest.fn();
-
-const mockFeedbackService = {
-  create: mockCreate,
-};
-
-const mockExecutionContext = createMock<ExecutionContext>({
-  switchToHttp: () => ({
-    getRequest: () => ({
-      ip: '127.0.0.1',
-      header: () => {
-        return 'test';
-      },
-    }),
-  }),
-});
-
-const req = mockExecutionContext.switchToHttp().getRequest();
-
-const feedbackPayload: CreateFeedbackDto = {
-  title: 'feedback',
-  name: 'test',
-  email: 'info@geo.test',
-  shareLink: 'https://geo.test/test-testid',
-  comment: 'everything works correctly',
-};
 
 describe('FeedbackController', () => {
   let controller: FeedbackController;
+
+  const mockExecutionContext = createMock<ExecutionContext>({
+    switchToHttp: () => ({
+      getRequest: () => ({
+        ip: '127.0.0.1',
+        header: () => {
+          return 'test';
+        },
+      }),
+    }),
+  });
+
+  const postMock = jest.fn();
+
+  const mockFeedbackService = {
+    post: postMock,
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -57,9 +46,27 @@ describe('FeedbackController', () => {
   });
 
   it('should succesfully save feedback', async () => {
-    mockCreate.mockReturnValueOnce('test');
-    const result = await controller.create(req as any, feedbackPayload);
+    postMock.mockReturnValueOnce('test');
+    const req = mockExecutionContext.switchToHttp().getRequest();
+
+    const result = await controller.create(req as never, {
+      title: 'feedback',
+      name: 'test',
+      email: 'info@geo.test',
+      shareLink: 'https://geo.test/test-testid',
+      comment: 'everything works correctly',
+    });
+
     expect(result).toBe('test');
-    expect(mockCreate).toHaveBeenCalledWith(feedbackPayload, req);
+    expect(postMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'feedback',
+        name: 'test',
+        email: 'info@geo.test',
+        shareLink: 'https://geo.test/test-testid',
+        comment: 'everything works correctly',
+      }),
+      req,
+    );
   });
 });

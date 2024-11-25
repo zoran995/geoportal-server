@@ -27,4 +27,4 @@ export const redmineFeedback = baseFeedback.extend({
     .describe('Password for authenticating on redmine.'),
 });
 
-export type RedmineFeedbackType = z.infer<typeof redmineFeedback>;
+export type RedmineFeedbackConfigType = z.infer<typeof redmineFeedback>;

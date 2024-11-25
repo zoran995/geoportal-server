@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { fqdnOrIp } from 'src/common/validators';
+import { fqdnOrIp, portSchema } from 'src/common/validators';
 
 import { baseFeedback } from './base-feedback.schema';
 
@@ -23,11 +23,7 @@ export const mailFeedback = baseFeedback.extend({
     'Hostname or IP address of smtp server to connect to.',
   ),
 
-  smtpPort: z.coerce
-    .number()
-    .min(0)
-    .max(65535)
-    .describe('Port of smtp server to connect to.'),
+  smtpPort: portSchema.describe('Port of smtp server to connect to.'),
 
   secure: z
     .boolean()
@@ -39,4 +35,4 @@ export const mailFeedback = baseFeedback.extend({
   email: z.string().email().describe('Email to which feedback will be sent.'),
 });
 
-export type MailFeedbackType = z.infer<typeof mailFeedback>;
+export type MailFeedbackConfigType = z.infer<typeof mailFeedback>;

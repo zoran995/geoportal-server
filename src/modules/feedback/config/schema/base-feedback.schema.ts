@@ -1,13 +1,8 @@
 import { z } from 'zod';
 
-import { FeedbackServiceType } from '../../types/feedback-service.type';
 import { additionalParameters } from './additional-parameters.schema';
 
 export const baseFeedback = z.object({
-  /**
-   * Service to use.
-   */
-  service: z.enum(FeedbackServiceType),
   /**
    * Id of feedback service.
    */

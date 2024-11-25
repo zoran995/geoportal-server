@@ -37,7 +37,7 @@ export const configuration = z.object({
     ),
 
   feedback: feedbackConfig
-    .optional()
+    .default(feedbackConfig.parse({}))
     .describe(
       `Configuration for the feedback service. If not defined feedback service will be disabled.`,
     ),

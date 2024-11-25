@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, Inject, Post, Req } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -9,13 +9,17 @@ import {
 
 import { Request } from 'express';
 
+import { FeedbackService } from './common/feedback-service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
-import { FeedbackService } from './feedback.service';
+import type { AbstractFeedbackService } from './providers/abstract-feedback.service';
 
 @Controller('feedback')
 @ApiTags('feedback')
 export class FeedbackController {
-  constructor(private readonly feedbackService: FeedbackService) {}
+  constructor(
+    @Inject(FeedbackService)
+    private readonly feedbackService: AbstractFeedbackService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Send new feedback' })
@@ -26,6 +30,6 @@ export class FeedbackController {
     @Req() request: Request,
     @Body() createFeedbackDto: CreateFeedbackDto,
   ) {
-    return this.feedbackService.create(createFeedbackDto, request);
+    return this.feedbackService.post(createFeedbackDto, request);
   }
 }

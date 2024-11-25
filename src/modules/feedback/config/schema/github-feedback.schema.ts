@@ -23,4 +23,4 @@ export const githubFeedback = baseFeedback.extend({
     .describe('Http user agent.'),
 });
 
-export type GithubFeedbackType = z.infer<typeof githubFeedback>;
+export type GithubFeedbackConfigType = z.infer<typeof githubFeedback>;

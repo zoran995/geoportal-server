@@ -8,17 +8,16 @@ import { catchError, map } from 'rxjs/operators';
 import { LoggerService } from 'src/infrastructure/logger';
 
 import { formatBody } from '../common/formatBody';
+import { RedmineFeedbackConfigType } from '../config/schema/redmine-feedback.schema';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
-import { RedmineFeedbackType } from '../config/schema/redmine-feedback.schema';
 import { AbstractFeedbackService } from './abstract-feedback.service';
 
 @Injectable()
-export class RedmineFeedbackService extends AbstractFeedbackService<RedmineFeedbackType> {
-  logger = new LoggerService(RedmineFeedbackService.name);
-
+export class RedmineFeedbackService extends AbstractFeedbackService<RedmineFeedbackConfigType> {
   constructor(
-    protected readonly options: RedmineFeedbackType,
+    protected readonly options: RedmineFeedbackConfigType,
     private readonly httpService: HttpService,
+    private readonly logger: LoggerService,
   ) {
     super(options);
   }
