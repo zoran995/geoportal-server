@@ -1,6 +1,6 @@
 import { isArray, isObject } from 'src/common/helpers';
 
-import { ConfigurationType } from './dto/configuration.dto';
+import { ConfigurationType } from './schema/configuration.schema';
 import { loadEnvFile } from './utils/load-env.util';
 import { loadJsonConfig } from './utils/load-json-config.util';
 import { loadYargs, YargsConfigType } from './utils/load-yargs.util';
@@ -147,14 +147,4 @@ export class ConfigLoader {
   private static resolveEscapeSequences(value: string) {
     return value.replace(/\\\$/g, '$');
   }
-}
-
-// like String.prototype.search but returns the last index
-function _searchLast(str: string, rgx: RegExp) {
-  const matches = Array.from(str.matchAll(rgx));
-  return matches.length > 0 ? matches.slice(-1)[0].index : -1;
-}
-
-function _resolveEscapeSequences(value: string) {
-  return value.replace(/\\\$/g, '$');
 }

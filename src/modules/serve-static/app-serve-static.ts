@@ -10,9 +10,9 @@ import { existsSync } from 'fs';
 import path, { extname } from 'path';
 
 import { isDefined } from 'src/common/helpers';
+import { WWWROOT_TOKEN } from 'src/common/utils';
 
-import { IConfigurationType, WWWROOT_TOKEN } from '../config';
-import { ServeStaticType } from './dto/serve-static.dto';
+import { IConfigurationType } from '../config';
 
 @Injectable()
 export class AppServeStatic implements ServeStaticModuleOptionsFactory {
@@ -22,7 +22,7 @@ export class AppServeStatic implements ServeStaticModuleOptionsFactory {
   ) {}
 
   createLoggerOptions(): ServeStaticModuleOptions[] {
-    const serveStatic = this.configService.get<ServeStaticType>('serveStatic');
+    const serveStatic = this.configService.get('serveStatic', { infer: true });
     // check if the index file actually exists so we can share. If the file
     // doesn't exist disable serve static, so we don't receive error on each
     // access.

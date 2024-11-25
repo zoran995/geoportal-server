@@ -2,20 +2,19 @@ import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { ProxyListService } from '../proxy';
+import type { z } from 'zod';
 
-export interface ISafeSettings {
-  version?: string;
-  allowProxyFor?: string[];
-  newShareUrlPrefix?: string;
-  proxyAllDomains?: boolean;
-}
+import type { ConfigurationType } from '../config';
+import { ProxyListService } from '../proxy';
+import { serverConfigResponse } from './schema/safe-settings.schema';
+
+type SafeSettings = z.infer<typeof serverConfigResponse>;
 
 @Controller('serverConfig')
 @ApiTags('serverConfig')
 export class ServerConfigController {
   constructor(
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<ConfigurationType, true>,
     private readonly proxyListService: ProxyListService,
   ) {}
 
@@ -29,11 +28,13 @@ export class ServerConfigController {
   @Get()
   serverConfig() {
     const allowProxyFor = this.proxyListService.whitelist;
-    const newShareUrlPrefix = this.configService.get<string>('share.newPrefix');
-    const proxyAllDomains = this.configService.get<boolean>(
-      'proxy.proxyAllDomains',
-    );
-    const safeSettings: ISafeSettings = {
+    const newShareUrlPrefix = this.configService.get('share', {
+      infer: true,
+    })?.newPrefix;
+    const proxyAllDomains = this.configService.get('proxy.proxyAllDomains', {
+      infer: true,
+    });
+    const safeSettings: SafeSettings = {
       newShareUrlPrefix,
       proxyAllDomains,
     };
@@ -41,6 +42,7 @@ export class ServerConfigController {
       safeSettings.allowProxyFor = allowProxyFor;
     }
     safeSettings.version = process.env.npm_package_version;
-    return safeSettings;
+
+    return serverConfigResponse.strip().safeParse(safeSettings).data;
   }
 }

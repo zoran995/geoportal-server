@@ -5,15 +5,14 @@ import { Response } from 'express';
 import { existsSync } from 'fs';
 import path from 'path';
 
-import { IConfigurationType } from 'src/infrastructure/config';
-import { ServeStaticType } from 'src/infrastructure/serve-static';
+import type { ConfigurationType } from 'src/modules/config';
 
 import { HttpExceptionFilter } from './http-exception.filter';
 
 @Catch(NotFoundException)
 export class NotFoundExceptionFilter extends HttpExceptionFilter {
   constructor(
-    private readonly configService: ConfigService<IConfigurationType, true>,
+    private readonly configService: ConfigService<ConfigurationType, true>,
     private readonly wwwroot: string,
   ) {
     super();
@@ -21,7 +20,7 @@ export class NotFoundExceptionFilter extends HttpExceptionFilter {
   catch(exception: NotFoundException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const serveStatic = this.configService.get<ServeStaticType>('serveStatic');
+    const serveStatic = this.configService.get('serveStatic', { infer: true });
     const file404 = path.resolve(path.join(this.wwwroot, '/404.html'));
 
     if (existsSync(file404)) {

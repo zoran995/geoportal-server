@@ -4,7 +4,7 @@ import { fqdnOrIp } from 'src/common/validators';
 
 import { baseFeedback } from './base-feedback.dto';
 
-export const mailFeedbackAuth = z.object({
+const mailFeedbackAuth = z.object({
   user: z
     .string()
     .min(1)

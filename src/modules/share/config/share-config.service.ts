@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { IConfigurationType } from 'src/infrastructure/config';
-
-import { ShareConfigType } from '../dto/share.config.dto';
+import { IConfigurationType } from '../../config';
 
 @Injectable()
 export class ShareConfigService {
@@ -27,6 +25,6 @@ export class ShareConfigService {
   }
 
   private get shareConfig() {
-    return this.configService.get<ShareConfigType>('share');
+    return this.configService.get('share', { infer: true });
   }
 }

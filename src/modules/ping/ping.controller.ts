@@ -1,8 +1,8 @@
-import { All, Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 
 @Controller('ping')
 export class PingController {
-  @All()
+  @Get()
   ping() {
     return 'OK';
   }

@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
-import { rateLimit } from './rate-limit.dto';
-import { createZodDto } from 'nestjs-zod';
+import { rateLimit } from './rate-limit.schema';
 
 export const basicAuthentication = z.object({
   username: z
@@ -21,5 +20,3 @@ export const basicAuthentication = z.object({
    */
   rateLimit: rateLimit,
 });
-
-export type BasicAuthenticationType = z.infer<typeof basicAuthentication>;

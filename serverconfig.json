@@ -17,16 +17,5 @@
         "authorization": ""
       }
     }
-  },
-  "feedback": {
-    "primaryId": "g1",
-    "options": [
-      {
-        "service": "github",
-        "id": "g1",
-        "accessToken": "${accessToken}",
-        "issuesUrl": "${issuesUrl}"
-      }
-    ]
   }
 }

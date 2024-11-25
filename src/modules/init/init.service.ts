@@ -4,7 +4,9 @@ import { ConfigService } from '@nestjs/config';
 import fs from 'fs';
 import * as path from 'path';
 
-import { IConfigurationType, WWWROOT_TOKEN } from 'src/infrastructure/config';
+import { WWWROOT_TOKEN } from 'src/common/utils';
+
+import { IConfigurationType } from '../config';
 
 @Injectable()
 export class InitService {
@@ -13,7 +15,7 @@ export class InitService {
     private readonly configService: ConfigService<IConfigurationType>,
     @Inject(WWWROOT_TOKEN) private readonly wwwroot: string,
   ) {
-    const initPaths = this.configService.get<string[]>('initPaths');
+    const initPaths = this.configService.get('initPaths', { infer: true });
     const initPath = path.join(this.wwwroot, 'init');
 
     if (!initPaths?.some((iPath) => iPath === initPath.replace(/\\/g, '/'))) {
@@ -27,13 +29,13 @@ export class InitService {
    * @returns file path
    */
   getFilePath(fileName: string): string | undefined {
-    const configFile = this.configService.get<string>('config-file');
+    const configFile = this.configService.get('config-file', { infer: true });
 
     const configFileBase = configFile
       ? path.dirname(configFile)
       : process.cwd();
     let filePath: string | undefined = undefined;
-    this.configService.get<string[]>('initPaths')?.some((initPath) => {
+    this.configService.get('initPaths', { infer: true })?.some((initPath) => {
       const resolvedPath = path.resolve(configFileBase, initPath, fileName);
       if (fs.existsSync(resolvedPath)) {
         filePath = resolvedPath;

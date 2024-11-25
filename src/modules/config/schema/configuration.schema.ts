@@ -1,12 +1,16 @@
-import { proxyConfig } from 'src/modules/proxy';
-import { shareConfig } from 'src/modules/share/dto/share.config.dto';
+import { z } from 'zod';
 
 import { createZodDto } from 'nestjs-zod';
-import { feedbackConfig } from 'src/modules/feedback/dto/feedback.config.dto';
-import { z } from 'zod';
-import { serveStatic } from '../../serve-static/dto/serve-static.dto';
-import { basicAuthentication } from './basic-authentication.dto';
-import { contentSecurityPolicy } from './ContentSecurityPolicy.dto';
+
+import { portSchema } from 'src/common/validators';
+
+import { feedbackConfig } from '../../feedback/dto/feedback.config.dto';
+import { proxyConfig } from '../../proxy';
+import { serveStatic } from '../../serve-static';
+import { shareConfig } from '../../share/dto/share.config.dto';
+
+import { basicAuthentication } from './basic-authentication.schema';
+import { contentSecurityPolicy } from './ContentSecurityPolicy.schema';
 
 export const configuration = z.object({
   compressResponse: z.boolean().default(true).describe(`
@@ -18,7 +22,7 @@ export const configuration = z.object({
 
   basicAuthentication: z.optional(basicAuthentication),
 
-  port: z.coerce.number().int().min(0).max(65535).default(3001).describe(`
+  port: portSchema.default(3001).describe(`
     Port to listen on. Overridden by the --port command line setting.`),
 
   initPaths: z.array(z.string()).default([]).describe(`
@@ -58,6 +62,8 @@ export const configuration = z.object({
   csp: contentSecurityPolicy
     .describe('Configuration for the Content Security Policy.')
     .default(contentSecurityPolicy.parse({})),
+
+  wwwroot: z.string().default('./wwwroot'),
 });
 
 export type ConfigurationType = z.infer<typeof configuration>;

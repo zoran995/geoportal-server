@@ -5,8 +5,10 @@ import fs from 'fs';
 import { vol } from 'memfs';
 import * as path from 'path';
 
-import { IConfigurationType, WWWROOT_TOKEN } from 'src/infrastructure/config';
+import { WWWROOT_TOKEN } from 'src/common/utils';
 import { LoggerModule } from 'src/infrastructure/logger';
+
+import { IConfigurationType } from '../../config';
 
 import { InitService } from '../init.service';
 

@@ -1,9 +1,10 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import { ConfigLoader } from './config-loader';
+import { WWWROOT_TOKEN } from 'src/common/utils';
 
-export const WWWROOT_TOKEN = 'wwwroot';
+import { ConfigLoader } from './config-loader';
+import type { ConfigurationType } from './schema/configuration.schema';
 
 @Global()
 @Module({
@@ -18,10 +19,18 @@ export const WWWROOT_TOKEN = 'wwwroot';
   providers: [
     {
       provide: WWWROOT_TOKEN,
-      useFactory: (configService: ConfigService) => {
-        return (
-          configService.get<string>('wwwroot') ?? process.cwd() + '/wwwroot'
+      useFactory: (
+        configService: ConfigService<ConfigurationType, true>,
+      ): string => {
+        const wwwroot = configService.get(
+          'wwwroot',
+          `${process.cwd()}/wwwroot`,
+          {
+            infer: true,
+          },
         );
+
+        return wwwroot;
       },
       inject: [ConfigService],
     },

@@ -1,5 +1,5 @@
 import { writeFileSync } from 'node:fs';
-import { configuration } from 'src/infrastructure/config';
+import { configuration } from 'src/modules/config';
 
 import { zodToJsonSchema } from 'zod-to-json-schema';
 

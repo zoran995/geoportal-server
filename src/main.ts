@@ -1,4 +1,4 @@
-import { LogLevel, ValidationPipe } from '@nestjs/common';
+import { LogLevel } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -6,18 +6,17 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import compression from 'compression';
 import helmet from 'helmet';
+import { patchNestJsSwagger } from 'nestjs-zod';
 
 import { AppModule } from './app.module';
-import { ValidationException } from './common/exceptions';
 import {
   HttpExceptionFilter,
   InternalServerErrorExceptionFilter,
   NotFoundExceptionFilter,
 } from './common/filters';
-import { ConfigurationType, WWWROOT_TOKEN } from './infrastructure/config';
+import { WWWROOT_TOKEN } from './common/utils';
 import { LoggerService } from './infrastructure/logger';
-import { ContentSecurityPolicyType } from './infrastructure/config/dto/ContentSecurityPolicy.dto';
-import { patchNestJsSwagger } from 'nestjs-zod';
+import { ConfigurationType } from './modules/config';
 
 /**
  *
@@ -52,12 +51,14 @@ async function bootstrap() {
   const logger = await app.resolve(LoggerService);
   app.useLogger(logger);
   logger.setLogLevels(getLoggerLevelByEnvironment());
-  const compressResponse = configService.get<boolean>('compressResponse');
+  const compressResponse = configService.get('compressResponse', {
+    infer: true,
+  });
   if (compressResponse) {
     app.use(compression());
   }
 
-  const trustProxy = configService.get<boolean>('trustProxy');
+  const trustProxy = configService.get('trustProxy', { infer: true });
   if (typeof trustProxy !== 'undefined' && trustProxy !== false) {
     app.set('trust proxy', trustProxy);
   }
@@ -71,23 +72,6 @@ async function bootstrap() {
     origin: true,
   });
   app.setGlobalPrefix('api');
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      transformOptions: { enableImplicitConversion: true },
-      exceptionFactory: (errors) => {
-        const errorMessages: Record<string, unknown> = {};
-        errors.forEach((error) => {
-          if (error.constraints) {
-            errorMessages[error.property] = Object.values(error.constraints)
-              .join('. ')
-              .trim();
-          }
-        });
-        return new ValidationException(errorMessages);
-      },
-    }),
-  );
   const wwwroot = app.get<string>(WWWROOT_TOKEN);
   app.useGlobalFilters(
     new HttpExceptionFilter(),
@@ -107,9 +91,9 @@ async function bootstrap() {
   });
   SwaggerModule.setup('api/docs', app, document);
 
-  const port = configService.get<number>('port', 3001);
+  const port = configService.get('port', 3001, { infer: true });
 
-  const cspConfig = configService.get<ContentSecurityPolicyType>('csp');
+  const cspConfig = configService.get('csp', { infer: true });
 
   await app
     .use(

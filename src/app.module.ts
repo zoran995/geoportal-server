@@ -1,3 +1,4 @@
+import { APP_PIPE } from '@nestjs/core';
 import {
   MiddlewareConsumer,
   Module,
@@ -5,11 +6,13 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 
+import { ZodValidationPipe } from 'nestjs-zod';
+
 import { HttpLoggerMiddleware } from './common/middleware';
-import { AppConfigModule } from './infrastructure/config';
+import { AppConfigModule } from './modules/config';
 import { AppHttpModule } from './infrastructure/http';
 import { LoggerModule } from './infrastructure/logger';
-import { AppServeStaticModule } from './infrastructure/serve-static';
+import { AppServeStaticModule } from './modules/serve-static';
 import { FeedbackModule } from './modules/feedback';
 import { InitModule } from './modules/init';
 import { PingModule } from './modules/ping';
@@ -31,6 +34,12 @@ import { ShareModule } from './modules/share';
     PingModule,
     Proj4Module,
     ServerConfigModule,
+  ],
+  providers: [
+    {
+      provide: APP_PIPE,
+      useClass: ZodValidationPipe,
+    },
   ],
 })
 export class AppModule implements NestModule {

@@ -1,6 +1,6 @@
 import * as yargs from 'yargs';
 
-export const DEFAULT_CONFIG_LOCATION = './serverconfig.json';
+const DEFAULT_CONFIG_LOCATION = './serverconfig.json';
 
 type RemoveIndex<T> = {
   [K in keyof T as string extends K
@@ -13,7 +13,7 @@ export type PromiseResolvedType<T> = T extends Promise<infer R> ? R : never;
 
 export type YargsConfigType = RemoveIndex<ReturnType<typeof loadYargs>>;
 
-export interface YargsConfigModuleSettings {
+interface YargsConfigModuleSettings {
   /**
    * When multiple values for the same key are supplied yargs converts them into an array.
    * When true replace arrays with the rightmost value. This matters when `npm run` has options

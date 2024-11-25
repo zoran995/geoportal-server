@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import {
-  BasicAuthenticationType,
-  IConfigurationType,
-} from 'src/infrastructure/config';
+import { IConfigurationType } from '../../config';
 
 import { ProxyConfigType } from '../dto/proxy-config.dto';
 
@@ -72,9 +69,7 @@ export class ProxyConfigService {
   }
 
   get basicAuthentication() {
-    return this.configService.get<BasicAuthenticationType>(
-      'basicAuthentication',
-    );
+    return this.configService.get('basicAuthentication', { infer: true });
   }
 
   get proxyAuth() {
@@ -82,6 +77,6 @@ export class ProxyConfigService {
   }
 
   private get proxyConfig() {
-    return this.configService.get<ProxyConfigType>('proxy');
+    return this.configService.get('proxy', { infer: true });
   }
 }

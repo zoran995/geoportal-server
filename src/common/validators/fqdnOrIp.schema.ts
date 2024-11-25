@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const IS_FQDN_OR_IP = 'isFqdnOrIp';
+import { portSchema } from './port.schema';
 
 const hostNameRegex =
   /^(?!-)(?!.*--)(?!.*\.\.)(?!.*\.$)[a-zA-Z0-9-]{1,63}(?<!-)(\.[a-zA-Z0-9-]{1,63})*$/;
@@ -13,10 +13,7 @@ const ipWithPort = (ipVersion?: 'v4' | 'v6') => {
         return false;
       }
       const port = split[1];
-      if (
-        port === '' ||
-        !z.coerce.number().int().min(0).max(65535).safeParse(port).success
-      ) {
+      if (port === '' || !portSchema.safeParse(port).success) {
         return false;
       }
 

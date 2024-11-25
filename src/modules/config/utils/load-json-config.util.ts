@@ -1,6 +1,6 @@
 import { EncodingOption, existsSync, readFileSync } from 'fs';
 
-import { ConfigurationDto } from '../dto/configuration.dto';
+import { ConfigurationType } from '../schema/configuration.schema';
 
 interface ILoadJsonConfigOptions {
   filePath: string | string[];
@@ -9,7 +9,7 @@ interface ILoadJsonConfigOptions {
 
 export function loadJsonConfig(
   options: ILoadJsonConfigOptions,
-): ConfigurationDto {
+): ConfigurationType {
   const jsonFilePaths = Array.isArray(options.filePath)
     ? options.filePath
     : [options.filePath];
@@ -21,8 +21,8 @@ export function loadJsonConfig(
         JSON.parse(
           readFileSync(jsonFilePath, options.encoding ?? 'utf-8').toString(),
         ),
-      ) as ConfigurationDto;
+      ) as ConfigurationType;
     }
   }
-  return config as unknown as ConfigurationDto;
+  return config as unknown as ConfigurationType;
 }

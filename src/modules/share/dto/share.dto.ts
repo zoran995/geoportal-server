@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-import { ShareTypeArr } from '../types/share.type';
+import { ShareType } from '../types/share.type';
 
 export const share = z.object({
-  service: z.enum(ShareTypeArr),
+  service: z.enum(ShareType),
   prefix: z.string().min(1),
 });
 

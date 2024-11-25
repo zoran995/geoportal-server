@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { configuration } from 'src/infrastructure/config';
+import { configuration } from '../../config';
 
 import { ProxyConfigService, ProxyListService } from '../../proxy';
 import { ShareConfigType } from '../../share';

@@ -1,19 +1,14 @@
-import type { ZodAny, ZodObject, ZodRawShape } from 'zod';
-
 import { LoggerService } from 'src/infrastructure/logger';
 
-import { configuration } from '../dto/configuration.dto';
+import { configuration } from '../schema/configuration.schema';
 
 /* enum Environment {Development = 'development', Production = 'production',
   Test = 'test', Provision = 'provision',
 } */
 
-export function validate<T extends ZodAny>(
-  config: T,
-  conf: ZodObject<ZodRawShape> = configuration,
-) {
+export function validate(config: Record<string, unknown>) {
   const logger = new LoggerService('Config validation');
-  const validationResult = conf.safeParse(config);
+  const validationResult = configuration.safeParse(config);
 
   if (!validationResult.success) {
     logger.error(
@@ -34,5 +29,6 @@ export function validate<T extends ZodAny>(
     );
     throw new Error('Configuration validation failed.');
   }
+
   return validationResult.data;
 }

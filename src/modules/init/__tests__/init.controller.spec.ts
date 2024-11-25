@@ -7,7 +7,7 @@ import { Response } from 'express';
 import { vol } from 'memfs';
 import * as path from 'path';
 
-import { WWWROOT_TOKEN } from 'src/infrastructure/config';
+import { WWWROOT_TOKEN } from 'src/common/utils';
 import { LoggerModule } from 'src/infrastructure/logger';
 
 import { InitController } from '../init.controller';

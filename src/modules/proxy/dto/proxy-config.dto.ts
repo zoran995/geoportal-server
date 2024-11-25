@@ -2,11 +2,11 @@ import { z } from 'zod';
 
 import { fqdnOrIp } from 'src/common/validators/fqdnOrIp.schema';
 
-import { DEFAULT_BLACKLIST } from '../proxy.constants';
+import { DEFAULT_BLACKLIST, DEFAULT_MAX_SIZE } from '../proxy.constants';
 import { proxyAuthConfig } from './proxy-auth-config.dto';
 import { createZodDto } from 'nestjs-zod';
 
-export const appendParamToQueryString = z.object({
+const appendParamToQueryString = z.object({
   regexPattern: z
     .string()
     .describe(
@@ -23,7 +23,7 @@ export const proxyConfig = z.object({
     .number()
     .int()
     .min(0)
-    .default(102400)
+    .default(DEFAULT_MAX_SIZE)
     .describe(
       'The largest size, in bytes, of data that the proxy will send in a POST request.',
     ),

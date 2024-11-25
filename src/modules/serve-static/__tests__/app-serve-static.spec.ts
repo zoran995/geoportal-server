@@ -6,7 +6,10 @@ import path from 'path';
 
 import { WWWROOT_TOKEN } from '../../config';
 import { AppServeStatic } from '../app-serve-static';
-import { serveStatic, type ServeStaticType } from '../dto/serve-static.dto';
+import {
+  serveStatic,
+  type ServeStaticType,
+} from '../config/serve-static.scheme';
 
 jest.mock('fs');
 const mockConfigGet = jest.fn();
