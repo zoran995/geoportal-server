@@ -57,7 +57,7 @@ describe('ServerConfigController', () => {
       mockConfigGet.mockImplementation((propertyPath) => {
         return path(defaultConfig as never, propertyPath);
       });
-      safeSettings = controller.serverConfig()!;
+      safeSettings = controller.serverConfig() as never;
     });
 
     afterEach(() => {
