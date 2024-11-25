@@ -6,23 +6,17 @@ import {
 
 import { PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { NodeHttpHandler } from '@smithy/node-http-handler';
-import baseX from 'base-x';
-import * as crypto from 'crypto';
 import http from 'http';
 import https from 'https';
+import baseX from 'base-x';
+import * as crypto from 'crypto';
 
-import { AwsS3Service } from 'src/infrastructure/aws-sdk';
+import { AwsS3Service } from 'src/infrastructure/aws-sdk/aws-s3.service';
 import { LoggerService } from 'src/infrastructure/logger';
 
 import { ShareS3Config } from '../config/schema/share-s3.schema';
-import { ISaveShareResponse } from '../interfaces/save-share-response.interface';
+import { ShareResult } from '../interfaces/save-share-response.interface';
 import { AbstractShareService } from './abstract-share.service';
-
-class S3Logger extends LoggerService {
-  info() {
-    return;
-  }
-}
 
 const agentConfig: https.AgentOptions = {
   keepAlive: true,
@@ -31,13 +25,32 @@ const agentConfig: https.AgentOptions = {
   timeout: 60000,
 };
 
+// We append some pseudo-dir prefixes into the actual object ID to avoid thousands of objects in a single pseudo-directory.
+// MyRaNdoMkey => M/y/MyRaNdoMkey
+export const idToPath = (id: string) => `${id[0]}/${id[1]}/${id}`;
+
+export const generateShareId = (
+  data: Record<string, unknown>,
+  keyLength = 58,
+): string => {
+  const hmac = crypto.createHmac('sha1', JSON.stringify(data)).digest();
+  const BASE62 =
+    '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+  const bs62 = baseX(BASE62);
+  const fullkey = bs62.encode(hmac);
+  return fullkey.slice(0, keyLength); // if length undefined, return the whole thing
+};
+
 @Injectable()
 export class S3ShareService extends AbstractShareService<ShareS3Config> {
-  private readonly logger = new S3Logger(S3ShareService.name);
   private readonly awsS3Service: AwsS3Service;
 
-  constructor(protected readonly config: ShareS3Config) {
-    super(config);
+  constructor(
+    protected readonly config: ShareS3Config,
+    logger: LoggerService,
+  ) {
+    super(config, logger);
     this.awsS3Service = new AwsS3Service({
       credentials: config.credentials,
       region: config.region,
@@ -45,18 +58,18 @@ export class S3ShareService extends AbstractShareService<ShareS3Config> {
         httpsAgent: new https.Agent(agentConfig),
         httpAgent: new http.Agent(agentConfig),
       }),
-      logger: this.logger,
+      logger: logger,
     });
   }
 
   /**
    * Save share configuration in s3 bucket
    */
-  async save(data: Record<string, unknown>): Promise<ISaveShareResponse> {
-    const id = shortId(data, this.config.keyLength);
+  async save(data: Record<string, unknown>): Promise<ShareResult> {
+    const id = generateShareId(data, this.config.keyLength);
     const params: PutObjectCommandInput = {
       Bucket: this.config.bucket,
-      Key: idToObject(id),
+      Key: idToPath(id),
       Body: JSON.stringify(data),
     };
     return this.awsS3Service
@@ -87,7 +100,7 @@ export class S3ShareService extends AbstractShareService<ShareS3Config> {
   async resolve(id: string): Promise<Record<string, unknown>> {
     const params = {
       Bucket: this.config.bucket,
-      Key: idToObject(id),
+      Key: idToPath(id),
     };
 
     return this.awsS3Service
@@ -100,20 +113,4 @@ export class S3ShareService extends AbstractShareService<ShareS3Config> {
         throw new NotFoundException();
       });
   }
-}
-
-// We append some pseudo-dir prefixes into the actual object ID to avoid thousands of objects in a single pseudo-directory.
-// MyRaNdoMkey => M/y/MyRaNdoMkey
-export const idToObject = (id: string) => id.replace(/^(.)(.)/, '$1/$2/$1$2');
-
-/*
-  Generate short ID by hashing body, converting to base62 then truncating.
- */
-export function shortId(body: Record<string, unknown>, length: number): string {
-  const hmac = crypto.createHmac('sha1', JSON.stringify(body)).digest();
-  const BASE62 =
-    '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const bs62 = baseX(BASE62);
-  const fullkey = bs62.encode(hmac);
-  return fullkey.slice(0, length); // if length undefined, return the whole thing
 }

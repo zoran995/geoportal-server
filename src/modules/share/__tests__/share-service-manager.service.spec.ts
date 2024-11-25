@@ -1,6 +1,8 @@
 import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { LoggerService } from 'src/infrastructure/logger';
+
 import { shareGist } from '../config/schema/share-gist.schema';
 import { shareS3 } from '../config/schema/share-s3.schema';
 import { GistShareService } from '../providers/gist-share.service';
@@ -13,9 +15,22 @@ const gistConf = shareGist.parse({
   accessToken: 'a',
 });
 
+const gistConf2 = shareGist.parse({
+  service: 'gist',
+  prefix: 'test2',
+  accessToken: 'a',
+});
+
 const s3Conf = shareS3.parse({
   service: 's3',
   prefix: 's3test',
+  region: 'test',
+  bucket: 'test',
+});
+
+const s3Conf2 = shareS3.parse({
+  service: 's3',
+  prefix: 's3test2',
   region: 'test',
   bucket: 'test',
 });
@@ -39,6 +54,12 @@ describe('ShareServiceManager', () => {
             post: mockHttpPost,
           },
         },
+        {
+          provide: LoggerService,
+          useValue: {
+            error: jest.fn(),
+          },
+        },
         ShareServiceManager,
       ],
     }).compile();
@@ -47,82 +68,65 @@ describe('ShareServiceManager', () => {
     httpService = module.get<HttpService>(HttpService);
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('should be defined', () => {
     expect(service).toBeDefined();
-  });
-
-  it('httpService should be defined', () => {
     expect(httpService).toBeDefined();
   });
 
-  it('succesfully create instance and stores it', () => {
-    const share = service.create(gistConf);
-    expect(share).toBeInstanceOf(GistShareService);
-    expect(service.shareServices).toHaveLength(1);
+  describe('initializeProviders', () => {
+    it('should initialize providers successfully', async () => {
+      await service.initializeProviders([gistConf, s3Conf]);
+
+      const gistProvider = service.getProvider(gistConf.prefix);
+      const s3Provider = service.getProvider(s3Conf.prefix);
+
+      expect(gistProvider).toBeInstanceOf(GistShareService);
+      expect(s3Provider).toBeInstanceOf(S3ShareService);
+      expect(service.providers.size).toBe(2);
+    });
+
+    it('should initialize multiple providers of same type with different prefixes', async () => {
+      await service.initializeProviders([gistConf, gistConf2, s3Conf, s3Conf2]);
+
+      const gistProvider = service.getProvider(gistConf.prefix);
+      const gistProvider2 = service.getProvider(gistConf2.prefix);
+      const s3Provider = service.getProvider(s3Conf.prefix);
+      const s3Provider2 = service.getProvider(s3Conf2.prefix);
+
+      expect(gistProvider).toBeInstanceOf(GistShareService);
+      expect(gistProvider2).toBeInstanceOf(GistShareService);
+      expect(s3Provider).toBeInstanceOf(S3ShareService);
+      expect(s3Provider2).toBeInstanceOf(S3ShareService);
+      expect(service.providers.size).toBe(4);
+    });
+
+    it('should throw error for unknown service type', async () => {
+      await expect(
+        service.initializeProviders([unknownService as never]),
+      ).rejects.toThrow('Unknown provider type');
+    });
   });
 
-  it('keep instance stored', () => {
-    const exists = service.has(gistConf.prefix);
-    expect(exists).toBe(true);
-    expect(service.shareServices).toHaveLength(1);
-  });
+  describe('getProvider', () => {
+    beforeEach(async () => {
+      await service.initializeProviders([gistConf]);
+    });
 
-  it('succesfully resolve stored instance', () => {
-    const share = service.get(gistConf.prefix);
-    expect(share).toBeInstanceOf(GistShareService);
-    expect(service.shareServices).toHaveLength(1);
-  });
+    it('should get provider successfully', () => {
+      const provider = service.getProvider(gistConf.prefix);
+      expect(provider).toBeInstanceOf(GistShareService);
+    });
 
-  it('succesfully create service instance and stores it', () => {
-    const share = service.create(s3Conf);
-    expect(share).toBeInstanceOf(S3ShareService);
-    expect(service.shareServices).toHaveLength(2);
-  });
+    it('should throw error when prefix is not provided', () => {
+      expect(() => service.getProvider(undefined)).toThrow(
+        'Prefix is required',
+      );
+    });
 
-  it('succesfully removes stored instance', () => {
-    const removed = service.remove(gistConf.prefix);
-    expect(removed).toBeTruthy();
-    expect(service.shareServices).toHaveLength(1);
-  });
-
-  it("return false when removing service that doesn't exist", () => {
-    const removed = service.remove(gistConf.prefix);
-    expect(removed).toBe(false);
-    expect(service.shareServices).toHaveLength(1);
-  });
-
-  it('successfully recreates service instance', () => {
-    expect(service.shareServices).toHaveLength(1);
-    const share = service.create(s3Conf);
-    expect(share).toBeInstanceOf(S3ShareService);
-    expect(service.shareServices).toHaveLength(1);
-  });
-
-  it("throws an error when getting instance of service that doesn't exist", () => {
-    expect.assertions(3);
-    let share;
-    try {
-      share = service.get(gistConf.prefix);
-    } catch (err: any) {
-      expect(share).toBeUndefined();
-      expect(err).toBeDefined();
-      expect(JSON.stringify(err.message)).toContain(gistConf.prefix);
-    }
-  });
-
-  it('throws an error on unknown service type', () => {
-    expect.assertions(3);
-    let share;
-    try {
-      share = service.create(unknownService as never);
-    } catch (err: any) {
-      expect(share).toBeUndefined();
-      expect(err).toBeDefined();
-      expect(JSON.stringify(err.message)).toContain(unknownService.service);
-    }
+    it('should throw NotFoundException when provider not found', () => {
+      expect(() => service.getProvider('non-existent')).toThrow(
+        'Share provider non-existent not found',
+      );
+    });
   });
 });

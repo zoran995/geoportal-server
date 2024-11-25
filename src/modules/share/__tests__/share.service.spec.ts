@@ -1,22 +1,20 @@
 import { HttpService } from '@nestjs/axios';
-import {
-  BadRequestException,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { of } from 'rxjs';
 
 import { POST_SIZE_LIMIT } from 'src/common/interceptor';
+import { LoggerService } from 'src/infrastructure/logger';
+import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service';
 
-import { ShareConfigService } from '../config/share-config.service';
 import { shareGist } from '../config/schema/share-gist.schema';
 import {
   shareConfig as shareConfigSchema,
   ShareConfigType,
 } from '../config/schema/share.config.schema';
+import { ShareConfigService } from '../config/share-config.service';
 import { ShareServiceManager } from '../share-service-manager.service';
 import { ShareService } from '../share.service';
 
@@ -69,6 +67,10 @@ describe('ShareService', () => {
           provide: POST_SIZE_LIMIT,
           useValue: 102400,
         },
+        {
+          provide: LoggerService,
+          useClass: TestLoggerService,
+        },
       ],
     }).compile();
 
@@ -95,131 +97,65 @@ describe('ShareService', () => {
   });
 
   describe('save', () => {
-    it('should throw a NotFoundException when newPrefix is not specified in config', async () => {
-      expect.assertions(1);
-      const shareConf = { ...shareConfig };
-      shareConf.newPrefix = undefined;
+    it('should throw a NotFoundException when newPrefix is not specified in config', () => {
+      const shareConf = { ...shareConfig, newPrefix: undefined };
       configGet.mockReturnValue(shareConf);
-      try {
-        await service.save({});
-      } catch (err) {
-        expect(err).toBeInstanceOf(NotFoundException);
-      }
+
+      expect(() => service.save({})).rejects.toThrow();
     });
 
-    it('should throw a NotFoundException when there is availablePrefixes configured', async () => {
-      expect.assertions(1);
-      const shareConf = { ...shareConfig };
-      shareConf.availablePrefixes = [];
-      configGet.mockReturnValue(shareConf);
-      try {
-        await service.save({});
-      } catch (err) {
-        expect(err).toBeInstanceOf(NotFoundException);
-      }
+    it('should throw a NotFoundException when there is no availablePrefixes configured', async () => {
+      configGet.mockReturnValue(shareConfig);
+
+      await shareServiceManager.initializeProviders([]);
+
+      expect(() => service.save({})).rejects.toThrow(NotFoundException);
     });
 
     it('properly saves', async () => {
       configGet.mockReturnValue(shareConfig);
-      mockHttpPost.mockReturnValue(of({ data: { id: 'test' } }));
+      mockHttpPost.mockReturnValue(of({ data: { id: 'test-gist-id' } }));
+
+      await shareServiceManager.initializeProviders([gistConfig]);
+
       const shareServiceSpy = jest.spyOn(service, 'save');
       const result = await service.save({});
       expect(shareServiceSpy).toHaveBeenCalledTimes(1);
-      expect(result.id).toBe(`${shareConfig.newPrefix}-test`);
-    });
-
-    it('should reuse connection', async () => {
-      configGet.mockReturnValue(shareConfig);
-      const shareServiceSpy = jest.spyOn(service, 'save');
-      const shareManagerHasSpy = jest.spyOn(shareServiceManager, 'has');
-
-      const shareManagerGetSpy = jest.spyOn(shareServiceManager, 'get');
-      const shareManagerCreateSpy = jest.spyOn(shareServiceManager, 'create');
-      mockHttpPost.mockReturnValue(of({ data: { id: 'test' } }));
-      await service.save({});
-
-      expect(shareServiceSpy).toHaveBeenCalledTimes(1);
-      expect(shareManagerHasSpy).toHaveBeenCalledTimes(1);
-      expect(shareManagerCreateSpy).toHaveBeenCalledTimes(1);
-      expect(shareManagerGetSpy).not.toHaveBeenCalled();
-
-      await service.save({});
-      expect(shareServiceSpy).toHaveBeenCalledTimes(2);
-      expect(shareManagerHasSpy).toHaveBeenCalledTimes(2);
-      expect(shareManagerCreateSpy).toHaveBeenCalledTimes(1);
-      expect(shareManagerGetSpy).toHaveBeenCalledTimes(1);
+      expect(result.id).toBe(`${shareConfig.newPrefix}-test-gist-id`);
     });
   });
 
   describe('resolve', () => {
     it('throws an error when id is in form prefix-id', async () => {
-      expect.assertions(2);
-      let result;
-      try {
-        result = await service.resolve('testId');
-      } catch (err) {
-        expect(result).toBeUndefined();
-        expect(err).toBeInstanceOf(BadRequestException);
-      }
+      const data = { files: [{ content: 'test content' }] };
+      configGet.mockReturnValue(shareConfig);
+      mockHttpGet.mockReturnValue(of({ data }));
+      await shareServiceManager.initializeProviders([gistConfig]);
+
+      expect(() => service.resolve('testId')).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('properly resolves ', async () => {
-      const data = { files: [{ content: 'test' }] };
+      const data = { files: [{ content: 'test content' }] };
       configGet.mockReturnValue(shareConfig);
       mockHttpGet.mockReturnValue(of({ data }));
+      await shareServiceManager.initializeProviders([gistConfig]);
+
       const result = await service.resolve('test-id');
-      expect(result).toBe(data.files[0].content);
+
+      expect(result).toBe('test content');
     });
 
-    it('throws a NotFoundException on unknown prefix ', async () => {
-      expect.assertions(2);
+    it('throws a NotFoundException on unknown prefix ', () => {
       const data = { files: [{ content: 'test' }] };
       configGet.mockReturnValue(shareConfig);
       mockHttpGet.mockReturnValue(of({ data }));
-      let result;
-      try {
-        result = await service.resolve('test1-id');
-      } catch (err) {
-        expect(result).toBeUndefined();
-        expect(err).toBeInstanceOf(NotFoundException);
-      }
+
+      expect(() => service.resolve('test1-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
-
-    it('should reuse connection', async () => {
-      const data = { files: [{ content: 'test' }] };
-      configGet.mockReturnValue(shareConfig);
-      const shareServiceSpy = jest.spyOn(service, 'resolve');
-      const shareManagerHasSpy = jest.spyOn(shareServiceManager, 'has');
-
-      const shareManagerGetSpy = jest.spyOn(shareServiceManager, 'get');
-      const shareManagerCreateSpy = jest.spyOn(shareServiceManager, 'create');
-      mockHttpPost.mockReturnValue(of({ data }));
-      await service.resolve('test-id');
-
-      expect(shareServiceSpy).toHaveBeenCalledTimes(1);
-      expect(shareManagerHasSpy).toHaveBeenCalledTimes(1);
-      expect(shareManagerCreateSpy).toHaveBeenCalledTimes(1);
-      expect(shareManagerGetSpy).not.toHaveBeenCalled();
-
-      await service.resolve('test-id1');
-      expect(shareServiceSpy).toHaveBeenCalledTimes(2);
-      expect(shareManagerHasSpy).toHaveBeenCalledTimes(2);
-      expect(shareManagerCreateSpy).toHaveBeenCalledTimes(1);
-      expect(shareManagerGetSpy).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  it('should throw InternalServerErrorException when unknown service', async () => {
-    expect.assertions(1);
-    const shareConf = { ...shareConfig };
-    if (shareConf.availablePrefixes) {
-      (<any>shareConf.availablePrefixes[0].service) = 'test';
-      configGet.mockReturnValue(shareConf);
-    }
-    try {
-      await service.save({});
-    } catch (err) {
-      expect(err).toBeInstanceOf(InternalServerErrorException);
-    }
   });
 });

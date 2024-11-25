@@ -18,6 +18,7 @@ export const shareConfig = z.object({
 
   availablePrefixes: z
     .array(z.union([shareGist, shareS3]))
+    .default([])
     .describe('List of available configurations for share urls.'),
 });
 

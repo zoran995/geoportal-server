@@ -32,6 +32,7 @@ export const configuration = z.object({
 
   share: z
     .optional(shareConfig)
+    .default(shareConfig.parse({}))
     .describe(
       'Configuration for the share service. If not defined share service will be disabled.',
     ),

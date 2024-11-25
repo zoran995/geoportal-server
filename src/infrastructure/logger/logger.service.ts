@@ -29,4 +29,7 @@ export class LoggerService extends ConsoleLogger implements NestLoggerService {
   verbose(message: unknown) {
     super.verbose(message);
   }
+  info(message: unknown) {
+    super.log(message);
+  }
 }

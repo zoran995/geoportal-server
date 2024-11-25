@@ -1,24 +1,11 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
-
-import { isDefined } from 'src/common/helpers';
-import { LoggerService } from 'src/infrastructure/logger';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { ShareConfigService } from './config/share-config.service';
-import { ISaveShareResponse } from './interfaces/save-share-response.interface';
-import { AbstractShareService } from './providers/abstract-share.service';
+import { ShareResult } from './interfaces/save-share-response.interface';
 import { ShareServiceManager } from './share-service-manager.service';
-import type { ShareGistConfig } from './config/schema/share-gist.schema';
-import type { ShareS3Config } from './config/schema/share-s3.schema';
 
 @Injectable()
 export class ShareService {
-  private readonly logger = new LoggerService(ShareService.name);
-
   constructor(
     private readonly configService: ShareConfigService,
     private readonly shareServiceManager: ShareServiceManager,
@@ -26,32 +13,15 @@ export class ShareService {
 
   /**
    * Save the share data
-   * @param body - Share data
+   * @param data - Share data
    * @returns Share id
    */
-  async save(body: Record<string, unknown>): Promise<ISaveShareResponse> {
-    const newSharePrefix = this.configService.newPrefix;
-    if (!isDefined(newSharePrefix)) {
-      this.logger.error(
-        'Share url could not be created. NewSharePrefix is not defined',
-      );
-      throw new NotFoundException(
-        'This server has not been configured to generate new share URLs.',
-      );
-    }
-    if (this.configService.availablePrefixes === undefined) {
-      this.logger.warn(
-        'This server has not been configured to generate new share URLs.',
-      );
-      throw new NotFoundException(
-        'This server has not been configured to generate new share URLs.',
-      );
-    }
+  async save(data: Record<string, unknown>): Promise<ShareResult> {
+    const prefix = this.configService.newPrefix;
 
-    const shareService: AbstractShareService<ShareGistConfig | ShareS3Config> =
-      this.createOrGetShareService(newSharePrefix);
+    const provider = this.shareServiceManager.getProvider(prefix);
 
-    return shareService.save(body);
+    return provider.save(data);
   }
 
   /**
@@ -60,51 +30,20 @@ export class ShareService {
    * @returns Share data
    */
   async resolve(id: string): Promise<Record<string, unknown>> {
-    const idSplit = id.match(splitPrefixRe);
-    if (
-      !isDefined(idSplit) ||
-      idSplit.length < 3 ||
-      !idSplit[2] ||
-      !idSplit[3]
-    ) {
-      throw new BadRequestException(
-        'Share id is not properly formatted (prefix-id)',
-      );
-    }
-    const prefix = idSplit[2];
-    const shareId = idSplit[3];
+    const [prefix, shareId] = this.parseShareId(id);
 
-    const shareService: AbstractShareService<ShareGistConfig | ShareS3Config> =
-      this.createOrGetShareService(prefix);
+    const provider = this.shareServiceManager.getProvider(prefix);
 
-    return shareService.resolve(shareId);
+    return provider.resolve(shareId);
   }
 
-  private createOrGetShareService(prefix: string) {
-    if (!this.shareServiceManager.has(prefix)) {
-      const availableConfigs = this.configService.availablePrefixes;
-      const shareConfig = availableConfigs?.find(
-        (config) => prefix === config.prefix,
-      );
+  private parseShareId(id: string): [string, string] {
+    const match = id.match(/^(?:([^-]+)-)?(.+)$/);
 
-      if (!shareConfig) {
-        throw new NotFoundException(
-          'This server has not been configured to generate new share URLs.',
-        );
-      }
-      try {
-        return this.shareServiceManager.create(shareConfig);
-      } catch (err: unknown) {
-        this.logger.error(
-          `An error occurred while getting share configuration`,
-          err as never,
-        );
-        throw new InternalServerErrorException();
-      }
-    } else {
-      return this.shareServiceManager.get(prefix);
+    if (!match || match.length < 3 || !match[1] || !match[2]) {
+      throw new BadRequestException('Invalid share id format');
     }
+
+    return [match[1], match[2]];
   }
 }
-
-const splitPrefixRe = /^(([^-]+)-)?(.*)$/;

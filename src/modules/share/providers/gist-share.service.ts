@@ -11,25 +11,22 @@ import { combineURLs, isDefined } from 'src/common/helpers';
 import { LoggerService } from 'src/infrastructure/logger';
 
 import { ShareGistConfig } from '../config/schema/share-gist.schema';
-import { ISaveShareResponse } from '../interfaces/save-share-response.interface';
+import { ShareResult } from '../interfaces/save-share-response.interface';
 import { AbstractShareService } from './abstract-share.service';
 
 export class GistShareService extends AbstractShareService<ShareGistConfig> {
-  private readonly logger = new LoggerService(GistShareService.name);
-
   constructor(
     protected readonly config: ShareGistConfig,
     private readonly httpService: HttpService,
+    logger: LoggerService,
   ) {
-    super(config);
+    super(config, logger);
   }
 
   /**
    * Save share configuration using gist.
    */
-  public async save(
-    data: Record<string, unknown>,
-  ): Promise<ISaveShareResponse> {
+  public async save(data: Record<string, unknown>): Promise<ShareResult> {
     const gistFile: Record<string, unknown> = {};
     gistFile[this.config.fileName] = {
       content: JSON.stringify(data),
