@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { FeedbackServiceType } from '../../types/feedback-service.type';
-import { additionalParameters } from '../../dto/additional-parameters.dto';
+import { additionalParameters } from './additional-parameters.schema';
 
 export const baseFeedback = z.object({
   /**
