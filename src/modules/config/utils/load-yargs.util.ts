@@ -9,7 +9,6 @@ type RemoveIndex<T> = {
       ? never
       : K]: T[K];
 };
-export type PromiseResolvedType<T> = T extends Promise<infer R> ? R : never;
 
 export type YargsConfigType = RemoveIndex<ReturnType<typeof loadYargs>>;
 

@@ -9,5 +9,3 @@ export const contentSecurityPolicy = z.object({
   frameSrc: z.array(z.string()).default([]),
   frameAncestors: z.array(z.string()).default([]),
 });
-
-export type ContentSecurityPolicyType = z.infer<typeof contentSecurityPolicy>;
