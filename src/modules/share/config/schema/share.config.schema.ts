@@ -9,11 +9,13 @@ export const shareConfig = z.object({
     .min(1)
     .optional()
     .describe('Which service should be used when new URLs are requested.'),
+
   maxRequestSize: z
     .number()
     .int()
     .positive()
     .default(200)
+    .transform((v) => v * 1024)
     .describe('Max payload size for share in kb.'),
 
   availablePrefixes: z

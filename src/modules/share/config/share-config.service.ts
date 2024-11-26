@@ -18,10 +18,7 @@ export class ShareConfigService {
   }
 
   get maxRequestSize() {
-    const maxRequestSize = this.shareConfig?.maxRequestSize;
-    if (maxRequestSize) {
-      return maxRequestSize * 1024;
-    }
+    return this.shareConfig?.maxRequestSize;
   }
 
   private get shareConfig() {
