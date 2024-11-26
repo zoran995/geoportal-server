@@ -21,4 +21,12 @@ describe('Feedback config', () => {
 
     expect(result.success).toBe(false);
   });
+
+  it('should fail when primaryId specified without options', () => {
+    const result = feedbackConfig.safeParse({
+      primaryId: 'test',
+    });
+
+    expect(result.success).toBe(false);
+  });
 });
