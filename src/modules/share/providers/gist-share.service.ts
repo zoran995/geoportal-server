@@ -13,6 +13,7 @@ import { LoggerService } from 'src/infrastructure/logger';
 import { ShareGistConfig } from '../config/schema/share-gist.schema';
 import { ShareResult } from '../interfaces/save-share-response.interface';
 import { AbstractShareService } from './abstract-share.service';
+import type { Request } from 'express';
 
 export class GistShareService extends AbstractShareService<ShareGistConfig> {
   constructor(
@@ -26,7 +27,10 @@ export class GistShareService extends AbstractShareService<ShareGistConfig> {
   /**
    * Save share configuration using gist.
    */
-  public async save(data: Record<string, unknown>): Promise<ShareResult> {
+  public async save(
+    data: Record<string, unknown>,
+    req: Request,
+  ): Promise<ShareResult> {
     const gistFile: Record<string, unknown> = {};
     gistFile[this.config.fileName] = {
       content: JSON.stringify(data),
@@ -58,11 +62,9 @@ export class GistShareService extends AbstractShareService<ShareGistConfig> {
               );
               throw new NotFoundException();
             }
+
             this.logger.verbose(`Created Gist with ID '${res.data.id}`);
-            return {
-              id: `${this.config.prefix}-${res.data.id}`,
-              path: `/api/share/${this.config.prefix}-${res.data.id}`,
-            };
+            return this.buildResponse(res.data.id, req);
           }),
           catchError((e: unknown) => {
             this.logger.error(`Creating share url failed`, e as never);

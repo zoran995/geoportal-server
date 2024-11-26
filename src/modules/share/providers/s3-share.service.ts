@@ -1,15 +1,15 @@
 import {
-  Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 
 import { PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { NodeHttpHandler } from '@smithy/node-http-handler';
-import http from 'http';
-import https from 'https';
 import baseX from 'base-x';
 import * as crypto from 'crypto';
+import type { Request } from 'express';
+import http from 'http';
+import https from 'https';
 
 import { AwsS3Service } from 'src/infrastructure/aws-sdk/aws-s3.service';
 import { LoggerService } from 'src/infrastructure/logger';
@@ -42,7 +42,6 @@ export const generateShareId = (
   return fullkey.slice(0, keyLength); // if length undefined, return the whole thing
 };
 
-@Injectable()
 export class S3ShareService extends AbstractShareService<ShareS3Config> {
   private readonly awsS3Service: AwsS3Service;
 
@@ -65,7 +64,10 @@ export class S3ShareService extends AbstractShareService<ShareS3Config> {
   /**
    * Save share configuration in s3 bucket
    */
-  async save(data: Record<string, unknown>): Promise<ShareResult> {
+  async save(
+    data: Record<string, unknown>,
+    req: Request,
+  ): Promise<ShareResult> {
     const id = generateShareId(data, this.config.keyLength);
     const params: PutObjectCommandInput = {
       Bucket: this.config.bucket,
@@ -78,10 +80,8 @@ export class S3ShareService extends AbstractShareService<ShareS3Config> {
         this.logger.verbose(
           `Saved key ${id} to S3 bucket ${params.Bucket}: ${params.Key}. Etag: ${response.ETag}`,
         );
-        return {
-          id: `${this.config.prefix}-${id}`,
-          path: `/api/share/${this.config.prefix}-${id}`,
-        };
+
+        return this.buildResponse(id, req);
       })
       .catch((err) => {
         this.logger.error(

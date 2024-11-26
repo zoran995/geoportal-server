@@ -1,16 +1,34 @@
+import { createMock } from '@golevelup/ts-jest';
 import {
   InternalServerErrorException,
   NotFoundException,
+  type ExecutionContext,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { of, throwError } from 'rxjs';
+
+import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service';
 import { shareGist } from '../../config/schema/share-gist.schema';
 import { GistShareService } from '../gist-share.service';
-import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service';
 
 describe('GistShareService', () => {
   let service: GistShareService;
   let httpServiceMock: { get: jest.Mock; post: jest.Mock };
   let gistShareConfig: any;
+
+  const mockExecutionContext = createMock<ExecutionContext>({
+    switchToHttp: () => ({
+      getRequest: () =>
+        ({
+          protocol: 'http',
+          baseUrl: '/api/share',
+          ip: '127.0.0.1',
+          headers: {
+            host: 'example.co',
+          },
+        }) as Request,
+    }),
+  });
 
   const defaultHeaders = {
     'User-Agent': 'TerriaJS-Server',
@@ -40,9 +58,10 @@ describe('GistShareService', () => {
   describe('save', () => {
     describe('when saving successfully', () => {
       it('should send post request with correct headers and auth token', async () => {
+        const req = mockExecutionContext.switchToHttp().getRequest<Request>();
         httpServiceMock.post.mockReturnValue(of({ data: { id: 'test' } }));
 
-        await service.save({ conf: 'test' });
+        await service.save({ conf: 'test' }, req);
 
         expect(httpServiceMock.post).toHaveBeenCalledWith(
           gistShareConfig.apiUrl,
@@ -57,11 +76,16 @@ describe('GistShareService', () => {
       });
 
       it('should return prefixed id', async () => {
+        const req = mockExecutionContext.switchToHttp().getRequest<Request>();
         httpServiceMock.post.mockReturnValue(of({ data: { id: 'testId' } }));
 
-        const result = await service.save({ conf: 'test' });
+        const result = await service.save({ conf: 'test' }, req);
 
-        expect(result.id).toBe(`${gistShareConfig.prefix}-${'testId'}`);
+        expect(result).toEqual({
+          id: `${gistShareConfig.prefix}-${'testId'}`,
+          path: `/api/share/${gistShareConfig.prefix}-${'testId'}`,
+          url: `http://example.co/api/share/${gistShareConfig.prefix}-${'testId'}`,
+        });
       });
     });
 
@@ -76,9 +100,10 @@ describe('GistShareService', () => {
       });
 
       it('should not include authorization header', async () => {
+        const req = mockExecutionContext.switchToHttp().getRequest<Request>();
         httpServiceMock.post.mockReturnValue(of({ data: { id: 'test' } }));
 
-        await service.save({ conf: 'test' });
+        await service.save({ conf: 'test' }, req);
 
         expect(httpServiceMock.post).toHaveBeenCalledWith(
           gistShareConfig.apiUrl,
@@ -90,27 +115,30 @@ describe('GistShareService', () => {
 
     describe('when errors occur', () => {
       it('should throw NotFoundException when response data is missing', async () => {
+        const req = mockExecutionContext.switchToHttp().getRequest<Request>();
         httpServiceMock.post.mockReturnValue(of({}));
 
-        await expect(service.save({ conf: 'test' })).rejects.toThrow(
+        await expect(service.save({ conf: 'test' }, req)).rejects.toThrow(
           NotFoundException,
         );
       });
 
       it('should throw NotFoundException when id is missing', async () => {
+        const req = mockExecutionContext.switchToHttp().getRequest<Request>();
         httpServiceMock.post.mockReturnValue(of({ data: {} }));
 
-        await expect(service.save({ conf: 'test' })).rejects.toThrow(
+        await expect(service.save({ conf: 'test' }, req)).rejects.toThrow(
           NotFoundException,
         );
       });
 
       it('should throw InternalServerErrorException on API error', async () => {
+        const req = mockExecutionContext.switchToHttp().getRequest<Request>();
         httpServiceMock.post.mockReturnValue(
           throwError(() => new Error('test error')),
         );
 
-        await expect(service.save({ conf: 'test' })).rejects.toThrow(
+        await expect(service.save({ conf: 'test' }, req)).rejects.toThrow(
           InternalServerErrorException,
         );
       });

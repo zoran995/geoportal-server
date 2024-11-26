@@ -3,6 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { ShareConfigService } from './config/share-config.service';
 import { ShareResult } from './interfaces/save-share-response.interface';
 import { ShareServiceManager } from './share-service-manager.service';
+import type { Request } from 'express';
 
 @Injectable()
 export class ShareService {
@@ -16,12 +17,15 @@ export class ShareService {
    * @param data - Share data
    * @returns Share id
    */
-  async save(data: Record<string, unknown>): Promise<ShareResult> {
+  async save(
+    data: Record<string, unknown>,
+    req: Request,
+  ): Promise<ShareResult> {
     const prefix = this.configService.newPrefix;
 
     const provider = this.shareServiceManager.getProvider(prefix);
 
-    return provider.save(data);
+    return provider.save(data, req);
   }
 
   /**

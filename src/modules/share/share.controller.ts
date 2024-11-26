@@ -24,6 +24,7 @@ import { PayloadLimitInterceptor } from 'src/common/interceptor';
 
 import { GetShareDto } from './dto/get-share.dto';
 import { ShareService } from './share.service';
+import type { Request } from 'express';
 
 @ApiTags('share')
 @Controller('share')
@@ -46,8 +47,8 @@ export class ShareController {
   @ApiNotFoundResponse()
   @ApiInternalServerErrorResponse()
   @UseInterceptors(PayloadLimitInterceptor)
-  async create(@Body() shareDto: Record<string, unknown>) {
-    return this.shareService.save(shareDto);
+  async create(@Body() shareDto: Record<string, unknown>, req: Request) {
+    return this.shareService.save(shareDto, req);
   }
 
   /**

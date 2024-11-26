@@ -1,8 +1,14 @@
 import { HttpService } from '@nestjs/axios';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  NotFoundException,
+  type ExecutionContext,
+} from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import type { Request } from 'express';
 
+import { createMock } from '@golevelup/ts-jest';
 import { of } from 'rxjs';
 
 import { POST_SIZE_LIMIT } from 'src/common/interceptor';
@@ -48,6 +54,21 @@ describe('ShareService', () => {
   let service: ShareService;
   let shareConfigService: ShareConfigService;
   let shareServiceManager: ShareServiceManager;
+
+  const mockExecutionContext = createMock<ExecutionContext>({
+    switchToHttp: () => ({
+      getRequest: () =>
+        ({
+          protocol: 'http',
+          baseUrl: '/api/share',
+          ip: '127.0.0.1',
+          headers: {
+            host: 'example.co',
+          },
+        }) as Request,
+    }),
+  });
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ConfigModule, ShareService],
@@ -98,30 +119,39 @@ describe('ShareService', () => {
 
   describe('save', () => {
     it('should throw a NotFoundException when newPrefix is not specified in config', () => {
+      const req = mockExecutionContext.switchToHttp().getRequest<Request>();
       const shareConf = { ...shareConfig, newPrefix: undefined };
+
       configGet.mockReturnValue(shareConf);
 
-      expect(() => service.save({})).rejects.toThrow();
+      expect(() => service.save({}, req)).rejects.toThrow();
     });
 
     it('should throw a NotFoundException when there is no availablePrefixes configured', async () => {
+      const req = mockExecutionContext.switchToHttp().getRequest<Request>();
+
       configGet.mockReturnValue(shareConfig);
 
       await shareServiceManager.initializeProviders([]);
 
-      expect(() => service.save({})).rejects.toThrow(NotFoundException);
+      expect(() => service.save({}, req)).rejects.toThrow(NotFoundException);
     });
 
     it('properly saves', async () => {
+      const req = mockExecutionContext.switchToHttp().getRequest<Request>();
       configGet.mockReturnValue(shareConfig);
       mockHttpPost.mockReturnValue(of({ data: { id: 'test-gist-id' } }));
 
       await shareServiceManager.initializeProviders([gistConfig]);
 
       const shareServiceSpy = jest.spyOn(service, 'save');
-      const result = await service.save({});
+      const result = await service.save({}, req);
       expect(shareServiceSpy).toHaveBeenCalledTimes(1);
-      expect(result.id).toBe(`${shareConfig.newPrefix}-test-gist-id`);
+      expect(result).toEqual({
+        id: `${shareConfig.newPrefix}-test-gist-id`,
+        path: `/api/share/${shareConfig.newPrefix}-test-gist-id`,
+        url: `http://example.co/api/share/${shareConfig.newPrefix}-test-gist-id`,
+      });
     });
   });
 
