@@ -57,7 +57,7 @@ export const configuration = z.object({
     http://expressjs.com/en/api.html#trust.proxy.options.table`),
 
   serveStatic: serveStatic
-    .optional()
+    .default(serveStatic.parse({}))
     .describe('Configuration for serving static files.'),
 
   csp: contentSecurityPolicy
