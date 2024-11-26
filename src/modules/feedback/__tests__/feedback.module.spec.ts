@@ -1,126 +1,245 @@
-import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
-import { Test, type TestingModuleBuilder } from '@nestjs/testing';
+import type { INestApplication } from '@nestjs/common';
+import { APP_PIPE } from '@nestjs/core';
+import { Test } from '@nestjs/testing';
+import { ZodValidationPipe } from 'nestjs-zod';
 
-import { LoggerService } from 'src/infrastructure/logger';
+import { vol } from 'memfs';
+import { http, HttpResponse, passthrough } from 'msw';
+import { setupServer } from 'msw/node';
+import request from 'supertest';
+
+import { AppHttpModule } from 'src/infrastructure/http';
+import { LoggerModule, LoggerService } from 'src/infrastructure/logger';
+import { AppConfigModule } from 'src/modules/config';
 
 import { FeedbackService } from '../common/feedback-service';
-import {
-  feedbackConfig,
-  type FeedbackConfigType,
-} from '../config/schema/feedback.config.schema';
-import { feedbackServiceFactory } from '../feeback-service.factory';
+import { FeedbackModule } from '../feedback.module';
 import { DefaultFeedbackService } from '../providers/default-feedback.service';
 import { GithubFeedbackService } from '../providers/github-feedback.service';
 import { MailFeedbackService } from '../providers/mail-feedback.service';
 import { RedmineFeedbackService } from '../providers/redmine-feedback.service';
 
+jest.mock('fs');
+
 describe('FeedbackModule', () => {
-  let app: TestingModuleBuilder;
-  const getConfigMock = jest.fn();
-  beforeEach(() => {
-    app = Test.createTestingModule({
-      imports: [],
-      providers: [
-        feedbackServiceFactory,
-        {
-          provide: ConfigService,
-          useValue: {
-            get: getConfigMock,
-          },
-        },
-        {
-          provide: HttpService,
-          useValue: jest.fn(),
-        },
-        {
-          provide: LoggerService,
-          useValue: {
-            error: jest.fn(),
-          },
-        },
-      ],
+  const moduleFixture = Test.createTestingModule({
+    imports: [FeedbackModule, LoggerModule, AppHttpModule, AppConfigModule],
+    providers: [
+      {
+        provide: APP_PIPE,
+        useClass: ZodValidationPipe,
+      },
+    ],
+  })
+    .overrideProvider(LoggerService)
+    .useValue({
+      error: jest.fn(),
+    });
+
+  describe('with default config', () => {
+    let app: INestApplication;
+
+    beforeAll(async () => {
+      app = (await moduleFixture.compile()).createNestApplication();
+    });
+
+    it('should create default feedback service with default config', () => {
+      const service = app.get(FeedbackService);
+
+      expect(service).toBeDefined();
+      expect(service).toBeInstanceOf(DefaultFeedbackService);
     });
   });
 
-  it('should create default feedback service with default config', async () => {
-    getConfigMock.mockReturnValue(feedbackConfig.parse({}));
+  describe('with github config', () => {
+    let app: INestApplication;
 
-    const module = await app.compile();
-
-    const service = module.get(FeedbackService);
-    expect(service).toBeDefined();
-    expect(service).toBeInstanceOf(DefaultFeedbackService);
-  });
-
-  it('should create github feedback service with github config', async () => {
-    getConfigMock.mockReturnValue(
-      feedbackConfig.parse({
-        primaryId: 'g1',
-        options: [
-          {
-            id: 'g1',
-            service: 'github',
-            issuesUrl: 'https://test.com',
-            accessToken: 'test',
-            userAgent: 'test',
+    beforeAll(async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          feedback: {
+            primaryId: 'g1',
+            options: [
+              {
+                id: 'g1',
+                service: 'github',
+                issuesUrl: 'https://test.com/api/issues/url',
+                accessToken: 'test',
+              },
+            ],
           },
+        }),
+      });
+
+      app = (await moduleFixture.compile()).createNestApplication();
+
+      app.setGlobalPrefix('api');
+
+      await app.init();
+    });
+
+    it('should create github feedback service with github config', () => {
+      const service = app.get(FeedbackService);
+
+      expect(service).toBeDefined();
+      expect(service).toBeInstanceOf(GithubFeedbackService);
+    });
+
+    it('should post feedback to github api', async () => {
+      const server = setupServer(
+        ...[
+          http.post('*', ({ request }) => {
+            if (request.url.includes('127.0.0.1')) {
+              passthrough();
+            }
+          }),
+          http.post('https://test.com/api/issues/url', () => {
+            return HttpResponse.json({});
+          }),
         ],
-      } satisfies FeedbackConfigType),
-    );
+      );
+      server.listen();
 
-    const module = await app.compile();
-
-    const service = module.get(FeedbackService);
-    expect(service).toBeDefined();
-    expect(service).toBeInstanceOf(GithubFeedbackService);
-  });
-
-  it('should create mail feedback service with mail config', async () => {
-    getConfigMock.mockReturnValue(
-      feedbackConfig.parse({
-        primaryId: 'm1',
-        options: [
-          {
-            id: 'm1',
-            service: 'mail',
+      await server.boundary(async () => {
+        await request(app.getHttpServer())
+          .post('/api/feedback')
+          .send({
+            title: 'feedback',
+            name: 'description',
             email: 'test@example.com',
-            smtpPort: 22,
-            smtpHost: 'mail.example.com',
-            secure: false,
-          },
+            comment: 'This long to satisfy the minimum length',
+          })
+          .expect(201);
+      })();
+
+      server.close();
+    });
+
+    it('should throw an error on invalid feedback data', async () => {
+      const server = setupServer(
+        ...[
+          http.post('*', ({ request }) => {
+            if (request.url.includes('127.0.0.1')) {
+              passthrough();
+            }
+          }),
+          http.post('https://test.com/api/issues/url', () => {
+            return HttpResponse.json({});
+          }),
         ],
-      } satisfies FeedbackConfigType),
-    );
+      );
+      server.listen();
 
-    const module = await app.compile();
+      await server.boundary(async () => {
+        await request(app.getHttpServer())
+          .post('/api/feedback')
+          .send({
+            title: 'feedback',
+            name: 'description',
+            email: 'test',
+            comment: 'short',
+          })
+          .expect(400);
+      })();
 
-    const service = module.get(FeedbackService);
-    expect(service).toBeDefined();
-    expect(service).toBeInstanceOf(MailFeedbackService);
+      server.close();
+    });
+
+    it('should throw an error if post request fails', async () => {
+      const server = setupServer(
+        ...[
+          http.post('*', ({ request }) => {
+            if (request.url.includes('127.0.0.1')) {
+              passthrough();
+            }
+          }),
+          http.post('https://test.com/api/issues/url', () => {
+            return HttpResponse.error();
+          }),
+        ],
+      );
+
+      server.listen();
+
+      await server.boundary(async () => {
+        await request(app.getHttpServer())
+          .post('/api/feedback')
+          .send({
+            title: 'feedback',
+            name: 'description',
+            email: 'test@example.com',
+            comment: 'This long to satisfy the minimum length',
+          })
+          .expect(500);
+      })();
+
+      server.close();
+    });
   });
 
-  it('should create redmine feedback service with redmine config', async () => {
-    getConfigMock.mockReturnValue(
-      feedbackConfig.parse({
-        primaryId: 'r1',
-        options: [
-          {
-            id: 'r1',
-            service: 'redmine',
-            issuesUrl: 'https://test.com',
-            username: 'test',
-            password: 'password',
-            project_id: 1,
+  describe('with mail config', () => {
+    let app: INestApplication;
+
+    beforeAll(async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          feedback: {
+            primaryId: 'm1',
+            options: [
+              {
+                id: 'm1',
+                service: 'mail',
+                email: 'test@example.com',
+                smtpPort: 22,
+                smtpHost: 'mail.example.com',
+                secure: false,
+              },
+            ],
           },
-        ],
-      } satisfies FeedbackConfigType),
-    );
+        }),
+      });
 
-    const module = await app.compile();
+      app = (await moduleFixture.compile()).createNestApplication();
+    });
 
-    const service = module.get(FeedbackService);
-    expect(service).toBeDefined();
-    expect(service).toBeInstanceOf(RedmineFeedbackService);
+    it('should create mail feedback service with mail config', () => {
+      const service = app.get(FeedbackService);
+
+      expect(service).toBeDefined();
+      expect(service).toBeInstanceOf(MailFeedbackService);
+    });
+  });
+
+  describe('with redmine config', () => {
+    let app: INestApplication;
+
+    beforeAll(async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          feedback: {
+            primaryId: 'r1',
+            options: [
+              {
+                id: 'r1',
+                service: 'redmine',
+                issuesUrl: 'https://test.com',
+                username: 'test',
+                password: 'password',
+                project_id: 1,
+              },
+            ],
+          },
+        }),
+      });
+
+      app = (await moduleFixture.compile()).createNestApplication();
+    });
+
+    it('should create redmine feedback service with redmine config', () => {
+      const service = app.get(FeedbackService);
+
+      expect(service).toBeDefined();
+      expect(service).toBeInstanceOf(RedmineFeedbackService);
+    });
   });
 });
