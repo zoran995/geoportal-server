@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, type OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import fs from 'fs';
@@ -9,17 +9,27 @@ import { WWWROOT_TOKEN } from 'src/common/utils';
 import { IConfigurationType } from '../config';
 
 @Injectable()
-export class InitService {
+export class InitService implements OnModuleInit {
   private readonly initPaths: string[] = [];
-  constructor(
-    private readonly configService: ConfigService<IConfigurationType>,
-    @Inject(WWWROOT_TOKEN) private readonly wwwroot: string,
-  ) {
-    const initPaths = this.configService.get('initPaths', { infer: true });
-    const initPath = path.join(this.wwwroot, 'init');
 
-    if (!initPaths?.some((iPath) => iPath === initPath.replace(/\\/g, '/'))) {
-      initPaths?.push(initPath);
+  constructor(
+    private readonly configService: ConfigService<IConfigurationType, true>,
+    @Inject(WWWROOT_TOKEN) private readonly wwwroot: string,
+  ) {}
+
+  onModuleInit() {
+    const initPaths = this.configService.get('initPaths', [], { infer: true });
+    const serveStatic = this.configService.get('serveStatic.serveStatic', {
+      infer: true,
+    });
+    this.initPaths.push(...initPaths);
+
+    const initPath = path.join(this.wwwroot, 'init');
+    if (
+      serveStatic &&
+      !initPaths.some((iPath) => iPath === initPath.replace(/\\/g, '/'))
+    ) {
+      this.initPaths.push(initPath);
     }
   }
 
@@ -34,8 +44,9 @@ export class InitService {
     const configFileBase = configFile
       ? path.dirname(configFile)
       : process.cwd();
+
     let filePath: string | undefined = undefined;
-    this.configService.get('initPaths', { infer: true })?.some((initPath) => {
+    this.initPaths?.some((initPath) => {
       const resolvedPath = path.resolve(configFileBase, initPath, fileName);
       if (fs.existsSync(resolvedPath)) {
         filePath = resolvedPath;
