@@ -97,14 +97,7 @@ describe('Share Module (e2e)', () => {
     app.setGlobalPrefix('api');
     await app.init();
 
-    server.listen({
-      onUnhandledRequest(request, print) {
-        if (request.url.includes('127.0.0.1')) {
-          return;
-        }
-        print.warning();
-      },
-    });
+    server.listen();
   });
 
   describe('POST /api/share', () => {
