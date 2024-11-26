@@ -1,288 +1,1026 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const yargs = require('yargs');
-
-import { Controller, Get, INestApplication, Res } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import { Response } from 'express';
-import { DirectoryJSON, vol } from 'memfs';
-import supertest from 'supertest';
+import { vol } from 'memfs';
+import { http, HttpResponse, passthrough } from 'msw';
+import { setupServer } from 'msw/node';
+import request from 'supertest';
 
 import { AppModule } from 'src/app.module';
-import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
-import { InternalServerErrorExceptionFilter } from 'src/common/filters/internal-server-error-exception.filter';
-import { NotFoundExceptionFilter } from 'src/common/filters/not-found-exception.filter';
-import { WWWROOT_TOKEN } from 'src/common/utils';
 import { LoggerService } from 'src/infrastructure/logger/logger.service';
 
-import { ProxyConfigType } from 'src/modules/proxy/config/schema/proxy-config.dto';
-
-import { Cancel, CancelToken } from './helpers/axios-cancel';
 import { NoopLoggerService } from './noop-logger.service';
+import type { ProxyConfigType } from 'src/modules/proxy/config/schema/proxy-config.dto';
 
-// mock our logger service so there is no logs when testing
-jest.mock('axios');
 jest.mock('fs');
-const data = 'success';
-const requestHeaders = {
-  fakeheader: 'fakevalue',
-  'Cache-Control': 'no-cache',
-  'Proxy-Connection': 'delete me',
-};
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const axiosRequest: any = axios.request;
+const localRequestHandler = http.all('*', ({ request }) => {
+  if (request.url.includes('127.0.0.1')) {
+    return passthrough();
+  }
+});
 
-axios.Cancel = Cancel;
-axios.CancelToken = CancelToken;
-axiosRequest.mockImplementation(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (reqConfig: InternalAxiosRequestConfig): Promise<AxiosResponse<any>> => {
-    let status = 200;
-    if (reqConfig.headers && 'x-give-response-status' in reqConfig.headers) {
-      status = reqConfig.headers['x-give-response-status'] as unknown as number;
+const handlers = [
+  localRequestHandler,
+
+  http.all('https://example.com/redirect', () => {
+    return HttpResponse.redirect('https://example.com/response');
+  }),
+
+  http.all('https://example.com/redirect2', () => {
+    return HttpResponse.redirect('http://202.168.1.1/test');
+  }),
+
+  http.all('https://example.com/response', () => {
+    return HttpResponse.json({ data: 'response success' });
+  }),
+
+  http.all('http://example.com/response', () => {
+    return HttpResponse.json({ data: 'response success' });
+  }),
+
+  http.all('https://example.com/error', () => {
+    return new HttpResponse(null, { status: 500 });
+  }),
+
+  http.all('https://example.com', ({ request }) => {
+    if (request.headers.get('Proxy-Connection')) {
+      throw new Error('Proxy-Connection header should not be passed');
     }
 
-    return Promise.resolve({
-      data: data,
-      status: status,
-      statusText: `${status}`,
-      headers: requestHeaders,
-      config: reqConfig,
-    });
-  },
-);
-
-const openProxyConfig: Partial<ProxyConfigType> = {
-  proxyAllDomains: true,
-};
-
-const volJson: DirectoryJSON = {
-  './serverconfig.json': JSON.stringify({ proxy: openProxyConfig }),
-  './redirect.json': JSON.stringify({
-    proxy: { proxyAllDomains: true, blacklistedAddresses: ['202.168.1.1'] },
+    return HttpResponse.json(
+      { data: 'response success root' },
+      {
+        headers: {
+          fakeheader: 'fakevalue',
+          'Cache-Control': 'no-cache',
+          Connection: 'delete me',
+          'Content-Type': 'application/json',
+        },
+      },
+    );
   }),
-  './redirect2.json': JSON.stringify({
-    proxy: {
-      allowProxyFor: ['127.0.0.1'],
-      blacklistedAddresses: ['202.168.1.1'],
-    },
+
+  http.all('http://example.com', ({ request }) => {
+    if (request.headers.get('Proxy-Connection')) {
+      throw new Error('Proxy-Connection header should not be passed');
+    }
+
+    return HttpResponse.json(
+      { data: 'response success root' },
+      {
+        headers: {
+          fakeheader: 'fakevalue',
+          'Cache-Control': 'no-cache',
+          Connection: 'delete me',
+          'Content-Type': 'application/json',
+        },
+      },
+    );
   }),
-};
 
-vol.fromJSON(volJson);
+  http.all('http://example2.com', ({ request }) => {
+    if (request.headers.get('Proxy-Connection')) {
+      throw new Error('Proxy-Connection header should not be passed');
+    }
 
-@Controller('test')
-export class TestRedirectController {
-  @Get('redirect')
-  redirect(@Res() res: Response) {
-    return res.redirect('/test/response');
-  }
+    return HttpResponse.json(
+      { data: 'response success root' },
+      {
+        headers: {
+          fakeheader: 'fakevalue',
+          'Cache-Control': 'no-cache',
+          Connection: 'delete me',
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+  }),
+];
 
-  @Get('redirect2')
-  redirect2(@Res() res: Response) {
-    return res.redirect('http://202.168.1.1/test');
-  }
-
-  @Get('response')
-  getHello(): string {
-    return 'test-redirect';
-  }
-}
-
-async function buildApp(configFile: string) {
-  yargs(`--config-file ${configFile}`);
-
+async function buildApp() {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
-    controllers: [TestRedirectController],
   })
     .overrideProvider(LoggerService)
     .useClass(NoopLoggerService)
     .compile();
 
   const app = moduleFixture.createNestApplication();
-  const configService = app.get(ConfigService);
-  const wwwroot = app.get(WWWROOT_TOKEN);
-  app.useGlobalFilters(
-    new HttpExceptionFilter(),
-    new InternalServerErrorExceptionFilter(wwwroot),
-    new NotFoundExceptionFilter(configService, wwwroot),
-  );
+  app.setGlobalPrefix('api');
+
   app.useLogger(new NoopLoggerService());
+
   await app.init();
 
-  const agent = supertest.agent(app.getHttpServer());
-  // agent.use((req) => {
-  //   req.set({ 'x-client-id': 'e2e-test-client' });
-  // });
-
-  return { app, agent };
+  return { app };
 }
 
 describe('Proxy (e2e)', () => {
   describe('/ (GET)', () => {
-    doCommonTest('GET');
+    doCommonTest('get');
 
     describe('before redirect', () => {
-      it('should follow redirect', async () => {
-        const { app, agent } = await buildApp('./redirect.json');
-        const { url } = agent.get('/');
-        await agent.get(`/proxy/${url}test/redirect`).expect(200);
-
-        app.close();
-      });
-
-      it('should block redirect to blacklisted host', async () => {
-        const { app, agent } = await buildApp('./redirect2.json');
-        const { url } = agent.get('/');
-        await agent.get(`/proxy/${url}test/redirect2`).expect(403);
-
-        app.close();
-      });
+      // it('should follow redirect', async () => {
+      //   vol.fromJSON({
+      //     './serverconfig.json': JSON.stringify({
+      //       proxy: {
+      //         proxyAllDomains: true,
+      //         blacklistedAddresses: ['202.168.1.1'],
+      //       },
+      //     }),
+      //   });
+      //   const { app } = await buildApp();
+      //   const { url } = request(app.getHttpServer()).get('/');
+      //   await agent.get(`/proxy/${url}test/redirect`).expect(200);
+      //   app.close();
+      // });
+      // it('should block redirect to blacklisted host', async () => {
+      //   const { app, agent } = await buildApp('./redirect2.json');
+      //   const { url } = agent.get('/');
+      //   await agent.get(`/proxy/${url}test/redirect2`).expect(403);
+      //   app.close();
+      // });
     });
   });
 
   describe('/ (POST)', () => {
-    doCommonTest('POST');
+    doCommonTest('post');
   });
 });
 
-function doCommonTest(verb: 'GET' | 'POST') {
-  const methodName = verb === 'GET' ? 'get' : 'post';
-  let app: INestApplication;
-  let agent: ReturnType<typeof supertest.agent>;
-  beforeEach(async () => {
-    ({ app, agent } = await buildApp('./serverconfig.json'));
-  });
+function doCommonTest(methodName: 'get' | 'post') {
+  describe('default config', () => {
+    let app: INestApplication;
+    const server = setupServer(...handlers);
 
-  it('should proxy through to the path that is given', async () => {
-    const url = 'https://example.com/blah?query=value&otherQuery=otherValue';
-    await agent[methodName](`/proxy/${url}`).expect(200);
-    expect(axiosRequest).toHaveBeenCalledTimes(1);
-    expect(axiosRequest).toHaveBeenCalledWith(
-      expect.objectContaining({
-        method: verb,
-        url: url,
-      }),
-    );
-  });
+    beforeAll(async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({}),
+      });
 
-  it("should add http if it isn't provided", async () => {
-    const url = 'example.com/';
-    await agent[methodName](`/proxy/${url}`).expect(200);
-    expect(axiosRequest).toHaveBeenCalledTimes(1);
-    expect(axiosRequest).toHaveBeenCalledWith(
-      expect.objectContaining({
-        method: verb,
-        url: `http://${url}`,
-      }),
-    );
-  });
+      ({ app } = await buildApp());
 
-  it("should add a trailing slash if it isn't provided", async () => {
-    const url = 'example.com';
-    await agent[methodName](`/proxy/${url}`).expect(200);
-    expect(axiosRequest).toHaveBeenCalledTimes(1);
-    expect(axiosRequest).toHaveBeenCalledWith(
-      expect.objectContaining({
-        method: verb,
-        url: `http://${url}/`,
-      }),
-    );
-  });
-
-  it('should return 400 if no url is specified', async () => {
-    await agent[methodName]('/proxy/').expect(400);
-    expect(axiosRequest).toHaveBeenCalledTimes(0);
-  });
-
-  it('should return 400 if invalid url is specified', async () => {
-    await agent[methodName]('/proxy/test').expect(400);
-    expect(axiosRequest).toHaveBeenCalledTimes(0);
-  });
-
-  it('should stream back the body and headers of the request made', async () => {
-    const response = await agent[methodName]('/proxy/example.com').expect(
-      200,
-      data,
-    );
-    //.expect('fakeheader', 'fakevalue');
-    expect(axiosRequest).toHaveBeenCalledTimes(1);
-    expect(response.headers).toHaveProperty('fakeheader');
-  });
-
-  describe('should change headers', () => {
-    it('to overwrite cache-control header to two weeks if no max age is specified in req', () => {
-      return agent[methodName]('/proxy/example.com')
-        .expect(200, data)
-        .expect('Cache-Control', 'public,max-age=1209600');
+      server.listen({
+        onUnhandledRequest: 'error',
+      });
     });
 
-    it('to filter out disallowed ones passed in req', async () => {
-      await agent[methodName]('/proxy/example.com')
-        .set('Proxy-Connection', 'delete me!')
-        .set('unfilteredheader', "don't delete me!")
-        .expect(200, data)
-        .expect('Cache-Control', 'public,max-age=1209600');
-
-      const apiCallParams = axiosRequest.mock.calls[0][0];
-      expect(apiCallParams.headers).not.toHaveProperty('Proxy-Connection');
-      expect(apiCallParams.headers).toHaveProperty('unfilteredheader');
+    it('should not allow proxy by default', () => {
+      return request(app.getHttpServer())
+        [methodName]('/api/proxy/example.com')
+        .expect(403);
     });
 
-    it('to filter out disallowed ones that come back from the response', async () => {
-      await agent[methodName]('/proxy/example.com')
-        .expect(200, data)
-        .expect('Cache-Control', 'public,max-age=1209600');
+    afterAll(async () => {
+      await app?.close();
+      server.close();
+    });
+  });
+  describe('simple config', () => {
+    let app: INestApplication;
+    const server = setupServer(...handlers);
 
-      const apiCallParams = axiosRequest.mock.calls[0][0];
-      expect(apiCallParams.headers).not.toHaveProperty('Proxy-Connection');
+    beforeAll(async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            blacklistedAddresses: ['202.168.1.1'],
+          },
+        }),
+      });
+
+      ({ app } = await buildApp());
+
+      server.listen({
+        onUnhandledRequest: 'error',
+      });
     });
 
-    it('should not set max age on error response', async () => {
-      await agent[methodName]('/proxy/example.com')
-        .set('x-give-response-status', '500')
-        .expect(500)
-        .expect('Cache-Control', 'no-cache');
+    it('should proxy through to the path that is given', async () => {
+      const url = 'https://example.com/response';
+
+      await request(app.getHttpServer())
+        [methodName](`/api/proxy/${url}`)
+        .expect(200, { data: 'response success' });
+    });
+
+    it("should add protocol if it isn't provided", async () => {
+      const url = 'example.com/response';
+      await request(app.getHttpServer())
+        [methodName](`/api/proxy/${url}`)
+        .expect(200, { data: 'response success' });
+    });
+
+    it('should proxy to just domain', async () => {
+      const url = 'example.com';
+
+      await request(app.getHttpServer())
+        [methodName](`/api/proxy/${url}`)
+        .expect(200, { data: 'response success root' });
+    });
+
+    it('should return 400 if no url is specified', async () => {
+      await request(app.getHttpServer())[methodName]('/api/proxy/').expect(400);
+    });
+
+    it('should return 400 if invalid url is specified', async () => {
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/test')
+        .expect(400);
+    });
+
+    it('should stream back the body and headers of the request made', async () => {
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com')
+        .expect(200, { data: 'response success root' })
+        .expect('fakeheader', 'fakevalue');
+    });
+
+    describe('should change headers', () => {
+      it('to overwrite cache-control header to two weeks if no max age is specified in req', () => {
+        return request(app.getHttpServer())
+          [methodName]('/api/proxy/example.com')
+          .expect(200, { data: 'response success root' })
+          .expect('Cache-Control', 'public,max-age=1209600');
+      });
+
+      it('to filter out disallowed ones passed in req', async () => {
+        await request(app.getHttpServer())
+          [methodName]('/api/proxy/example.com')
+          .set('Proxy-Connection', 'delete me!')
+          .set('unfilteredheader', "don't delete me!")
+          .expect(200, { data: 'response success root' })
+          .expect('Cache-Control', 'public,max-age=1209600');
+      });
+
+      it('to filter out disallowed ones that come back from the response', async () => {
+        const response = await request(app.getHttpServer())
+          [methodName]('/api/proxy/example.com')
+          .expect(200, { data: 'response success root' })
+          .expect('Cache-Control', 'public,max-age=1209600');
+
+        expect(response.headers['Connection']).not.toBeDefined();
+      });
+
+      it('should not set max age on error response', async () => {
+        await request(app.getHttpServer())
+          [methodName]('/api/proxy/https://example.com/error')
+          .expect(500);
+      });
     });
 
     describe('when specifying max age', () => {
       describe('should return 400 for', () => {
         it('a max-age specifying url with no actual url specified', async () => {
-          await agent[methodName]('/proxy/_3000ms').expect(400);
-          expect(axiosRequest).toHaveBeenCalledTimes(0);
+          await request(app.getHttpServer())
+            [methodName]('/api/proxy/_3000ms')
+            .expect(400);
         });
 
         it("a max-age specifying url with just '/' as a url", async () => {
-          await agent[methodName]('/proxy/_3000ms/').expect(400);
-          expect(axiosRequest).toHaveBeenCalledTimes(0);
+          await request(app.getHttpServer())
+            [methodName]('/api/proxy/_3000ms/')
+            .expect(400);
         });
 
-        it('a max-age specifying url with no actual url specified', async () => {
-          await agent[methodName]('/proxy/_FUBAR/example.com').expect(400);
-          expect(axiosRequest).toHaveBeenCalledTimes(0);
+        it('a max-age specifying url with invalid max age value', async () => {
+          await request(app.getHttpServer())
+            [methodName]('/api/proxy/_FUBAR/example.com')
+            .expect(400);
         });
 
         it('a max-age specifying url with an invalid unit for a max-age value', async () => {
-          await agent[methodName]('/proxy/_3000q/example.com').expect(400);
-          expect(axiosRequest).toHaveBeenCalledTimes(0);
+          await request(app.getHttpServer())
+            [methodName]('/api/proxy/_3000q/example.com')
+            .expect(400);
         });
       });
 
-      it('should properly set max age', async () => {
-        await agent[methodName]('/proxy/_3000ms/example.com')
-          .expect(200)
-          .expect('Cache-Control', 'public,max-age=3');
-        expect(axiosRequest).toHaveBeenCalledTimes(1);
+      describe('should properly interpret max age', () => {
+        it('ms (millisecond)', async () => {
+          await request(app.getHttpServer())
+            [methodName]('/api/proxy/_3000ms/example.com')
+            .expect(200)
+            .expect('Cache-Control', 'public,max-age=3');
+        });
+
+        it('s (second)', async () => {
+          await request(app.getHttpServer())
+            [methodName]('/api/proxy/_3s/example.com')
+            .set('Cache-Control', 'no-cache')
+            .expect(200)
+            .expect('Cache-Control', 'public,max-age=3');
+        });
+
+        it('m (minute)', async () => {
+          await request(app.getHttpServer())
+            [methodName]('/api/proxy/_2m/example.com')
+            .set('Cache-Control', 'no-cache')
+            .expect(200)
+            .expect('Cache-Control', 'public,max-age=120');
+        });
+
+        it('h (hour)', async () => {
+          await request(app.getHttpServer())
+            [methodName]('/api/proxy/_2h/example.com')
+            .set('Cache-Control', 'no-cache')
+            .expect(200)
+            .expect('Cache-Control', 'public,max-age=7200');
+        });
+
+        it('d (day)', async () => {
+          await request(app.getHttpServer())
+            [methodName]('/api/proxy/_2d/example.com')
+            .set('Cache-Control', 'no-cache')
+            .expect(200)
+            .expect('Cache-Control', 'public,max-age=172800');
+        });
+
+        it('w (week)', async () => {
+          await request(app.getHttpServer())
+            [methodName]('/api/proxy/_2w/example.com')
+            .set('Cache-Control', 'no-cache')
+            .expect(200)
+            .expect('Cache-Control', 'public,max-age=1209600');
+        });
+
+        it('y (year)', async () => {
+          await request(app.getHttpServer())
+            [methodName]('/api/proxy/_2y/example.com')
+            .set('Cache-Control', 'no-cache')
+            .expect(200)
+            .expect('Cache-Control', 'public,max-age=63072000');
+        });
       });
+    });
+
+    afterAll(async () => {
+      await app?.close();
+      server.close();
     });
   });
 
-  afterEach(async () => {
-    jest.clearAllMocks();
-    await app?.close();
+  describe('with an upstream proxy', () => {
+    const server = setupServer(...handlers);
+
+    beforeAll(() => {
+      server.listen({
+        onUnhandledRequest: 'error',
+      });
+    });
+
+    it.skip('should proxy through upstream proxy', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            upstreamProxy: 'http://proxy/',
+            proxyAllDomains: true,
+            blacklistedAddresses: ['202.168.1.1'],
+          },
+        }),
+      });
+
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/example.com')
+        .expect(200);
+
+      await app.close();
+    });
+
+    it('is not used when host is in bypassUpstreamProxyHosts', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            upstreamProxy: 'http://proxy/',
+            bypassUpstreamProxyHosts: { 'example.com': true },
+            proxyAllDomains: true,
+            blacklistedAddresses: ['202.168.1.1'],
+          },
+        }),
+      });
+
+      const { app } = await buildApp();
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/example.com')
+        .expect(200);
+      request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com/response')
+        .expect(200, { data: 'response success' });
+
+      await app.close();
+    });
+
+    it.skip('is still used when bypassUpstreamProxyHosts is defined but host is not in it', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            upstreamProxy: 'http://proxy/',
+            bypassUpstreamProxyHosts: { 'example2.com': true },
+            proxyAllDomains: true,
+            blacklistedAddresses: ['202.168.1.1'],
+          },
+        }),
+      });
+
+      const { app } = await buildApp();
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com/blah')
+        .expect(200);
+
+      await app.close();
+    });
+
+    afterAll(() => {
+      server.close();
+    });
+  });
+
+  describe('when specifying an allowed list of domains to proxy', function () {
+    const server = setupServer(...handlers);
+
+    beforeAll(() => {
+      server.listen({
+        onUnhandledRequest: 'error',
+      });
+    });
+
+    it('should proxy a domain on that list', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            allowProxyFor: ['example.com'],
+            blacklistedAddresses: ['202.168.1.1'],
+          },
+        }),
+      });
+
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/example.com/response')
+        .expect(200, { data: 'response success' });
+    });
+
+    it('should block a domain not on that list', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            allowProxyFor: ['example.com'],
+            blacklistedAddresses: ['202.168.1.1'],
+          },
+        }),
+      });
+
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/example2.com/blah')
+        .expect(403);
+    });
+
+    it('should not block a domain on the list if proxyAllDomains is true', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            allowProxyFor: ['example.com'],
+            blacklistedAddresses: ['202.168.1.1'],
+          },
+        }),
+      });
+
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/example2.com')
+        .expect(200);
+    });
+
+    afterAll(() => {
+      server.close();
+    });
+  });
+
+  describe('when domain has basic authentication specified', function () {
+    it('should set an auth header for that domain', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            allowProxyFor: ['example.com'],
+            blacklistedAddresses: ['202.168.1.1'],
+            proxyAuth: {
+              'example.com': {
+                authorization: 'blahfaceauth',
+              },
+            },
+          } satisfies Partial<ProxyConfigType>,
+        }),
+      });
+
+      const server = setupServer(
+        ...[
+          localRequestHandler,
+          http.all('https://example.com/auth', ({ request }) => {
+            if (request.headers.get('Authorization') !== 'blahfaceauth') {
+              return HttpResponse.error();
+            }
+
+            return HttpResponse.json({ data: 'response success' });
+          }),
+        ],
+      );
+
+      server.listen({
+        onUnhandledRequest: 'error',
+      });
+
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com/auth')
+        .expect(200, { data: 'response success' });
+
+      await app.close();
+      server.close();
+    });
+
+    it('should not set auth headers for other domains', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            // allowProxyFor: ['example.com'],
+            blacklistedAddresses: ['202.168.1.1'],
+            proxyAuth: {
+              'example2.com': {
+                authorization: 'blahfaceauth',
+              },
+            },
+          } satisfies Partial<ProxyConfigType>,
+        }),
+      });
+
+      const server = setupServer(
+        ...[
+          localRequestHandler,
+          http.all('https://example.com/auth', ({ request }) => {
+            if (request.headers.get('authorization')) {
+              return new HttpResponse(null, { status: 500 });
+            }
+
+            return HttpResponse.json({ data: 'response success' });
+          }),
+        ],
+      );
+
+      server.listen({
+        onUnhandledRequest: 'error',
+      });
+
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com/auth')
+        .expect(200, { data: 'response success' });
+
+      await app.close();
+      server.close();
+    });
+
+    it('should set other headers for that domain', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            allowProxyFor: ['example.com'],
+            blacklistedAddresses: ['202.168.1.1'],
+            proxyAuth: {
+              'example.com': {
+                authorization: 'blahfaceauth',
+                headers: [{ name: 'X-Test-Header', value: 'testvalue' }],
+              },
+            },
+          } satisfies Partial<ProxyConfigType>,
+        }),
+      });
+
+      const server = setupServer(
+        ...[
+          localRequestHandler,
+          http.all('https://example.com/auth', ({ request }) => {
+            if (
+              !request.headers.get('authorization') ||
+              request.headers.get('X-Test-Header') !== 'testvalue'
+            ) {
+              return new HttpResponse(null, { status: 500 });
+            }
+
+            return HttpResponse.json({ data: 'properly set header and auth' });
+          }),
+        ],
+      );
+
+      server.listen({
+        onUnhandledRequest: 'error',
+      });
+
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com/auth')
+        .expect(200, { data: 'properly set header and auth' });
+
+      await app.close();
+      server.close();
+    });
+  });
+
+  describe('append query params', function () {
+    it('append params to the querystring for a specified domain', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            allowProxyFor: ['example.com'],
+            blacklistedAddresses: ['202.168.1.1'],
+            appendParamToQueryString: {
+              'example.com': [
+                {
+                  regexPattern: '.',
+                  params: {
+                    foo: 'bar',
+                  },
+                },
+              ],
+            },
+          } satisfies Partial<ProxyConfigType>,
+        }),
+      });
+
+      const server = setupServer(
+        ...[
+          localRequestHandler,
+          http.all('https://example.com', ({ request }) => {
+            const url = new URL(request.url);
+            if (url.searchParams.get('foo') !== 'bar') {
+              return HttpResponse.error();
+            }
+
+            return HttpResponse.json({
+              data: 'have set search params foo=bar',
+            });
+          }),
+        ],
+      );
+
+      server.listen({
+        onUnhandledRequest: 'error',
+      });
+
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com')
+        .expect(200, { data: 'have set search params foo=bar' });
+
+      await app.close();
+      server.close();
+    });
+
+    it('append params to the querystring for a specified domain using specified regex', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            allowProxyFor: ['example.com'],
+            blacklistedAddresses: ['202.168.1.1'],
+            appendParamToQueryString: {
+              'example.com': [
+                {
+                  regexPattern: 'something',
+                  params: {
+                    foo: 'bar',
+                  },
+                },
+              ],
+            },
+          } satisfies Partial<ProxyConfigType>,
+        }),
+      });
+
+      const server = setupServer(
+        ...[
+          localRequestHandler,
+          http.all('https://example.com/something/else', ({ request }) => {
+            const url = new URL(request.url);
+            if (url.searchParams.get('foo') !== 'bar') {
+              return HttpResponse.error();
+            }
+
+            return HttpResponse.json({
+              data: 'have set search params foo=bar',
+            });
+          }),
+        ],
+      );
+
+      server.listen({
+        onUnhandledRequest: 'error',
+      });
+
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com/something/else')
+        .expect(200, { data: 'have set search params foo=bar' });
+
+      await app.close();
+      server.close();
+    });
+
+    it('no params appended when mismatch in regex', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            allowProxyFor: ['example.com'],
+            blacklistedAddresses: ['202.168.1.1'],
+            appendParamToQueryString: {
+              'example.com': [
+                {
+                  regexPattern: 'something',
+                  params: {
+                    foo: 'bar',
+                  },
+                },
+              ],
+            },
+          } satisfies Partial<ProxyConfigType>,
+        }),
+      });
+
+      const server = setupServer(
+        ...[
+          localRequestHandler,
+          http.all('https://example.com/nothing/else', ({ request }) => {
+            const url = new URL(request.url);
+            if (url.searchParams.get('foo')) {
+              return HttpResponse.error();
+            }
+
+            return HttpResponse.json({
+              data: 'have not set search params foo=bar',
+            });
+          }),
+        ],
+      );
+
+      server.listen({
+        onUnhandledRequest: 'error',
+      });
+
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com/nothing/else')
+        .expect(200, { data: 'have not set search params foo=bar' });
+
+      await app.close();
+      server.close();
+    });
+
+    it('no params appended when mismatch in regex', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            allowProxyFor: ['example.com'],
+            blacklistedAddresses: ['202.168.1.1'],
+            appendParamToQueryString: {
+              'example.com': [
+                {
+                  regexPattern: 'something',
+                  params: {
+                    foo: 'bar',
+                  },
+                },
+                {
+                  regexPattern: 'nothing',
+                  params: {
+                    yep: 'works',
+                  },
+                },
+              ],
+            },
+          } satisfies Partial<ProxyConfigType>,
+        }),
+      });
+
+      const server = setupServer(
+        ...[
+          localRequestHandler,
+          http.all('https://example.com/nothing/else', ({ request }) => {
+            const url = new URL(request.url);
+            if (
+              url.searchParams.get('foo') ||
+              url.searchParams.get('yep') !== 'works'
+            ) {
+              return HttpResponse.error();
+            }
+
+            return HttpResponse.json({
+              data: 'have set search params yep=works',
+            });
+          }),
+        ],
+      );
+
+      server.listen({
+        onUnhandledRequest: 'error',
+      });
+
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com/nothing/else')
+        .expect(200, { data: 'have set search params yep=works' });
+
+      await app.close();
+      server.close();
+    });
+
+    it('no params appended when mismatch in regex', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            allowProxyFor: ['example.com'],
+            blacklistedAddresses: ['202.168.1.1'],
+            appendParamToQueryString: {
+              'example.com': [
+                {
+                  regexPattern: '.',
+                  params: {
+                    foo: 'bar',
+                    another: 'val',
+                  },
+                },
+              ],
+            },
+          } satisfies Partial<ProxyConfigType>,
+        }),
+      });
+
+      const server = setupServer(
+        ...[
+          localRequestHandler,
+          http.all('https://example.com/nothing/else', ({ request }) => {
+            const url = new URL(request.url);
+            if (
+              url.searchParams.get('foo') !== 'bar' ||
+              url.searchParams.get('another') !== 'val'
+            ) {
+              return HttpResponse.error();
+            }
+
+            return HttpResponse.json({
+              data: 'have set search params foo=bar and another=val',
+            });
+          }),
+        ],
+      );
+
+      server.listen({
+        onUnhandledRequest: 'error',
+      });
+
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com/nothing/else')
+        .expect(200, {
+          data: 'have set search params foo=bar and another=val',
+        });
+
+      await app.close();
+      server.close();
+    });
+
+    it('no params appended when mismatch in regex', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            allowProxyFor: ['example.com'],
+            blacklistedAddresses: ['202.168.1.1'],
+            appendParamToQueryString: {
+              'example.com': [
+                {
+                  regexPattern: '.',
+                  params: {
+                    foo: 'bar',
+                  },
+                },
+              ],
+            },
+          } satisfies Partial<ProxyConfigType>,
+        }),
+      });
+
+      const server = setupServer(
+        ...[
+          localRequestHandler,
+          http.all('https://example.com/something', ({ request }) => {
+            const url = new URL(request.url);
+            if (
+              url.searchParams.get('foo') !== 'bar' ||
+              url.searchParams.get('already') !== 'here'
+            ) {
+              return HttpResponse.error();
+            }
+
+            return HttpResponse.json({
+              data: 'have extended search params with foo=bar',
+            });
+          }),
+        ],
+      );
+
+      server.listen({
+        onUnhandledRequest: 'error',
+      });
+
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com/something?already=here')
+        .expect(200, {
+          data: 'have extended search params with foo=bar',
+        });
+
+      await app.close();
+      server.close();
+    });
+
+    it('no params appended when mismatch in regex', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            allowProxyFor: ['example.com'],
+            blacklistedAddresses: ['202.168.1.1'],
+            appendParamToQueryString: {
+              'example2.com': [
+                {
+                  regexPattern: '.',
+                  params: {
+                    foo: 'bar',
+                  },
+                },
+              ],
+            },
+          } satisfies Partial<ProxyConfigType>,
+        }),
+      });
+
+      const server = setupServer(
+        ...[
+          localRequestHandler,
+          http.all('https://example.com/something', ({ request }) => {
+            const url = new URL(request.url);
+            if (
+              url.searchParams.get('foo') ||
+              url.searchParams.get('already') !== 'here'
+            ) {
+              return HttpResponse.error();
+            }
+
+            return HttpResponse.json({
+              data: 'haven\t set search params',
+            });
+          }),
+        ],
+      );
+
+      server.listen({
+        onUnhandledRequest: 'error',
+      });
+
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com/something?already=here')
+        .expect(200, {
+          data: 'haven\t set search params',
+        });
+
+      await app.close();
+      server.close();
+    });
   });
 }

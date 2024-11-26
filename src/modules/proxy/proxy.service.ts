@@ -63,19 +63,26 @@ export class ProxyService {
     remoteUrl.search = this.getQuery();
 
     if (this.proxyConfigService.appendParamToQueryString) {
-      const host = this.proxyConfigService.appendParamToQueryString.get(
-        remoteUrl.host,
-      );
+      const host =
+        this.proxyConfigService.appendParamToQueryString[remoteUrl.host];
       host && this.appendParamToQuery(host, remoteUrl);
     }
 
-    let proxy;
+    let proxy: AxiosProxyConfig | undefined;
     if (
       this.proxyConfigService.upstreamProxy &&
       (!this.proxyConfigService.bypassUpstreamProxyHosts ||
-        !this.proxyConfigService.bypassUpstreamProxyHosts.get(remoteUrl.host))
+        !this.proxyConfigService.bypassUpstreamProxyHosts[remoteUrl.host])
     ) {
-      proxy = this.proxyConfigService.upstreamProxy;
+      const url = new URL(this.proxyConfigService.upstreamProxy);
+      proxy = {
+        port: url.port
+          ? parseInt(url.port, 10)
+          : url.protocol === 'https:'
+            ? 443
+            : 80,
+        host: `${url.host}/`,
+      };
     }
 
     const filteredReqHeaders = filterHeaders(
@@ -94,12 +101,7 @@ export class ProxyService {
       this.deleteAuthorizationHeader(filteredReqHeaders);
     }
 
-    return this.#performRequest(
-      remoteUrl,
-      filteredReqHeaders,
-      maxAge,
-      proxy as unknown as AxiosProxyConfig,
-    );
+    return this.#performRequest(remoteUrl, filteredReqHeaders, maxAge, proxy);
   }
 
   /**
@@ -153,11 +155,11 @@ export class ProxyService {
       this.httpService
         .request({
           method: this.request.method === 'POST' ? 'POST' : 'GET',
-          url: remoteUrl.href,
+          url: `${remoteUrl.href}`,
           headers: proxyHeaders,
           responseType: 'arraybuffer',
           proxy,
-          data: this.request.body,
+          data: this.request.method === 'POST' ? this.request.body : undefined,
           maxBodyLength: this.proxyConfigService.postSizeLimit,
           beforeRedirect: (options, { headers }) =>
             this.beforeRedirect(headers, remoteUrl),
@@ -372,20 +374,9 @@ export class ProxyService {
       return;
     }
 
-    host = host.toLowerCase();
-    const proxyDomains = this.proxyConfigService.proxyDomains;
-    //check that host is from one of these domains
-    if (proxyDomains) {
-      for (const proxyDomain of proxyDomains) {
-        if (
-          host.indexOf(proxyDomain, host.length - proxyDomain.length) !== -1
-        ) {
-          return;
-        }
-      }
-    }
-    throw new ForbiddenException(
-      `Host is not in list of allowed hosts: ${host}`,
-    );
+    if (!this.proxyListService.isWhitelisted(host.toLowerCase()))
+      throw new ForbiddenException(
+        `Host is not in list of allowed hosts: ${host}`,
+      );
   }
 }

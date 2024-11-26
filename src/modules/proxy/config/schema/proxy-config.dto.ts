@@ -64,17 +64,18 @@ export const proxyConfig = z.object({
       "Location of the file containing the list of IP addresses to refuse to proxy for, even if they're resolved from a hostname that would ordinarily be proxied. Each IP address should be in its own row. If your server has access to an IP range that is not accessible to clients of the proxy, and you want to ensure that the client can't get access to it through the proxy, it is vital that you add that IP range to this list. Any change to file content will be picked up automatically without restarting server.",
     ),
 
-  upstreamProxy: fqdnOrIp()
+  upstreamProxy: z
+    .union([z.string().url(), fqdnOrIp()])
     .optional()
     .describe('Pass requests through to another proxy upstream.'),
 
   bypassUpstreamProxyHosts: z
-    .map(z.string(), z.boolean())
+    .record(z.string(), z.boolean())
     .optional()
     .describe('A list of hosts that should bypass the upstream proxy.'),
 
   appendParamToQueryString: z
-    .map(z.string(), z.array(appendParamToQueryString))
+    .record(z.string(), z.array(appendParamToQueryString))
     .optional()
     .describe(
       'An array of options which you to inform which additional parameters are appended to the url querystring.',

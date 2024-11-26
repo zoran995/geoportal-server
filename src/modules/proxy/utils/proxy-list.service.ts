@@ -36,6 +36,15 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
     if (this.whitelistWatcher) this.whitelistWatcher.close();
   }
 
+  isWhitelisted(host: string) {
+    for (const domain of this.#whitelist) {
+      if (host.indexOf(domain, host.length - domain.length) !== -1) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * Check if address is blacklisted
    * @returns Whether address is blacklisted
