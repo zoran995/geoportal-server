@@ -46,10 +46,10 @@ export abstract class AbstractShareService<T extends ShareType = ShareType>
 
   protected buildResponse(id: string, req: Request): ShareResult {
     const shareId = `${this.prefix}-${id}`;
-    const url = `${req.protocol}://${req.headers.host}${req.baseUrl}/${shareId}`;
+    const url = `${req.protocol}://${req.headers.host}${req.path}/${shareId}`;
     return {
       id: `${shareId}`,
-      path: `${req.baseUrl}/${shareId}`,
+      path: `${req.path}/${shareId}`,
       url,
     };
   }

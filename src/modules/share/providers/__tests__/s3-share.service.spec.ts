@@ -29,7 +29,7 @@ describe('S3ShareService', () => {
       getRequest: () =>
         ({
           protocol: 'http',
-          baseUrl: '/api/share',
+          path: '/api/share',
           ip: '127.0.0.1',
           headers: {
             host: 'example.co',

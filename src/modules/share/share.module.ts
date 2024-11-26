@@ -12,9 +12,9 @@ import { ShareService } from './share.service';
 @Module({
   controllers: [ShareController],
   providers: [
+    ShareConfigService,
     ShareServiceManager,
     ShareService,
-    ShareConfigService,
     {
       provide: POST_SIZE_LIMIT,
       useFactory: (configService: ShareConfigService) => {

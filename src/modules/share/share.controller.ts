@@ -5,6 +5,7 @@ import {
   Header,
   Param,
   Post,
+  Req,
   UseFilters,
   UseInterceptors,
 } from '@nestjs/common';
@@ -47,8 +48,11 @@ export class ShareController {
   @ApiNotFoundResponse()
   @ApiInternalServerErrorResponse()
   @UseInterceptors(PayloadLimitInterceptor)
-  async create(@Body() shareDto: Record<string, unknown>, req: Request) {
-    return this.shareService.save(shareDto, req);
+  async create(
+    @Body() shareDto: Record<string, unknown>,
+    @Req() request: Request,
+  ) {
+    return await this.shareService.save(shareDto, request);
   }
 
   /**
