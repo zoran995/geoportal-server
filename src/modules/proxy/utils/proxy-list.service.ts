@@ -10,13 +10,15 @@ import { ProxyConfigService } from '../config/proxy-config.service';
 
 @Injectable()
 export class ProxyListService implements OnModuleInit, OnModuleDestroy {
-  private readonly logger = new LoggerService(ProxyListService.name);
   #blacklist: string[] = [];
   #whitelist: string[] = [];
   private whitelistWatcher: fs.FSWatcher | undefined;
   private blacklistWatcher: fs.FSWatcher | undefined;
 
-  constructor(private readonly configService: ProxyConfigService) {}
+  constructor(
+    private readonly configService: ProxyConfigService,
+    private readonly logger: LoggerService,
+  ) {}
 
   get blacklist() {
     return this.#blacklist;
@@ -61,14 +63,14 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
   private setBlacklist() {
     const path = this.configService.blacklistPath;
     if (!path || !fs.existsSync(path)) {
-      this.logger.log('using blacklist set in config;');
+      this.logger.log('using blacklist set in config;', ProxyListService.name);
       if (isDefined(this.configService.blacklist)) {
         this.#blacklist.length = 0;
         this.#blacklist.push(...this.configService.blacklist);
       }
       return;
     }
-    this.logger.log(`reading blacklist from ${path}`);
+    this.logger.log(`reading blacklist from ${path}`, ProxyListService.name);
     this.#blacklist = readFileWithoutComments(path);
     this.blacklistWatcher = this.watchFileChanges(path, this.#blacklist);
   }
@@ -76,14 +78,14 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
   private setWhitelist() {
     const path = this.configService.whitelistPath;
     if (!path || !fs.existsSync(path)) {
-      this.logger.log('using whitelist set in config;');
+      this.logger.log('using whitelist set in config;', ProxyListService.name);
       if (isDefined(this.configService.proxyDomains)) {
         this.#whitelist.length = 0;
         this.#whitelist.push(...this.configService.proxyDomains);
       }
       return;
     }
-    this.logger.log(`reading whitelist from ${path}`);
+    this.logger.log(`reading whitelist from ${path}`, ProxyListService.name);
     this.#whitelist = readFileWithoutComments(path);
     this.whitelistWatcher = this.watchFileChanges(path, this.#whitelist);
   }

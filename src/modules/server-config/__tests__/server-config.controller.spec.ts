@@ -8,6 +8,7 @@ import { ProxyConfigService, ProxyListService } from '../../proxy';
 import { ShareConfigType } from '../../share';
 import { ServerConfigController } from '../server-config.controller';
 import type { serverConfigResponse } from '../schema/safe-settings.schema';
+import { LoggerService } from '../../../infrastructure/logger';
 
 function path(obj: Record<string, unknown>, path: string) {
   try {
@@ -35,6 +36,12 @@ describe('ServerConfigController', () => {
         },
         ProxyListService,
         ProxyConfigService,
+        {
+          provide: LoggerService,
+          useValue: {
+            log: jest.fn(),
+          },
+        },
       ],
       controllers: [ServerConfigController],
     }).compile();

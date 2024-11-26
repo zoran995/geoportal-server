@@ -7,8 +7,8 @@ import {
 
 @Injectable({ scope: Scope.TRANSIENT })
 export class LoggerService extends ConsoleLogger implements NestLoggerService {
-  log(message: unknown) {
-    super.log(message);
+  log(message: unknown, context?: string) {
+    super.log(message, context);
   }
 
   error(message: unknown, trace?: string) {

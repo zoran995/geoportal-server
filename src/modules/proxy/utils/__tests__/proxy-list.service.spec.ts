@@ -7,222 +7,276 @@ import { ProxyConfigService } from '../../config/proxy-config.service';
 import { proxyConfig } from '../../config/schema/proxy-config.dto';
 import { DEFAULT_BLACKLIST } from '../../proxy.constants';
 import { ProxyListService } from '../proxy-list.service';
+import type { INestApplication } from '@nestjs/common';
+import { LoggerService } from 'src/infrastructure/logger';
 
 jest.mock('fs');
 
-vol.fromJSON({
-  './test/blacklist': 'blacklist',
-  './test/whitelist': 'whitelist',
-});
-
-const defaultProxyConfig = proxyConfig.parse({});
-const mockConfigGet = jest.fn();
-
-class ConfigServiceMock {
-  get = mockConfigGet;
-}
-
 describe('ProxyListService', () => {
-  let service: ProxyListService;
-  let proxyConfigService: ProxyConfigService;
+  let app: INestApplication;
+
+  const mockConfigGet = jest.fn();
 
   beforeEach(async () => {
+    vol.fromJSON({
+      './test/blacklist': 'blacklist',
+      './test/whitelist': 'whitelist',
+    });
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         {
           provide: ConfigService,
-          useClass: ConfigServiceMock,
+          useValue: {
+            get: mockConfigGet,
+          },
+        },
+        {
+          provide: LoggerService,
+          useValue: {
+            log: jest.fn(),
+          },
         },
         ProxyListService,
         ProxyConfigService,
       ],
     }).compile();
 
-    service = module.get<ProxyListService>(ProxyListService);
-    proxyConfigService = module.get<ProxyConfigService>(ProxyConfigService);
+    app = module.createNestApplication();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     jest.clearAllMocks();
-    service.onModuleDestroy();
+    await app.close();
   });
 
-  it('should be defined', () => {
+  it('should be defined', async () => {
+    await app.init();
+
+    const service = app.get(ProxyListService);
+
     expect(service).toBeDefined();
   });
 
-  it('proxyConfigService should be defined', () => {
-    expect(proxyConfigService).toBeDefined();
-  });
+  it('proxyConfigService should be defined', async () => {
+    await app.init();
 
-  it('should call file watcher on whitelist', () => {
-    const proxyConf = { ...defaultProxyConfig };
-    proxyConf.whitelistPath = './test/whitelist';
-    mockConfigGet.mockReturnValue(proxyConf);
-    const watchSpy = jest.spyOn(fs, 'watch');
-    service.onModuleInit();
-    expect(watchSpy).toHaveBeenCalledTimes(1);
-    expect(service.blacklist).toEqual(DEFAULT_BLACKLIST);
-    expect(service.whitelist).toEqual(['whitelist']);
-    service.onModuleDestroy();
-  });
+    const service = app.get(ProxyConfigService);
 
-  it('should resolve `allowProxyFor` on invalid path', () => {
-    const proxyConf = { ...defaultProxyConfig };
-    proxyConf.whitelistPath = './test/whitelist-bad';
-    proxyConf.allowProxyFor = ['allowProxyFor'];
-    mockConfigGet.mockReturnValue(proxyConf);
-    service.onModuleInit();
-    expect(service.whitelist).toEqual(['allowProxyFor']);
-    service.onModuleDestroy();
+    expect(service).toBeDefined();
   });
-
-  it('should resolve `allowProxyFor` when whitelistPath not defined', () => {
-    const proxyConf = { ...defaultProxyConfig };
-    proxyConf.allowProxyFor = ['allowProxyFor'];
-    mockConfigGet.mockReturnValue(proxyConf);
-    service.onModuleInit();
-    expect(service.whitelist).toEqual(['allowProxyFor']);
-    service.onModuleDestroy();
-  });
-
-  it('should call file watcher on blacklist', () => {
-    const proxyConf = { ...defaultProxyConfig };
-    proxyConf.blacklistPath = './test/blacklist';
-    mockConfigGet.mockReturnValue(proxyConf);
-    const watchSpy = jest.spyOn(fs, 'watch');
-    service.onModuleInit();
-    expect(watchSpy).toHaveBeenCalledTimes(1);
-    expect(service.blacklist).toEqual(['blacklist']);
-    expect(service.whitelist).toEqual([]);
-    service.onModuleDestroy();
-  });
-
-  it('should resolve default blacklist on invalid path and no blacklist in config', () => {
-    const proxyConf = { ...defaultProxyConfig };
-    proxyConf.blacklistPath = './test/blacklist-bad';
-    mockConfigGet.mockReturnValue(proxyConf);
-    service.onModuleInit();
-    expect(service.blacklist).toEqual(DEFAULT_BLACKLIST);
-    service.onModuleDestroy();
-  });
-
-  it('should resolve default blacklist when blacklistPath not defined and no blacklist in config', () => {
-    const proxyConf = { ...defaultProxyConfig };
-    mockConfigGet.mockReturnValue(proxyConf);
-    service.onModuleInit();
-    expect(service.blacklist).toEqual(DEFAULT_BLACKLIST);
-    service.onModuleDestroy();
-  });
-
-  it('should resolve `blacklistAddresses` on invalid path', () => {
-    const proxyConf = { ...defaultProxyConfig };
-    proxyConf.blacklistPath = './test/blacklist-bad';
-    proxyConf.blacklistedAddresses = ['blacklistedAddresses'];
-    mockConfigGet.mockReturnValue(proxyConf);
-    service.onModuleInit();
-    expect(service.blacklist).toEqual(['blacklistedAddresses']);
-    service.onModuleDestroy();
-  });
-
-  it('should resolve `blacklistAddresses` when blacklistPath not defined', () => {
-    const proxyConf = { ...defaultProxyConfig };
-    proxyConf.blacklistedAddresses = ['blacklistedAddresses'];
-    mockConfigGet.mockReturnValue(proxyConf);
-    service.onModuleInit();
-    expect(service.blacklist).toEqual(['blacklistedAddresses']);
-    service.onModuleDestroy();
-  });
-
-  describe('addressBlacklisted', () => {
-    it('should return true for blacklisted address', () => {
-      const proxyConf = { ...defaultProxyConfig };
-      proxyConf.blacklistedAddresses = ['192.163.0.1'];
+  describe('whitelist', () => {
+    it('should resolve `allowProxyFor` when whitelistPath not defined', async () => {
+      const proxyConf = proxyConfig.parse({
+        allowProxyFor: ['allowProxyFor', 'allowProxyFor2'],
+      });
       mockConfigGet.mockReturnValue(proxyConf);
-      service.onModuleInit();
-      const result = service.addressBlacklisted('192.163.0.1:8080');
-      expect(result).toBe(true);
-      service.onModuleDestroy();
+
+      await app.init();
+      const service = app.get(ProxyListService);
+
+      expect(service.whitelist).toEqual(['allowProxyFor', 'allowProxyFor2']);
     });
 
-    it('should return false for non blacklisted address', () => {
-      const proxyConf = { ...defaultProxyConfig };
-      proxyConf.blacklistedAddresses = ['192.163.0.1'];
+    it('should return from whiteListPath', async () => {
+      const proxyConf = proxyConfig.parse({
+        whitelistPath: './test/whitelist',
+      });
       mockConfigGet.mockReturnValue(proxyConf);
-      service.onModuleInit();
-      const result = service.addressBlacklisted('192.163.0.2');
-      expect(result).toBe(false);
-      service.onModuleDestroy();
+
+      await app.init();
+      const service = app.get(ProxyListService);
+
+      expect(service.whitelist).toEqual(['whitelist']);
     });
 
-    it('should not use port when checking blacklisted address', () => {
-      const proxyConf = { ...defaultProxyConfig };
-      proxyConf.blacklistedAddresses = ['192.163.0.1'];
+    it('should resolve `allowProxyFor` on invalid path', async () => {
+      const proxyConf = proxyConfig.parse({
+        whitelistPath: './test/whitelist-bad',
+        allowProxyFor: ['allowProxyFor'],
+      });
       mockConfigGet.mockReturnValue(proxyConf);
-      service.onModuleInit();
-      const result = service.addressBlacklisted('192.163.0.1:8080');
-      expect(result).toBe(true);
-      service.onModuleDestroy();
-    });
-  });
 
-  describe('file changes', () => {
+      await app.init();
+      const service = app.get(ProxyListService);
+
+      expect(service.whitelist).toEqual(['allowProxyFor']);
+    });
+
     it('should listen to file changes in whitelist', async () => {
-      const proxyConf = { ...defaultProxyConfig };
-      proxyConf.whitelistPath = './test/whitelist';
-      proxyConf.blacklistPath = './test/blacklist';
+      const proxyConf = proxyConfig.parse({
+        whitelistPath: './test/whitelist',
+        blacklistPath: './test/blacklist',
+      });
       mockConfigGet.mockReturnValue(proxyConf);
-      const watchSpy = jest.spyOn(fs, 'watch');
-      replaceInFile(proxyConf.whitelistPath, 'whitelist');
-      replaceInFile(proxyConf.blacklistPath, 'blacklist');
-      service.onModuleInit();
-      expect(watchSpy).toHaveBeenCalledTimes(2);
+
+      await app.init();
+      const service = app.get(ProxyListService);
+
       expect(service.whitelist).toEqual(['whitelist']);
       expect(service.blacklist).toEqual(['blacklist']);
 
-      replaceInFile(proxyConf.whitelistPath, 'test replace');
+      replaceInFile('./test/whitelist', 'test replace');
       await new Promise((r) => setTimeout(r, 2000));
       expect(service.whitelist).toEqual(['test replace']);
       expect(service.blacklist).toEqual(['blacklist']);
-      service.onModuleDestroy();
-    });
-
-    it('should listen to file changes in blacklist', async () => {
-      const proxyConf = { ...defaultProxyConfig };
-      proxyConf.whitelistPath = './test/whitelist';
-      proxyConf.blacklistPath = './test/blacklist';
-      mockConfigGet.mockReturnValue(proxyConf);
-      const watchSpy = jest.spyOn(fs, 'watch');
-      replaceInFile(proxyConf.whitelistPath, 'whitelist');
-      replaceInFile(proxyConf.blacklistPath, 'blacklist');
-      service.onModuleInit();
-      expect(watchSpy).toHaveBeenCalledTimes(2);
-      expect(service.whitelist).toEqual(['whitelist']);
-      expect(service.blacklist).toEqual(['blacklist']);
-
-      replaceInFile(proxyConf.blacklistPath, 'test replace');
-      await new Promise((r) => setTimeout(r, 2000));
-      expect(service.whitelist).toEqual(['whitelist']);
-      expect(service.blacklist).toEqual(['test replace']);
-      service.onModuleDestroy();
     });
 
     it('should reinit on file delete', async () => {
-      const proxyConf = { ...defaultProxyConfig };
-      proxyConf.whitelistPath = './test/whitelist';
-      proxyConf.allowProxyFor = ['allowProxyFor'];
+      const proxyConf = proxyConfig.parse({
+        whitelistPath: './test/whitelist',
+        allowProxyFor: ['allowProxyFor'],
+      });
       mockConfigGet.mockReturnValue(proxyConf);
-      const watchSpy = jest.spyOn(fs, 'watch');
-      replaceInFile(proxyConf.whitelistPath, 'whitelist');
-      service.onModuleInit();
-      expect(watchSpy).toHaveBeenCalledTimes(1);
+
+      await app.init();
+      const service = app.get(ProxyListService);
+
       expect(service.whitelist).toEqual(['whitelist']);
 
-      deleteFile(proxyConf.whitelistPath);
-      //expect(watchSpy).toHaveBeenCalledTimes(1);
-      await new Promise((r) => setTimeout(r, 3000));
+      deleteFile('./test/whitelist');
+      await new Promise((r) => setTimeout(r, 2000));
+
       expect(service.whitelist).toEqual(['allowProxyFor']);
-      service.onModuleDestroy();
+    });
+  });
+
+  describe('blacklist', () => {
+    it('should resolve `blacklistAddresses` when blacklistPath not defined', async () => {
+      const proxyConf = proxyConfig.parse({
+        blacklistedAddresses: ['blacklistedAddresses'],
+      });
+      mockConfigGet.mockReturnValue(proxyConf);
+
+      await app.init();
+      const service = app.get(ProxyListService);
+
+      expect(service.blacklist).toEqual(['blacklistedAddresses']);
+    });
+
+    it('should resolve default blacklist when blacklistPath not defined and no blacklist in config', async () => {
+      const proxyConf = proxyConfig.parse({});
+      mockConfigGet.mockReturnValue(proxyConf);
+
+      await app.init();
+      const service = app.get(ProxyListService);
+
+      expect(service.blacklist).toEqual(DEFAULT_BLACKLIST);
+    });
+
+    it('should resolve `blacklistAddresses` on invalid path', async () => {
+      const proxyConf = proxyConfig.parse({
+        blacklistPath: './test/blacklist-bad',
+        blacklistedAddresses: ['blacklistedAddresses'],
+      });
+      mockConfigGet.mockReturnValue(proxyConf);
+
+      await app.init();
+      const service = app.get(ProxyListService);
+
+      expect(service.blacklist).toEqual(['blacklistedAddresses']);
+    });
+
+    it('should resolve default blacklist on invalid path and no blacklist in config', async () => {
+      const proxyConf = proxyConfig.parse({
+        blacklistPath: './test/blacklist-bad',
+      });
+      proxyConf.blacklistPath = './test/blacklist-bad';
+      mockConfigGet.mockReturnValue(proxyConf);
+
+      await app.init();
+      const service = app.get(ProxyListService);
+
+      expect(service.blacklist).toEqual(DEFAULT_BLACKLIST);
+    });
+
+    it('should listen to file changes in blacklist', async () => {
+      const proxyConf = proxyConfig.parse({
+        whitelistPath: './test/whitelist',
+        blacklistPath: './test/blacklist',
+      });
+      mockConfigGet.mockReturnValue(proxyConf);
+
+      await app.init();
+      const service = app.get(ProxyListService);
+
+      expect(service.whitelist).toEqual(['whitelist']);
+      expect(service.blacklist).toEqual(['blacklist']);
+
+      replaceInFile('./test/blacklist', 'test replace');
+      await new Promise((r) => setTimeout(r, 2000));
+
+      expect(service.whitelist).toEqual(['whitelist']);
+      expect(service.blacklist).toEqual(['test replace']);
+    });
+
+    it('should reinit on file delete', async () => {
+      const proxyConf = proxyConfig.parse({
+        blacklistPath: './test/blacklist',
+        blacklistedAddresses: ['blacklistedAddresses'],
+      });
+      mockConfigGet.mockReturnValue(proxyConf);
+
+      await app.init();
+      const service = app.get(ProxyListService);
+
+      expect(service.blacklist).toEqual(['blacklist']);
+
+      deleteFile('./test/blacklist');
+      await new Promise((r) => setTimeout(r, 2000));
+
+      expect(service.blacklist).toEqual(['blacklistedAddresses']);
+    });
+
+    it('should reinit to default list on file delete when no blacklisted address', async () => {
+      const proxyConf = proxyConfig.parse({
+        blacklistPath: './test/blacklist',
+      });
+      mockConfigGet.mockReturnValue(proxyConf);
+
+      await app.init();
+      const service = app.get(ProxyListService);
+
+      expect(service.blacklist).toEqual(['blacklist']);
+
+      deleteFile('./test/blacklist');
+      await new Promise((r) => setTimeout(r, 2000));
+
+      expect(service.blacklist).toEqual(DEFAULT_BLACKLIST);
+    });
+  });
+
+  describe('addressBlacklisted', () => {
+    beforeEach(async () => {
+      const proxyConf = proxyConfig.parse({
+        blacklistedAddresses: ['192.163.0.1'],
+      });
+      mockConfigGet.mockReturnValue(proxyConf);
+
+      await app.init();
+    });
+    it('should return true for blacklisted address', () => {
+      const service = app.get(ProxyListService);
+
+      const result = service.addressBlacklisted('192.163.0.1:8080');
+
+      expect(result).toBe(true);
+    });
+
+    it('should return false for non blacklisted address', () => {
+      const service = app.get(ProxyListService);
+
+      const result = service.addressBlacklisted('192.163.0.2');
+
+      expect(result).toBe(false);
+    });
+
+    it('should not use port when checking blacklisted address', () => {
+      const service = app.get(ProxyListService);
+
+      const result = service.addressBlacklisted('192.163.0.1:8080');
+
+      expect(result).toBe(true);
     });
   });
 });
