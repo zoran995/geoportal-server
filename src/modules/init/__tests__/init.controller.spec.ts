@@ -65,7 +65,7 @@ describe('InitController', () => {
     }
   });
 
-  it.only('should return file', () => {
+  it('should return file', () => {
     controller.serveInitFile({ fileName: 'init.json' }, responseMock);
     expect(responseMock.sendFile).toHaveBeenCalledTimes(1);
     expect(responseMock.sendFile).toHaveBeenCalledWith(
