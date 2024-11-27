@@ -5,6 +5,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import compression from 'compression';
+import type { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
 import { patchNestJsSwagger } from 'nestjs-zod';
 
@@ -16,6 +17,7 @@ import {
 } from './common/filters';
 import { WWWROOT_TOKEN } from './common/utils';
 import { LoggerService } from './infrastructure/logger';
+import { BasicAuthGuard } from './modules/auth/basic-auth.guard';
 import { ConfigurationType } from './modules/config';
 
 /**
@@ -78,6 +80,16 @@ async function bootstrap() {
     new InternalServerErrorExceptionFilter(wwwroot),
     new NotFoundExceptionFilter(configService, wwwroot),
   );
+
+  const authGuard = app.get(BasicAuthGuard);
+  app.useGlobalGuards(authGuard);
+
+  // nestjs won't call the guard for the express static so we have to define global middleware to validate request
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    if (authGuard.validateRequest(req, res)) {
+      next();
+    }
+  });
 
   const openApiConfig = new DocumentBuilder()
     .setTitle('Geoportal server')
