@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-import { rateLimit } from './rate-limit.schema';
-
 export const basicAuthentication = z.object({
   username: z
     .string()
@@ -11,12 +9,4 @@ export const basicAuthentication = z.object({
     .string()
     .min(1)
     .describe('Password of the user that is used for login.'),
-  /**
-   * Rate limits basic authentication requests. Note that this uses simple
-   * in-memory storage of requests, which means that the actual allowed rate
-   * will be higher when multiple terriajs-server processes. The first two wait
-   * times after `freeRetries` are `minWait`. Successive wait times are the sum
-   * of the two previous wait times, up to `maxWait`.
-   */
-  rateLimit: rateLimit,
 });

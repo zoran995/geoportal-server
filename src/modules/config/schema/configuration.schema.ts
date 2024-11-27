@@ -11,6 +11,7 @@ import { shareConfig } from '../../share/config/schema/share.config.schema';
 
 import { basicAuthentication } from './basic-authentication.schema';
 import { contentSecurityPolicy } from './ContentSecurityPolicy.schema';
+import { rateLimit } from './rate-limit.schema';
 
 export const configuration = z.object({
   compressResponse: z.boolean().default(true).describe(`
@@ -20,7 +21,24 @@ export const configuration = z.object({
     a reverse proxy (e.g., Nginx). In that case, you should not use compression
     middleware.`),
 
-  basicAuthentication: z.optional(basicAuthentication),
+  basicAuthentication: basicAuthentication
+    .optional()
+    .describe(
+      'Configuration for basic authentication. If not defined basic authentication will be disabled.',
+    ),
+
+  /**
+   * Rate limits basic authentication requests. Note that this uses simple
+   * in-memory storage of requests, which means that the actual allowed rate
+   * will be higher when multiple terriajs-server processes. The first two wait
+   * times after `freeRetries` are `minWait`. Successive wait times are the sum
+   * of the two previous wait times, up to `maxWait`.
+   */
+  rateLimit: rateLimit
+    .optional()
+    .describe(
+      'Rate limits basic authentication requests. Note that this uses simple in-memory storage of requests, which means that the actual allowed rate will be higher when multiple terriajs-server processes. The first two wait times after `freeRetries` are `minWait`. Successive wait times are the sum of the two previous wait times, up to `maxWait`.',
+    ),
 
   port: portSchema.default(3001).describe(`
     Port to listen on. Overridden by the --port command line setting.`),
