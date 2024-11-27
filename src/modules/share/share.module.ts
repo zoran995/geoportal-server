@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 
 import { POST_SIZE_LIMIT } from 'src/common/interceptor';
 
-import type { ConfigurationType } from '../config';
 import { ShareConfigService } from './config/share-config.service';
 import { ShareServiceManager } from './share-service-manager.service';
 import { ShareController } from './share.controller';
@@ -27,11 +25,12 @@ import { ShareService } from './share.service';
 export class ShareModule {
   constructor(
     private readonly shareServiceManager: ShareServiceManager,
-    private readonly configService: ConfigService<ConfigurationType, true>,
+    private readonly configService: ShareConfigService,
   ) {}
+
   async onModuleInit() {
     await this.shareServiceManager.initializeProviders(
-      this.configService.get('share.availablePrefixes', { infer: true }),
+      this.configService.availablePrefixes || [],
     );
   }
 }

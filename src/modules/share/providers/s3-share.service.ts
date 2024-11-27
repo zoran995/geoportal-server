@@ -51,13 +51,14 @@ export class S3ShareService extends AbstractShareService<ShareS3Config> {
   ) {
     super(config, logger);
     this.awsS3Service = new AwsS3Service({
-      credentials: config.credentials,
+      credentials: config.credentials ? { ...config.credentials } : undefined,
+      endpoint: config.endpoint,
       region: config.region,
+      forcePathStyle: config.forcePathStyle,
       requestHandler: new NodeHttpHandler({
         httpsAgent: new https.Agent(agentConfig),
         httpAgent: new http.Agent(agentConfig),
       }),
-      logger: logger,
     });
   }
 

@@ -10,7 +10,6 @@ import {
   GetObjectCommandInput,
   PutObjectCommand,
   PutObjectCommandInput,
-  PutObjectOutput,
   S3Client,
   S3ClientConfig,
 } from '@aws-sdk/client-s3';
@@ -35,38 +34,35 @@ export class AwsS3Service {
   }
 
   async save(params: PutObjectCommandInput) {
-    const putObjectCommand = new PutObjectCommand(params);
-    return this._s3
-      .send(putObjectCommand)
-      .then((info: PutObjectOutput) => {
-        this.logger.verbose(`Saved key in S3`);
-        return info;
-      })
-      .catch((err) => {
-        this.logger.error(
-          'An error occured while saving to S3',
-          JSON.stringify(err),
-        );
-        throw err;
-      });
+    try {
+      const putObjectCommand = new PutObjectCommand(params);
+      const info = await this._s3.send(putObjectCommand);
+
+      this.logger.verbose(`Saved key in S3`);
+      return info;
+    } catch (err) {
+      this.logger.error(
+        'An error occured while saving to S3',
+        JSON.stringify(err),
+      );
+      throw err;
+    }
   }
 
   async resolveObject(params: GetObjectCommandInput) {
     const getObjectCommand = new GetObjectCommand(params);
-    return this._s3
-      .send(getObjectCommand)
-      .then(({ Body: body }) => {
-        if (body instanceof Readable) {
-          return streamToString(body);
-        }
-        throw new InternalServerErrorException();
-      })
-      .catch((err) => {
-        this.logger.error(
-          'An error occured while resolving from S3',
-          JSON.stringify(err),
-        );
-        throw err;
-      });
+    try {
+      const { Body: body } = await this._s3.send(getObjectCommand);
+      if (body instanceof Readable) {
+        return streamToString(body);
+      }
+      throw new InternalServerErrorException();
+    } catch (err) {
+      this.logger.error(
+        'An error occured while resolving from S3',
+        JSON.stringify(err),
+      );
+      throw err;
+    }
   }
 }

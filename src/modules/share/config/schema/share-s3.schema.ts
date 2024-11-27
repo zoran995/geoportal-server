@@ -4,6 +4,7 @@ import { share } from './share.schema';
 
 export const shareS3 = share.extend({
   service: z.literal('s3'),
+  endpoint: z.string().optional().describe('The endpoint of the S3 service'),
   region: z.string().min(1).describe('The AWS region'),
   bucket: z
     .string()
@@ -31,6 +32,12 @@ export const shareS3 = share.extend({
     .describe(
       `The length of the random share key to generate (not including prefix), up to 54 characters. Defaults to the full length.`,
     ),
+
+  forcePathStyle: z
+    .boolean()
+    .default(false)
+    .optional()
+    .describe('Force path style URLs for S3 requests'),
 });
 
 export type ShareS3Config = z.infer<typeof shareS3>;
