@@ -6,12 +6,12 @@ import { portSchema } from 'src/common/validators';
 
 import { rateLimit } from 'src/infrastructure/rate-limiter';
 
+import { basicAuthentication } from '../../basic-auth';
 import { feedbackConfig } from '../../feedback/config/schema/feedback.config.schema';
 import { proxyConfig } from '../../proxy';
 import { serveStatic } from '../../serve-static';
 import { shareConfig } from '../../share/config/schema/share.config.schema';
 
-import { basicAuthentication } from './basic-authentication.schema';
 import { contentSecurityPolicy } from './ContentSecurityPolicy.schema';
 
 export const configuration = z.object({

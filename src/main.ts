@@ -18,7 +18,7 @@ import {
 import { WWWROOT_TOKEN } from './common/utils';
 import { LoggerService } from './infrastructure/logger';
 import { RateLimiterService } from './infrastructure/rate-limiter';
-import { BasicAuthGuard } from './modules/auth/basic-auth.guard';
+import { BasicAuthGuard } from './modules/basic-auth';
 import { ConfigurationType } from './modules/config';
 
 /**

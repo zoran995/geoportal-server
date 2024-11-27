@@ -1,12 +1,15 @@
 import {
+  Inject,
   Injectable,
+  Optional,
   UnauthorizedException,
   type CanActivate,
   type ExecutionContext,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import type { IConfigurationType } from '../config';
 import type { Request, Response } from 'express';
+
+import type { BasicAuthenticationOptions } from './config/basic-authentication.schema';
+import { BASIC_AUTH_OPTIONS } from './contants';
 
 const CREDENTIALS_REGEXP =
   /^ *(?:[Bb][Aa][Ss][Ii][Cc]) +([A-Za-z0-9._~+/-]+=*) *$/;
@@ -15,7 +18,9 @@ const USER_PASS_REGEXP = /^([^:]*):(.*)$/;
 @Injectable()
 export class BasicAuthGuard implements CanActivate {
   constructor(
-    private readonly configService: ConfigService<IConfigurationType, true>,
+    @Optional()
+    @Inject(BASIC_AUTH_OPTIONS)
+    private readonly options: BasicAuthenticationOptions,
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
@@ -26,11 +31,10 @@ export class BasicAuthGuard implements CanActivate {
   }
 
   validateRequest(request: Request, response: Response) {
-    const basicAuthentication = this.configService.get('basicAuthentication');
-
-    if (!basicAuthentication) {
+    if (!this.options) {
       return true;
     }
+
     try {
       const authorization = request.headers.authorization;
       if (!authorization || typeof authorization !== 'string') {
@@ -44,8 +48,8 @@ export class BasicAuthGuard implements CanActivate {
       }
 
       if (
-        user.username !== basicAuthentication.username ||
-        user.password !== basicAuthentication.password
+        user.username !== this.options.username ||
+        user.password !== this.options.password
       ) {
         throw new Error('Invalid username or password');
       }
