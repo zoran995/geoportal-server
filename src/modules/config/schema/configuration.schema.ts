@@ -4,6 +4,8 @@ import { createZodDto } from 'nestjs-zod';
 
 import { portSchema } from 'src/common/validators';
 
+import { rateLimit } from 'src/infrastructure/rate-limiter';
+
 import { feedbackConfig } from '../../feedback/config/schema/feedback.config.schema';
 import { proxyConfig } from '../../proxy';
 import { serveStatic } from '../../serve-static';
@@ -11,7 +13,6 @@ import { shareConfig } from '../../share/config/schema/share.config.schema';
 
 import { basicAuthentication } from './basic-authentication.schema';
 import { contentSecurityPolicy } from './ContentSecurityPolicy.schema';
-import { rateLimit } from './rate-limit.schema';
 
 export const configuration = z.object({
   compressResponse: z.boolean().default(true).describe(`
@@ -36,6 +37,7 @@ export const configuration = z.object({
    */
   rateLimit: rateLimit
     .optional()
+    .default(rateLimit.parse({}))
     .describe(
       'Rate limits basic authentication requests. Note that this uses simple in-memory storage of requests, which means that the actual allowed rate will be higher when multiple terriajs-server processes. The first two wait times after `freeRetries` are `minWait`. Successive wait times are the sum of the two previous wait times, up to `maxWait`.',
     ),

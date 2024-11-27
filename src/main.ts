@@ -17,6 +17,7 @@ import {
 } from './common/filters';
 import { WWWROOT_TOKEN } from './common/utils';
 import { LoggerService } from './infrastructure/logger';
+import { RateLimiterService } from './infrastructure/rate-limiter';
 import { BasicAuthGuard } from './modules/auth/basic-auth.guard';
 import { ConfigurationType } from './modules/config';
 
@@ -81,9 +82,11 @@ async function bootstrap() {
     new NotFoundExceptionFilter(configService, wwwroot),
   );
 
+  const rateLimiter = app.get(RateLimiterService);
+  app.use(rateLimiter.middleware.bind(rateLimiter));
+
   const authGuard = app.get(BasicAuthGuard);
   app.useGlobalGuards(authGuard);
-
   // nestjs won't call the guard for the express static so we have to define global middleware to validate request
   app.use((req: Request, res: Response, next: NextFunction) => {
     if (authGuard.validateRequest(req, res)) {
