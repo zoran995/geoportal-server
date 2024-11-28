@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { createZodDto } from 'nestjs-zod';
 
 import { portSchema } from 'src/common/validators';
-import { serveStatic } from 'src/common/schema';
+import { httpsSchema, serveStatic } from 'src/common/schema';
 
 import { rateLimit } from 'src/infrastructure/rate-limiter';
 
@@ -85,6 +85,8 @@ export const configuration = z.object({
     .default(contentSecurityPolicy.parse({})),
 
   wwwroot: z.string().default('./wwwroot'),
+
+  https: httpsSchema.optional().describe(''),
 });
 
 export type ConfigurationType = z.infer<typeof configuration>;

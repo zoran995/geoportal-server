@@ -27,6 +27,8 @@ import { AppServeStaticModule } from './modules/serve-static';
 import { ServerConfigModule } from './modules/server-config';
 import { ShareModule } from './modules/share';
 import { ProxyWrapperModule } from './modules/proxy-wrapper.module';
+import { ShutdownObserver } from './infrastructure/http/shutdown-observer';
+import { HTTPS_OPTIONS } from './common/utils/https-options.token';
 
 @Module({
   imports: [
@@ -81,6 +83,15 @@ import { ProxyWrapperModule } from './modules/proxy-wrapper.module';
     ServerConfigModule,
   ],
   providers: [
+    ShutdownObserver,
+    {
+      provide: HTTPS_OPTIONS,
+      useFactory: (configService: ConfigService<ConfigurationType, true>) => {
+        const httpsOptions = configService.get('https', { infer: true });
+        return httpsOptions;
+      },
+      inject: [ConfigService],
+    },
     {
       provide: APP_PIPE,
       useClass: ZodValidationPipe,
