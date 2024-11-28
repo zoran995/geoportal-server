@@ -13,6 +13,7 @@ import { LoggerModule, LoggerService } from 'src/infrastructure/logger';
 import { AppConfigModule } from 'src/modules/config';
 
 import { FeedbackService } from '../common/feedback-service';
+import { feedbackConfig } from '../config/schema/feedback.config.schema';
 import { FeedbackModule } from '../feedback.module';
 import { DefaultFeedbackService } from '../providers/default-feedback.service';
 import { GithubFeedbackService } from '../providers/github-feedback.service';
@@ -40,6 +41,13 @@ describe('FeedbackModule', () => {
     let app: INestApplication;
 
     beforeAll(async () => {
+      moduleFixture.overrideModule(FeedbackModule).useModule(
+        FeedbackModule.forRoot({
+          useFactory: () => {
+            return feedbackConfig.parse({});
+          },
+        }),
+      );
       app = (await moduleFixture.compile()).createNestApplication();
     });
 
@@ -55,21 +63,23 @@ describe('FeedbackModule', () => {
     let app: INestApplication;
 
     beforeAll(async () => {
-      vol.fromJSON({
-        './serverconfig.json': JSON.stringify({
-          feedback: {
-            primaryId: 'g1',
-            options: [
-              {
-                id: 'g1',
-                service: 'github',
-                issuesUrl: 'https://test.com/api/issues/url',
-                accessToken: 'test',
-              },
-            ],
+      moduleFixture.overrideModule(FeedbackModule).useModule(
+        FeedbackModule.forRoot({
+          useFactory: () => {
+            return feedbackConfig.parse({
+              primaryId: 'g1',
+              options: [
+                {
+                  id: 'g1',
+                  service: 'github',
+                  issuesUrl: 'https://test.com/api/issues/url',
+                  accessToken: 'test',
+                },
+              ],
+            });
           },
         }),
-      });
+      );
 
       app = (await moduleFixture.compile()).createNestApplication();
 
@@ -175,29 +185,36 @@ describe('FeedbackModule', () => {
 
       server.close();
     });
+
+    afterAll(async () => {
+      vol.reset();
+      await app.close();
+    });
   });
 
   describe('with mail config', () => {
     let app: INestApplication;
 
     beforeAll(async () => {
-      vol.fromJSON({
-        './serverconfig.json': JSON.stringify({
-          feedback: {
-            primaryId: 'm1',
-            options: [
-              {
-                id: 'm1',
-                service: 'mail',
-                email: 'test@example.com',
-                smtpPort: 22,
-                smtpHost: 'mail.example.com',
-                secure: false,
-              },
-            ],
+      moduleFixture.overrideModule(FeedbackModule).useModule(
+        FeedbackModule.forRoot({
+          useFactory: () => {
+            return feedbackConfig.parse({
+              primaryId: 'm1',
+              options: [
+                {
+                  id: 'm1',
+                  service: 'mail',
+                  email: 'test@example.com',
+                  smtpPort: 22,
+                  smtpHost: 'mail.example.com',
+                  secure: false,
+                },
+              ],
+            });
           },
         }),
-      });
+      );
 
       app = (await moduleFixture.compile()).createNestApplication();
     });
@@ -208,29 +225,36 @@ describe('FeedbackModule', () => {
       expect(service).toBeDefined();
       expect(service).toBeInstanceOf(MailFeedbackService);
     });
+
+    afterAll(async () => {
+      vol.reset();
+      await app.close();
+    });
   });
 
   describe('with redmine config', () => {
     let app: INestApplication;
 
     beforeAll(async () => {
-      vol.fromJSON({
-        './serverconfig.json': JSON.stringify({
-          feedback: {
-            primaryId: 'r1',
-            options: [
-              {
-                id: 'r1',
-                service: 'redmine',
-                issuesUrl: 'https://test.com',
-                username: 'test',
-                password: 'password',
-                project_id: 1,
-              },
-            ],
+      moduleFixture.overrideModule(FeedbackModule).useModule(
+        FeedbackModule.forRoot({
+          useFactory: () => {
+            return feedbackConfig.parse({
+              primaryId: 'r1',
+              options: [
+                {
+                  id: 'r1',
+                  service: 'redmine',
+                  issuesUrl: 'https://test.com',
+                  username: 'test',
+                  password: 'password',
+                  project_id: 1,
+                },
+              ],
+            });
           },
         }),
-      });
+      );
 
       app = (await moduleFixture.compile()).createNestApplication();
     });
@@ -240,6 +264,11 @@ describe('FeedbackModule', () => {
 
       expect(service).toBeDefined();
       expect(service).toBeInstanceOf(RedmineFeedbackService);
+    });
+
+    afterAll(async () => {
+      vol.reset();
+      await app.close();
     });
   });
 });

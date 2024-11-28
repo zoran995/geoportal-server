@@ -1,26 +1,25 @@
 import { HttpService } from '@nestjs/axios';
 import type { FactoryProvider } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 
 import { LoggerService } from 'src/infrastructure/logger';
 
-import type { ConfigurationType } from '../config';
 import { FeedbackService } from './common/feedback-service';
+import { FEEDBACK_CONFIG } from './feedback.constants';
 import { DefaultFeedbackService } from './providers/default-feedback.service';
 import { GithubFeedbackService } from './providers/github-feedback.service';
 import { MailFeedbackService } from './providers/mail-feedback.service';
 import { RedmineFeedbackService } from './providers/redmine-feedback.service';
+import type { FeedbackConfigType } from './config/schema/feedback.config.schema';
 
 export const feedbackServiceFactory: FactoryProvider = {
   provide: FeedbackService,
   useFactory: (
-    configService: ConfigService<ConfigurationType, true>,
+    feedbackConfig: FeedbackConfigType,
     httpService: HttpService,
     logger: LoggerService,
   ) => {
-    const feedbackConfigs = configService.get('feedback', { infer: true });
-    const primaryId = feedbackConfigs?.primaryId;
-    const config = feedbackConfigs.options?.find(
+    const primaryId = feedbackConfig?.primaryId;
+    const config = feedbackConfig.options?.find(
       (option) => option.id === primaryId,
     );
 
@@ -35,5 +34,5 @@ export const feedbackServiceFactory: FactoryProvider = {
         return new DefaultFeedbackService();
     }
   },
-  inject: [ConfigService, HttpService, LoggerService],
+  inject: [FEEDBACK_CONFIG, HttpService, LoggerService],
 };

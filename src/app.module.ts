@@ -32,18 +32,23 @@ import { ShareModule } from './modules/share';
     RateLimiterModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService<ConfigurationType, true>) => {
-        return configService.get('rateLimit');
+        return configService.get('rateLimit', { infer: true });
       },
     }),
     BasicAuthModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService<ConfigurationType, true>) => {
-        return configService.get('basicAuthentication');
+        return configService.get('basicAuthentication', { infer: true });
       },
     }),
     InitModule,
     ShareModule,
-    FeedbackModule,
+    FeedbackModule.forRoot({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService<ConfigurationType, true>) => {
+        return configService.get('feedback', { infer: true });
+      },
+    }),
     ProxyModule,
     AppServeStaticModule,
     PingModule,
