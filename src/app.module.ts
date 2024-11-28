@@ -23,10 +23,10 @@ import { FeedbackModule } from './modules/feedback';
 import { InitModule } from './modules/init';
 import { PingModule } from './modules/ping';
 import { Proj4Module } from './modules/proj4';
-import { ProxyModule } from './modules/proxy';
 import { AppServeStaticModule } from './modules/serve-static';
 import { ServerConfigModule } from './modules/server-config';
 import { ShareModule } from './modules/share';
+import { ProxyWrapperModule } from './modules/proxy-wrapper.module';
 
 @Module({
   imports: [
@@ -69,7 +69,7 @@ import { ShareModule } from './modules/share';
         return configService.get('feedback', { infer: true });
       },
     }),
-    ProxyModule,
+    ProxyWrapperModule,
     AppServeStaticModule,
     PingModule,
     Proj4Module,

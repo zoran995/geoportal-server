@@ -1,3 +1,4 @@
+export const PROXY_OPTIONS = Symbol('PROXY_OPTIONS');
 export const DURATION_REGEX = /^(\d+|\d+\.\d+)(ms|s|m|h|d|w|y)$/;
 export const PROTOCOL_REGEX = /^\w+:\//;
 export const DO_NOT_PROXY_REGEX =

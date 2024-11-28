@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 
-import { ProxyModule } from '../proxy';
+import { ProxyWrapperModule } from '../proxy-wrapper.module';
 import { ServerConfigController } from './server-config.controller';
 
 @Module({
-  imports: [ProxyModule],
+  imports: [ProxyWrapperModule],
   controllers: [ServerConfigController],
 })
 export class ServerConfigModule {}

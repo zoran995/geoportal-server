@@ -1,12 +1,17 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 
 import * as fs from 'fs';
 import { inRange } from 'range_check';
 
 import { isDefined } from 'src/common/helpers';
 import { LoggerService } from 'src/infrastructure/logger';
-
-import { ProxyConfigService } from '../config/proxy-config.service';
+import { PROXY_OPTIONS } from '../proxy.constants';
+import type { ProxyConfigType } from '../config/schema/proxy-config.dto';
 
 @Injectable()
 export class ProxyListService implements OnModuleInit, OnModuleDestroy {
@@ -16,7 +21,7 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
   private blacklistWatcher: fs.FSWatcher | undefined;
 
   constructor(
-    private readonly configService: ProxyConfigService,
+    @Inject(PROXY_OPTIONS) private readonly proxyOptions: ProxyConfigType,
     private readonly logger: LoggerService,
   ) {}
 
@@ -61,12 +66,12 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
   }
 
   private setBlacklist() {
-    const path = this.configService.blacklistPath;
+    const path = this.proxyOptions.blacklistPath;
     if (!path || !fs.existsSync(path)) {
       this.logger.log('using blacklist set in config;', ProxyListService.name);
-      if (isDefined(this.configService.blacklist)) {
+      if (isDefined(this.proxyOptions.blacklistedAddresses)) {
         this.#blacklist.length = 0;
-        this.#blacklist.push(...this.configService.blacklist);
+        this.#blacklist.push(...this.proxyOptions.blacklistedAddresses);
       }
       return;
     }
@@ -76,12 +81,12 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
   }
 
   private setWhitelist() {
-    const path = this.configService.whitelistPath;
+    const path = this.proxyOptions.whitelistPath;
     if (!path || !fs.existsSync(path)) {
       this.logger.log('using whitelist set in config;', ProxyListService.name);
-      if (isDefined(this.configService.proxyDomains)) {
+      if (isDefined(this.proxyOptions.allowProxyFor)) {
         this.#whitelist.length = 0;
-        this.#whitelist.push(...this.configService.proxyDomains);
+        this.#whitelist.push(...this.proxyOptions.allowProxyFor);
       }
       return;
     }

@@ -84,6 +84,7 @@ export const proxyConfig = z.object({
   proxyAuth: z
     .record(z.string(), proxyAuthConfig)
     .optional()
+    .default({})
     .describe('A map of proxy authentication configurations.'),
 });
 

@@ -4,11 +4,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { configuration } from '../../config';
 
-import { ProxyConfigService, ProxyListService } from '../../proxy';
+import { ProxyListService } from '../../proxy';
 import { ShareConfigType } from '../../share';
 import { ServerConfigController } from '../server-config.controller';
 import type { serverConfigResponse } from '../schema/safe-settings.schema';
 import { LoggerService } from '../../../infrastructure/logger';
+import { PROXY_OPTIONS } from 'src/modules/proxy/proxy.constants';
 
 function path(obj: Record<string, unknown>, path: string) {
   try {
@@ -34,8 +35,11 @@ describe('ServerConfigController', () => {
             get: mockConfigGet,
           },
         },
+        {
+          provide: PROXY_OPTIONS,
+          useValue: {},
+        },
         ProxyListService,
-        ProxyConfigService,
         {
           provide: LoggerService,
           useValue: {

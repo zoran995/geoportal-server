@@ -21,14 +21,18 @@ import { URL } from 'url';
 import { isDefined } from 'src/common/helpers';
 import { LoggerService } from 'src/infrastructure/logger';
 
-import { ProxyConfigService } from './config/proxy-config.service';
 import { AppendParamToQueryStringDto } from './config/schema/proxy-config.dto';
-import { DEFAULT_MAX_AGE_SECONDS, PROTOCOL_REGEX } from './proxy.constants';
+import {
+  DEFAULT_MAX_AGE_SECONDS,
+  PROTOCOL_REGEX,
+  PROXY_OPTIONS,
+} from './proxy.constants';
 import { filterHeaders } from './utils/filterHeaders';
 import { processDuration } from './utils/processDuration';
 import { processHeaders } from './utils/processHeaders';
 import { ProxyListService } from './utils/proxy-list.service';
 import { urlValidator } from './utils/urlValidator';
+import type { ProxyOptions } from './proxy-options';
 
 @Injectable({ scope: Scope.REQUEST })
 export class ProxyService {
@@ -36,7 +40,7 @@ export class ProxyService {
 
   constructor(
     @Inject(REQUEST) private readonly request: Request,
-    private readonly proxyConfigService: ProxyConfigService,
+    @Inject(PROXY_OPTIONS) private readonly proxyOptions: ProxyOptions,
     private readonly httpService: HttpService,
     private readonly proxyListService: ProxyListService,
   ) {}
@@ -62,19 +66,18 @@ export class ProxyService {
     // Copy the query string
     remoteUrl.search = this.getQuery();
 
-    if (this.proxyConfigService.appendParamToQueryString) {
-      const host =
-        this.proxyConfigService.appendParamToQueryString[remoteUrl.host];
+    if (this.proxyOptions.appendParamToQueryString) {
+      const host = this.proxyOptions.appendParamToQueryString[remoteUrl.host];
       host && this.appendParamToQuery(host, remoteUrl);
     }
 
     let proxy: AxiosProxyConfig | undefined;
     if (
-      this.proxyConfigService.upstreamProxy &&
-      (!this.proxyConfigService.bypassUpstreamProxyHosts ||
-        !this.proxyConfigService.bypassUpstreamProxyHosts[remoteUrl.host])
+      this.proxyOptions.upstreamProxy &&
+      (!this.proxyOptions.bypassUpstreamProxyHosts ||
+        !this.proxyOptions.bypassUpstreamProxyHosts[remoteUrl.host])
     ) {
-      const url = new URL(this.proxyConfigService.upstreamProxy);
+      const url = new URL(this.proxyOptions.upstreamProxy);
       proxy = {
         port: url.port
           ? parseInt(url.port, 10)
@@ -93,11 +96,7 @@ export class ProxyService {
     // Remove the Authorization header if we used it to authenticate the request
     // to terriajs-server. Keeping this here so we don't actually end up
     // removing authorization header specified from frontend for proxy request.
-    if (
-      this.proxyConfigService.basicAuthentication &&
-      this.proxyConfigService.basicAuthentication.username &&
-      this.proxyConfigService.basicAuthentication.password
-    ) {
+    if (this.proxyOptions.basicAuthentication) {
       this.deleteAuthorizationHeader(filteredReqHeaders);
     }
 
@@ -128,7 +127,7 @@ export class ProxyService {
     proxyAuthCredentials = false,
   ): Promise<unknown> | never {
     const proxyHeaders = { ...headers };
-    const authRequired = this.proxyConfigService.proxyAuth[remoteUrl.host];
+    const authRequired = this.proxyOptions.proxyAuth[remoteUrl.host];
 
     if (!retryWithoutAuth && authRequired && !headers['authorization']) {
       // identify that we tried using proxy auth headers
@@ -160,7 +159,7 @@ export class ProxyService {
           responseType: 'arraybuffer',
           proxy,
           data: this.request.method === 'POST' ? this.request.body : undefined,
-          maxBodyLength: this.proxyConfigService.postSizeLimit,
+          maxBodyLength: this.proxyOptions.postSizeLimit,
           beforeRedirect: (options, { headers }) =>
             this.beforeRedirect(headers, remoteUrl),
           onHttpSocketEvent: (config: NodeJS.Socket) =>
@@ -370,7 +369,7 @@ export class ProxyService {
       );
     }
 
-    if (this.proxyConfigService.proxyAllDomains) {
+    if (this.proxyOptions.proxyAllDomains) {
       return;
     }
 
