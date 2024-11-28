@@ -14,7 +14,11 @@ import { AppHttpModule } from './infrastructure/http';
 import { LoggerModule } from './infrastructure/logger';
 import { RateLimiterModule } from './infrastructure/rate-limiter';
 import { BasicAuthModule } from './modules/basic-auth';
-import { AppConfigModule, type ConfigurationType } from './modules/config';
+import {
+  AppConfigModule,
+  type ConfigurationType,
+  type IConfigurationType,
+} from './modules/config';
 import { FeedbackModule } from './modules/feedback';
 import { InitModule } from './modules/init';
 import { PingModule } from './modules/ping';
@@ -41,7 +45,18 @@ import { ShareModule } from './modules/share';
         return configService.get('basicAuthentication', { infer: true });
       },
     }),
-    InitModule,
+    InitModule.forRoot({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService<IConfigurationType, true>) => {
+        return {
+          initPaths: configService.get('initPaths', { infer: true }),
+          shouldServeStatic: configService.get('serveStatic.serveStatic', {
+            infer: true,
+          }),
+          configFilePath: configService.get('config-file', { infer: true }),
+        };
+      },
+    }),
     ShareModule.forRoot({
       inject: [ConfigService],
       useFactory: (configService: ConfigService<ConfigurationType, true>) => {

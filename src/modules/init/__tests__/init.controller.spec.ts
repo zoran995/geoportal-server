@@ -9,16 +9,13 @@ import * as path from 'path';
 import { WWWROOT_TOKEN } from 'src/common/utils';
 import { LoggerModule } from 'src/infrastructure/logger';
 
-import { AppConfigModule } from '../../config';
 import { InitController } from '../init.controller';
 import { InitService } from '../init.service';
+import { INIT_OPTIONS } from '../init.constants';
 
 jest.mock('fs');
 
 vol.fromJSON({
-  './serverconfig.json': JSON.stringify({
-    initPaths: ['test/init', 'test/init/init1'],
-  }),
   './test/init/init.json': 'hello init',
   './test/init/init1/init1.json': 'hello init 1',
   './test/init/init2/init2.json': 'hello init 2',
@@ -32,9 +29,18 @@ describe('InitController', () => {
   beforeEach(async () => {
     const module = await (
       await Test.createTestingModule({
-        imports: [LoggerModule, AppConfigModule],
+        imports: [LoggerModule],
         controllers: [InitController],
-        providers: [{ provide: WWWROOT_TOKEN, useValue: 'test' }, InitService],
+        providers: [
+          { provide: WWWROOT_TOKEN, useValue: 'test' },
+          {
+            provide: INIT_OPTIONS,
+            useValue: {
+              initPaths: ['test/init', 'test/init/init1'],
+            },
+          },
+          InitService,
+        ],
       }).compile()
     ).init();
 

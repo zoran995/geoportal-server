@@ -6,17 +6,14 @@ import * as path from 'path';
 import { LoggerModule } from 'src/infrastructure/logger';
 
 import type { INestApplication } from '@nestjs/common';
-import { AppConfigModule } from 'src/modules/config';
 
-import { InitService } from '../init.service';
 import { WWWROOT_TOKEN } from 'src/common/utils';
+import { INIT_OPTIONS } from '../init.constants';
+import { InitService } from '../init.service';
 
 jest.mock('fs');
 
 vol.fromJSON({
-  './serverconfig.json': JSON.stringify({
-    initPaths: ['test/init', 'test/init/init1'],
-  }),
   './test2/init/init2/init.json': 'hello test2 init 2',
   './test/init/init.json': 'hello init',
   './test/init/init1/init1.json': 'hello init 1',
@@ -28,8 +25,20 @@ describe('InitService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [LoggerModule, AppConfigModule],
-      providers: [InitService],
+      imports: [LoggerModule],
+      providers: [
+        InitService,
+        {
+          provide: INIT_OPTIONS,
+          useValue: {
+            initPaths: ['test/init', 'test/init/init1'],
+          },
+        },
+        {
+          provide: WWWROOT_TOKEN,
+          useValue: './wwwroot',
+        },
+      ],
     }).compile();
 
     app = module.createNestApplication();
@@ -97,9 +106,6 @@ describe('InitService', () => {
 
   it('should properly add WWWROOT_TOKEN init location and use it as a config location', async () => {
     vol.fromJSON({
-      './serverconfig.json': JSON.stringify({
-        initPaths: ['test/init', 'test/init/init1'],
-      }),
       './test2/init/init5.json': 'hello test2 init 5',
       './test/init/init.json': 'hello init',
       './test/init/init1/init1.json': 'hello init 1',
@@ -107,12 +113,22 @@ describe('InitService', () => {
     });
 
     const module: TestingModule = await Test.createTestingModule({
-      imports: [LoggerModule, AppConfigModule],
-      providers: [InitService],
-    })
-      .overrideProvider(WWWROOT_TOKEN)
-      .useValue('./test2')
-      .compile();
+      imports: [LoggerModule],
+      providers: [
+        InitService,
+        {
+          provide: INIT_OPTIONS,
+          useValue: {
+            shouldServeStatic: true,
+            initPaths: ['test/init', 'test/init/init1'],
+          },
+        },
+        {
+          provide: WWWROOT_TOKEN,
+          useValue: './test2',
+        },
+      ],
+    }).compile();
 
     app = module.createNestApplication();
 

@@ -1,27 +1,25 @@
 import { Inject, Injectable, type OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 
 import fs from 'fs';
 import * as path from 'path';
 
 import { WWWROOT_TOKEN } from 'src/common/utils';
 
-import { IConfigurationType } from '../config';
+import { INIT_OPTIONS } from './init.constants';
+import type { InitOptions } from './interfaces/init.options';
 
 @Injectable()
 export class InitService implements OnModuleInit {
   private readonly initPaths: string[] = [];
 
   constructor(
-    private readonly configService: ConfigService<IConfigurationType, true>,
+    @Inject(INIT_OPTIONS) private readonly initOptions: InitOptions,
     @Inject(WWWROOT_TOKEN) private readonly wwwroot: string,
   ) {}
 
   onModuleInit() {
-    const initPaths = this.configService.get('initPaths', [], { infer: true });
-    const serveStatic = this.configService.get('serveStatic.serveStatic', {
-      infer: true,
-    });
+    const initPaths = this.initOptions.initPaths;
+    const serveStatic = this.initOptions.shouldServeStatic;
     this.initPaths.push(...initPaths);
 
     const initPath = path.join(this.wwwroot, 'init');
@@ -39,7 +37,7 @@ export class InitService implements OnModuleInit {
    * @returns file path
    */
   getFilePath(fileName: string): string | undefined {
-    const configFile = this.configService.get('config-file', { infer: true });
+    const configFile = this.initOptions.configFilePath;
 
     const configFileBase = configFile
       ? path.dirname(configFile)
