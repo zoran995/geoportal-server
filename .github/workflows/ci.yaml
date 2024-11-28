@@ -43,4 +43,6 @@ jobs:
       - name: Unit tests
         run: yarn run test
       - name: e2e tests
-        run: yarn run test:e2e
+        run: |
+          echo "${{ secrets.E2E_HTTPS_ENV }}" | base64 -d  >> ./test/https/.env-e2e
+          yarn run test:e2e
