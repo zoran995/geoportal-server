@@ -2,8 +2,8 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { LoggerService } from 'src/infrastructure/logger';
-import type { ShareGistConfig } from './config/schema/share-gist.schema';
-import type { ShareS3Config } from './config/schema/share-s3.schema';
+import type { ShareGistConfig } from './schema/share-gist.schema';
+import type { ShareS3Config } from './schema/share-s3.schema';
 import type { AbstractShareService } from './providers/abstract-share.service';
 
 @Injectable()

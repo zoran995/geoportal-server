@@ -1,14 +1,15 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 
-import { ShareConfigService } from './config/share-config.service';
 import { ShareResult } from './interfaces/save-share-response.interface';
 import { ShareServiceManager } from './share-service-manager.service';
 import type { Request } from 'express';
+import { SHARE_OPTIONS } from './share.constants';
+import type { ShareConfigType } from './schema/share.config.schema';
 
 @Injectable()
 export class ShareService {
   constructor(
-    private readonly configService: ShareConfigService,
+    @Inject(SHARE_OPTIONS) private readonly shareOptions: ShareConfigType,
     private readonly shareServiceManager: ShareServiceManager,
   ) {}
 
@@ -21,7 +22,7 @@ export class ShareService {
     data: Record<string, unknown>,
     req: Request,
   ): Promise<ShareResult> {
-    const prefix = this.configService.newPrefix;
+    const prefix = this.shareOptions.newPrefix;
 
     const provider = this.shareServiceManager.getProvider(prefix);
 

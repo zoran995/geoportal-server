@@ -1,6 +1,5 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { DirectoryJSON, vol } from 'memfs';
 import { http, HttpResponse, passthrough } from 'msw';
 import { setupServer } from 'msw/node';
 import request from 'supertest';
@@ -9,6 +8,7 @@ import { AppHttpModule } from 'src/infrastructure/http';
 import { LoggerModule, LoggerService } from 'src/infrastructure/logger';
 import { AppConfigModule } from 'src/modules/config';
 
+import { shareConfig } from '../schema/share.config.schema';
 import { ShareModule } from '../share.module';
 
 const handlers = [
@@ -48,41 +48,40 @@ const handlers = [
 
 jest.mock('fs');
 
-const mockConfig = {
-  share: {
-    newPrefix: 'git',
-    maxRequestSize: 1024 * 1024,
-    availablePrefixes: [
-      {
-        service: 'gist',
-        prefix: 'git',
-        apiUrl: 'https://api.github.com/gists',
-        accessToken: 'test-token',
-      },
-      {
-        service: 's3',
-        prefix: 's3',
-        region: 'test-region',
-        bucket: 'test-bucket',
-      },
-    ],
-  },
-};
-
-const volJson: DirectoryJSON = {
-  './serverconfig.json': JSON.stringify(mockConfig),
-};
-
 export const server = setupServer(...handlers);
 
 describe('Share Module (e2e)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
-    vol.fromJSON(volJson);
-
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppConfigModule, AppHttpModule, LoggerModule, ShareModule],
+      imports: [
+        AppConfigModule,
+        AppHttpModule,
+        LoggerModule,
+        ShareModule.forRoot({
+          useFactory: () => {
+            return shareConfig.parse({
+              newPrefix: 'git',
+              maxRequestSize: 1024 * 1024,
+              availablePrefixes: [
+                {
+                  service: 'gist',
+                  prefix: 'git',
+                  apiUrl: 'https://api.github.com/gists',
+                  accessToken: 'test-token',
+                },
+                {
+                  service: 's3',
+                  prefix: 's3',
+                  region: 'test-region',
+                  bucket: 'test-bucket',
+                },
+              ],
+            });
+          },
+        }),
+      ],
     })
       .overrideProvider(LoggerService)
       .useValue({
@@ -157,6 +156,5 @@ describe('Share Module (e2e)', () => {
   afterAll(async () => {
     await app.close();
     server.close();
-    vol.reset();
   });
 });

@@ -10,7 +10,7 @@ import { basicAuthentication } from '../../basic-auth';
 import { feedbackConfig } from '../../feedback/config/schema/feedback.config.schema';
 import { proxyConfig } from '../../proxy';
 import { serveStatic } from '../../serve-static';
-import { shareConfig } from '../../share/config/schema/share.config.schema';
+import { shareConfig } from '../../share/schema/share.config.schema';
 
 import { contentSecurityPolicy } from './ContentSecurityPolicy.schema';
 

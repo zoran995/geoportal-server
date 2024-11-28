@@ -2,7 +2,7 @@ import type { Request } from 'express';
 
 import type { LoggerService } from 'src/infrastructure/logger';
 
-import { ShareType } from '../config/schema/share.schema';
+import { ShareType } from '../schema/share.schema';
 import { ShareResult } from '../interfaces/save-share-response.interface';
 
 interface IShareProvider {

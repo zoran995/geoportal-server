@@ -14,7 +14,7 @@ import https from 'https';
 import { AwsS3Service } from 'src/infrastructure/aws-sdk/aws-s3.service';
 import { LoggerService } from 'src/infrastructure/logger';
 
-import { ShareS3Config } from '../config/schema/share-s3.schema';
+import { ShareS3Config } from '../schema/share-s3.schema';
 import { ShareResult } from '../interfaces/save-share-response.interface';
 import { AbstractShareService } from './abstract-share.service';
 

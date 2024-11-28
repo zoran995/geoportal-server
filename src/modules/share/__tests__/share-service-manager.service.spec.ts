@@ -3,8 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { LoggerService } from 'src/infrastructure/logger';
 
-import { shareGist } from '../config/schema/share-gist.schema';
-import { shareS3 } from '../config/schema/share-s3.schema';
+import { shareGist } from '../schema/share-gist.schema';
+import { shareS3 } from '../schema/share-s3.schema';
 import { GistShareService } from '../providers/gist-share.service';
 import { S3ShareService } from '../providers/s3-share.service';
 import { ShareServiceManager } from '../share-service-manager.service';

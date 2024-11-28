@@ -8,7 +8,7 @@ import type { Request } from 'express';
 import { of, throwError } from 'rxjs';
 
 import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service';
-import { shareGist } from '../../config/schema/share-gist.schema';
+import { shareGist } from '../../schema/share-gist.schema';
 import { GistShareService } from '../gist-share.service';
 
 describe('GistShareService', () => {

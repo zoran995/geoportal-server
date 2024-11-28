@@ -10,7 +10,7 @@ import { catchError, map } from 'rxjs/operators';
 import { combineURLs, isDefined } from 'src/common/helpers';
 import { LoggerService } from 'src/infrastructure/logger';
 
-import { ShareGistConfig } from '../config/schema/share-gist.schema';
+import { ShareGistConfig } from '../schema/share-gist.schema';
 import { ShareResult } from '../interfaces/save-share-response.interface';
 import { AbstractShareService } from './abstract-share.service';
 import type { Request } from 'express';
@@ -67,6 +67,7 @@ export class GistShareService extends AbstractShareService<ShareGistConfig> {
             return this.buildResponse(res.data.id, req);
           }),
           catchError((e: unknown) => {
+            console.log(e);
             this.logger.error(`Creating share url failed`, e as never);
             if (e instanceof NotFoundException) {
               throw e;

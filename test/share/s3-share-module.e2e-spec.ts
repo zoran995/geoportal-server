@@ -1,21 +1,22 @@
 import { CreateBucketCommand, S3Client } from '@aws-sdk/client-s3';
+import type { INestApplication } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
 import {
   LocalstackContainer,
   type StartedLocalStackContainer,
 } from '@testcontainers/localstack';
+import { setTimeout } from 'node:timers/promises';
 import request from 'supertest';
 
-import { AppHttpModule } from 'src/infrastructure/http';
-import { LoggerModule, LoggerService } from 'src/infrastructure/logger';
-import { AppConfigModule, configuration } from 'src/modules/config';
-import { ShareConfigType, ShareModule } from 'src/modules/share';
+import { AppModule } from 'src/app.module';
+import { LoggerService } from 'src/infrastructure/logger';
+import { configuration } from 'src/modules/config';
+import { ShareConfigType } from 'src/modules/share';
 
-import { setTimeout } from 'timers/promises';
-import { ShareConfigService } from '../../src/modules/share/config/share-config.service';
-import type { INestApplication } from '@nestjs/common';
+import { SHARE_OPTIONS } from 'src/modules/share/share.constants';
 import { NoopLoggerService } from '../noop-logger.service';
 
+// in this test we can't mock file system as it will break down the testcontainers setup and tests won't work
 describe('Share Module (e2e) - S3', () => {
   jest.setTimeout(60000);
 
@@ -43,11 +44,11 @@ describe('Share Module (e2e) - S3', () => {
     expect(createBucketResponse.$metadata.httpStatusCode).toEqual(200);
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppConfigModule, AppHttpModule, LoggerModule, ShareModule],
+      imports: [AppModule],
     })
       .overrideProvider(LoggerService)
       .useClass(NoopLoggerService)
-      .overrideProvider(ShareConfigService)
+      .overrideProvider(SHARE_OPTIONS)
       .useValue(
         configuration.parse({
           share: {

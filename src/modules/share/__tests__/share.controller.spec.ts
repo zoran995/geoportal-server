@@ -1,4 +1,3 @@
-import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import type { ExecutionContext } from '@nestjs/common';
 
@@ -6,10 +5,10 @@ import type { Request } from 'express';
 
 import { POST_SIZE_LIMIT } from 'src/common/interceptor';
 
-import { ShareConfigService } from '../config/share-config.service';
 import { ShareController } from '../share.controller';
 import { ShareService } from '../share.service';
 import { createMock } from '@golevelup/ts-jest';
+import { SHARE_OPTIONS } from '../share.constants';
 
 const mockSave = jest.fn();
 const mockResolve = jest.fn();
@@ -46,15 +45,12 @@ describe('ShareController', () => {
           useValue: shareServiceMock,
         },
         {
-          provide: ConfigService,
-          useValue: {
-            get: jest.fn(),
-          },
-        },
-        ShareConfigService,
-        {
           provide: POST_SIZE_LIMIT,
           useValue: 102400,
+        },
+        {
+          provide: SHARE_OPTIONS,
+          useValue: {},
         },
       ],
     }).compile();

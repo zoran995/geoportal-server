@@ -42,7 +42,12 @@ import { ShareModule } from './modules/share';
       },
     }),
     InitModule,
-    ShareModule,
+    ShareModule.forRoot({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService<ConfigurationType, true>) => {
+        return configService.get('share', { infer: true });
+      },
+    }),
     FeedbackModule.forRoot({
       inject: [ConfigService],
       useFactory: (configService: ConfigService<ConfigurationType, true>) => {

@@ -8,7 +8,7 @@ import type { Request } from 'express';
 import { createMock } from '@golevelup/ts-jest';
 
 import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service';
-import { shareS3 } from '../../config/schema/share-s3.schema';
+import { shareS3 } from '../../schema/share-s3.schema';
 import { generateShareId, idToPath, S3ShareService } from '../s3-share.service';
 
 const mockSave = jest.fn();
