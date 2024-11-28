@@ -1,7 +1,8 @@
 import { type DynamicModule, type ModuleMetadata } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 
-import { WWWROOT_TOKEN, type ServeStaticType } from 'src/common/utils';
+import { WWWROOT_TOKEN } from 'src/common/utils';
+import { type ServeStaticType } from 'src/common/schema';
 
 import { AppServeStatic } from './app-serve-static';
 import { SERVE_STATIC_OPTIONS } from './serve-static.constants';

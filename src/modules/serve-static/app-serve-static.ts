@@ -9,7 +9,8 @@ import { existsSync } from 'fs';
 import path, { extname } from 'path';
 
 import { isDefined } from 'src/common/helpers';
-import { WWWROOT_TOKEN, type ServeStaticType } from 'src/common/utils';
+import { type ServeStaticType } from 'src/common/schema';
+import { WWWROOT_TOKEN } from 'src/common/utils';
 
 import { SERVE_STATIC_OPTIONS } from './serve-static.constants';
 

@@ -5,7 +5,7 @@ import path from 'path';
 
 import { WWWROOT_TOKEN } from 'src/common/utils';
 
-import { serveStatic, type ServeStaticType } from 'src/common/utils';
+import { serveStatic, type ServeStaticType } from 'src/common/schema';
 import { AppServeStatic } from '../app-serve-static';
 import { SERVE_STATIC_OPTIONS } from '../serve-static.constants';
 

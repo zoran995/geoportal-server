@@ -18,7 +18,8 @@ import { AppModule } from 'src/app.module';
 import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
 import { InternalServerErrorExceptionFilter } from 'src/common/filters/internal-server-error-exception.filter';
 import { NotFoundExceptionFilter } from 'src/common/filters/not-found-exception.filter';
-import { ServeStaticType, WWWROOT_TOKEN } from 'src/common/utils';
+import { type ServeStaticType } from 'src/common/schema';
+import { WWWROOT_TOKEN } from 'src/common/utils';
 import type { ConfigurationType } from 'src/modules/config';
 
 import { NoopLoggerService } from './noop-logger.service';

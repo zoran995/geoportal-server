@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { createZodDto } from 'nestjs-zod';
 
 import { portSchema } from 'src/common/validators';
-import { serveStatic } from 'src/common/utils';
+import { serveStatic } from 'src/common/schema';
 
 import { rateLimit } from 'src/infrastructure/rate-limiter';
 
