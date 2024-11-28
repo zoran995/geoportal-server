@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import {
   ServeStaticModuleOptions,
   ServeStaticModuleOptionsFactory,
@@ -10,19 +9,20 @@ import { existsSync } from 'fs';
 import path, { extname } from 'path';
 
 import { isDefined } from 'src/common/helpers';
-import { WWWROOT_TOKEN } from 'src/common/utils';
+import { WWWROOT_TOKEN, type ServeStaticType } from 'src/common/utils';
 
-import { IConfigurationType } from '../config';
+import { SERVE_STATIC_OPTIONS } from './serve-static.constants';
 
 @Injectable()
 export class AppServeStatic implements ServeStaticModuleOptionsFactory {
   constructor(
-    private readonly configService: ConfigService<IConfigurationType>,
     @Inject(WWWROOT_TOKEN) private readonly wwwroot: string,
+    @Inject(SERVE_STATIC_OPTIONS)
+    private readonly serveStaticOptions?: ServeStaticType,
   ) {}
 
   createLoggerOptions(): ServeStaticModuleOptions[] {
-    const serveStatic = this.configService.get('serveStatic', { infer: true });
+    const serveStatic = this.serveStaticOptions;
     // check if the index file actually exists so we can share. If the file
     // doesn't exist disable serve static, so we don't receive error on each
     // access.

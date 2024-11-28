@@ -1,4 +1,3 @@
-import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 
 import { vol } from 'memfs';
@@ -8,39 +7,33 @@ import { WWWROOT_TOKEN } from 'src/common/utils';
 
 import { serveStatic, type ServeStaticType } from 'src/common/utils';
 import { AppServeStatic } from '../app-serve-static';
+import { SERVE_STATIC_OPTIONS } from '../serve-static.constants';
 
 jest.mock('fs');
-const mockConfigGet = jest.fn();
 
 vol.fromJSON({
   'testwwwroot/index.html': 'index.html',
 });
 
-const mockConfigReturnValue = (
-  serveStaticConfig: ServeStaticType | undefined,
-) => {
-  mockConfigGet.mockImplementation((key) => {
-    if (key === 'serveStatic') {
-      return serveStaticConfig;
-    }
-
-    return undefined;
-  });
-};
-
 describe('AppServeStatic', () => {
-  const defaultConfig = serveStatic.parse({});
-
   let service: AppServeStatic;
+  const options = serveStatic.parse({});
+
+  const setConfig = (target?: Partial<ServeStaticType>) => {
+    Object.getOwnPropertyNames(options).forEach((key) => {
+      delete options[key as keyof ServeStaticType];
+    });
+    if (target) {
+      Object.assign(options, serveStatic.parse(target));
+    }
+  };
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
         {
-          provide: ConfigService,
-          useValue: {
-            get: mockConfigGet,
-          },
+          provide: SERVE_STATIC_OPTIONS,
+          useValue: options,
         },
         {
           provide: WWWROOT_TOKEN,
@@ -63,31 +56,38 @@ describe('AppServeStatic', () => {
 
   it('should return empty array when serve static undefined', () => {
     expect.assertions(3);
-    mockConfigReturnValue(undefined);
+    setConfig(undefined);
 
-    emptyOptions(service);
+    const serveStaticOptions = service.createLoggerOptions();
+    expect(serveStaticOptions).toBeDefined();
+    expect(Array.isArray(serveStaticOptions)).toBe(true);
+    expect(serveStaticOptions.length).toBe(0);
   });
 
   it('should return empty array when serveStatic.serveStatic is false', () => {
     expect.assertions(3);
-    const config = { ...defaultConfig };
-    config.serveStatic = false;
-    mockConfigReturnValue(config);
+    setConfig({ serveStatic: false });
 
-    emptyOptions(service);
+    const serveStaticOptions = service.createLoggerOptions();
+    expect(serveStaticOptions).toBeDefined();
+    expect(Array.isArray(serveStaticOptions)).toBe(true);
+    expect(serveStaticOptions.length).toBe(0);
   });
 
   it("should return empty array when index file doesn't exist", () => {
     expect.assertions(3);
-    const config = { ...defaultConfig };
-    config.resolvePathRelativeToWwwroot = 'index1.html';
-    mockConfigReturnValue(config);
+    setConfig({
+      resolvePathRelativeToWwwroot: 'index1.html',
+    });
 
-    emptyOptions(service);
+    const serveStaticOptions = service.createLoggerOptions();
+    expect(serveStaticOptions).toBeDefined();
+    expect(Array.isArray(serveStaticOptions)).toBe(true);
+    expect(serveStaticOptions.length).toBe(0);
   });
 
   it('should properly resolve options when serve static set', () => {
-    mockConfigReturnValue(defaultConfig);
+    setConfig({});
     const options = service.createLoggerOptions();
     expect(options).toBeDefined();
     expect(Array.isArray(options)).toBe(true);
@@ -99,10 +99,3 @@ describe('AppServeStatic', () => {
     });
   });
 });
-
-function emptyOptions(service: AppServeStatic) {
-  const options = service.createLoggerOptions();
-  expect(options).toBeDefined();
-  expect(Array.isArray(options)).toBe(true);
-  expect(options.length).toBe(0);
-}

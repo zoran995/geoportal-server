@@ -70,7 +70,12 @@ import { ProxyWrapperModule } from './modules/proxy-wrapper.module';
       },
     }),
     ProxyWrapperModule,
-    AppServeStaticModule,
+    AppServeStaticModule.forRoot({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService<ConfigurationType, true>) => {
+        return configService.get('serveStatic', { infer: true });
+      },
+    }),
     PingModule,
     Proj4Module,
     ServerConfigModule,
