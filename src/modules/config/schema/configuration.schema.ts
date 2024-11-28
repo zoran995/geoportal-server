@@ -3,13 +3,13 @@ import { z } from 'zod';
 import { createZodDto } from 'nestjs-zod';
 
 import { portSchema } from 'src/common/validators';
+import { serveStatic } from 'src/common/utils';
 
 import { rateLimit } from 'src/infrastructure/rate-limiter';
 
 import { basicAuthentication } from '../../basic-auth';
 import { feedbackConfig } from '../../feedback/config/schema/feedback.config.schema';
 import { proxyConfig } from '../../proxy';
-import { serveStatic } from '../../serve-static';
 import { shareConfig } from '../../share/schema/share.config.schema';
 
 import { contentSecurityPolicy } from './ContentSecurityPolicy.schema';

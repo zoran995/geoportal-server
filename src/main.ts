@@ -79,7 +79,10 @@ async function bootstrap() {
   app.useGlobalFilters(
     new HttpExceptionFilter(),
     new InternalServerErrorExceptionFilter(wwwroot),
-    new NotFoundExceptionFilter(configService, wwwroot),
+    new NotFoundExceptionFilter(
+      configService.get('serveStatic', { infer: true }),
+      wwwroot,
+    ),
   );
 
   const rateLimiter = app.get(RateLimiterService);

@@ -18,8 +18,8 @@ import { AppModule } from 'src/app.module';
 import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
 import { InternalServerErrorExceptionFilter } from 'src/common/filters/internal-server-error-exception.filter';
 import { NotFoundExceptionFilter } from 'src/common/filters/not-found-exception.filter';
-import { WWWROOT_TOKEN } from 'src/common/utils';
-import { ServeStaticType } from 'src/modules/serve-static/config/serve-static.scheme';
+import { ServeStaticType, WWWROOT_TOKEN } from 'src/common/utils';
+import type { ConfigurationType } from 'src/modules/config';
 
 import { NoopLoggerService } from './noop-logger.service';
 
@@ -86,12 +86,16 @@ async function buildApp(configFile: string, wwwrootPath?: string) {
   }
 
   const app = await NestFactory.create(TestModule);
-  const configService = app.get(ConfigService);
+  const configService: ConfigService<ConfigurationType, true> =
+    app.get(ConfigService);
   const wwwroot = app.get(WWWROOT_TOKEN);
   app.useGlobalFilters(
     new HttpExceptionFilter(),
     new InternalServerErrorExceptionFilter(wwwroot),
-    new NotFoundExceptionFilter(configService, wwwroot),
+    new NotFoundExceptionFilter(
+      configService.get('serveStatic', { infer: true }),
+      wwwroot,
+    ),
   );
   app.useLogger(new NoopLoggerService());
   await app.init();
