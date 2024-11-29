@@ -67,7 +67,6 @@ export class GistShareService extends AbstractShareService<ShareGistConfig> {
             return this.buildResponse(res.data.id, req);
           }),
           catchError((e: unknown) => {
-            console.log(e);
             this.logger.error(`Creating share url failed`, e as never);
             if (e instanceof NotFoundException) {
               throw e;
