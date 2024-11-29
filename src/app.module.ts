@@ -29,6 +29,7 @@ import { ShareModule } from './modules/share';
 import { ProxyWrapperModule } from './modules/proxy-wrapper.module';
 import { ShutdownObserver } from './infrastructure/http/shutdown-observer';
 import { HTTPS_OPTIONS } from './common/utils/https-options.token';
+import { HttpsRedirectMiddleware } from './common/middleware/https-redirect.middleware';
 
 @Module({
   imports: [
@@ -101,6 +102,8 @@ import { HTTPS_OPTIONS } from './common/utils/https-options.token';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer
+      .apply(HttpsRedirectMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL })
       .apply(HttpLoggerMiddleware)
       .forRoutes({ path: '*', method: RequestMethod.ALL });
   }
