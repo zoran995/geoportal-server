@@ -51,7 +51,7 @@
     "axios": "github:zoran995/axios.git#geoportal",
     "base-x": "5.0.0",
     "compression": "1.7.5",
-    "dotenv": "16.4.5",
+    "dotenv": "16.4.6",
     "dotenv-expand": "12.0.1",
     "helmet": "8.0.0",
     "nestjs-zod": "^4.2.0",
@@ -96,7 +96,7 @@
     "ts-jest": "29.2.5",
     "ts-node": "10.9.2",
     "tsconfig-paths": "4.2.0",
-    "typescript": "5.6.3",
+    "typescript": "5.7.2",
     "unionfs": "^4.5.4",
     "zod-to-json-schema": "^3.23.5"
   },
