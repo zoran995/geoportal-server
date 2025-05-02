@@ -39,7 +39,7 @@
     "url": "https://github.com/zoran995/geoportal-server.git"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.699.0",
+    "@aws-sdk/client-s3": "3.797.0",
     "@nestjs/axios": "3.1.2",
     "@nestjs/common": "10.4.8",
     "@nestjs/config": "3.3.0",
