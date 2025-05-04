@@ -1,6 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const yargs = require('yargs');
-
 import { vol, DirectoryJSON } from 'memfs';
 import { ConfigLoader } from '../config-loader';
 
@@ -38,11 +35,17 @@ describe('ConfigLoader', () => {
     return config as never;
   });
 
+  const originalArgv = [...process.argv];
+
+  beforeEach(() => {
+    process.argv = [...originalArgv];
+  });
+
   it('properly loads from json file', () => {
     expect.assertions(2);
 
     const configFile = './test/serverconfig1.json';
-    yargs('--config-file ' + configFile);
+    process.argv.push('--config-file', configFile);
 
     const config = ConfigLoader.load(validateMock);
 
@@ -53,7 +56,7 @@ describe('ConfigLoader', () => {
   describe('interprolate config values with env variables', () => {
     it('expand values with default yargs config', () => {
       expect.assertions(3);
-      yargs('--config-file ./test/serverconfig-expansion.json');
+      process.argv.push('--config-file', './test/serverconfig-expansion.json');
 
       const config: any = ConfigLoader.load(validateMock);
       expect(config.port).toBe('4444');
@@ -63,7 +66,7 @@ describe('ConfigLoader', () => {
 
     it('expand missing env variables to empty string', () => {
       expect.assertions(1);
-      yargs('--config-file ./test/serverconfig-complex.json');
+      process.argv.push('--config-file', './test/serverconfig-complex.json');
 
       const config = ConfigLoader.load(validateMock);
       expect(config.port).toBe('');
@@ -71,7 +74,7 @@ describe('ConfigLoader', () => {
 
     it("doesn't expand escaped values", () => {
       expect.assertions(1);
-      yargs('--config-file ./test/serverconfig-complex.json');
+      process.argv.push('--config-file', './test/serverconfig-complex.json');
 
       const config = ConfigLoader.load(validateMock) as unknown as Record<
         string,
@@ -83,7 +86,7 @@ describe('ConfigLoader', () => {
 
     it('does not expand inline escaped dollar sign', () => {
       expect.assertions(1);
-      yargs('--config-file ./test/serverconfig-complex.json');
+      process.argv.push('--config-file', './test/serverconfig-complex.json');
 
       const config = ConfigLoader.load(validateMock);
 
@@ -92,7 +95,7 @@ describe('ConfigLoader', () => {
 
     it('handle mixed value', () => {
       expect.assertions(1);
-      yargs('--config-file ./test/serverconfig-complex.json');
+      process.argv.push('--config-file', './test/serverconfig-complex.json');
 
       const config: any = ConfigLoader.load(validateMock);
 
@@ -106,7 +109,7 @@ describe('ConfigLoader', () => {
     it('uses default value', () => {
       expect.assertions(1);
 
-      yargs('--config-file ./test/serverconfig-complex.json');
+      process.argv.push('--config-file', './test/serverconfig-complex.json');
 
       const config = ConfigLoader.load(validateMock);
 
@@ -119,7 +122,7 @@ describe('ConfigLoader', () => {
 
     it('should properly expand values nested in object', () => {
       expect.assertions(1);
-      yargs('--config-file ./test/serverconfig-complex.json');
+      process.argv.push('--config-file', './test/serverconfig-complex.json');
 
       const config = ConfigLoader.load(validateMock);
 
@@ -134,7 +137,7 @@ describe('ConfigLoader', () => {
 
     it('should properly expand value in array', () => {
       expect.assertions(1);
-      yargs('--config-file ./test/serverconfig-complex.json');
+      process.argv.push('--config-file', './test/serverconfig-complex.json');
 
       const config = ConfigLoader.load(validateMock);
 
@@ -143,7 +146,7 @@ describe('ConfigLoader', () => {
 
     it('should properly expand value in array of object', () => {
       expect.assertions(1);
-      yargs('--config-file ./test/serverconfig-complex.json');
+      process.argv.push('--config-file', './test/serverconfig-complex.json');
 
       const config = ConfigLoader.load(validateMock);
 
@@ -158,7 +161,12 @@ describe('ConfigLoader', () => {
   });
 
   it('properly override json config values with values from yargs', () => {
-    yargs('--config-file ./test/serverconfig-complex.json --port 3005');
+    process.argv.push(
+      '--config-file',
+      './test/serverconfig-complex.json',
+      '--port',
+      '3005',
+    );
 
     const loadedConfig = ConfigLoader.load(validateMock);
 

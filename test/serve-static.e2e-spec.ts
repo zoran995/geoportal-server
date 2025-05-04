@@ -1,6 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const yargs = require('yargs');
-
 import {
   Controller,
   Get,
@@ -81,9 +78,9 @@ class TestModule {}
 
 async function buildApp(configFile: string, wwwrootPath?: string) {
   if (wwwrootPath) {
-    yargs(`--config-file ${configFile} ${wwwrootPath}`);
+    process.argv.push('--config-file', configFile, '--wwwroot', wwwrootPath);
   } else {
-    yargs(`--config-file ${configFile}`);
+    process.argv.push('--config-file', configFile);
   }
 
   const app = await NestFactory.create(TestModule);

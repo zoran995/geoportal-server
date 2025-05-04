@@ -1,6 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const yargs = require('yargs');
-
 import { vol, DirectoryJSON } from 'memfs';
 import { ConfigLoader } from '../config-loader';
 
@@ -106,8 +103,11 @@ describe('ConfigLoader tests based on dotenv repository', () => {
   });
 
   it('can load complex sample', () => {
-    yargs(
-      '--config-file ./test/dotenv-expand.json --env-file-path .env.dotenv',
+    process.argv.push(
+      '--config-file',
+      './test/dotenv-expand.json',
+      '--env-file-path',
+      '.env.dotenv',
     );
 
     const loadedConfig = ConfigLoader.load(validateMock);
