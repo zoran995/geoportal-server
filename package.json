@@ -39,7 +39,7 @@
     "url": "https://github.com/zoran995/geoportal-server.git"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.699.0",
+    "@aws-sdk/client-s3": "3.802.0",
     "@nestjs/axios": "4.0.0",
     "@nestjs/common": "11.1.0",
     "@nestjs/config": "4.0.2",
@@ -47,7 +47,7 @@
     "@nestjs/platform-express": "11.1.0",
     "@nestjs/serve-static": "5.0.3",
     "@nestjs/swagger": "11.1.6",
-    "@smithy/node-http-handler": "3.3.1",
+    "@smithy/node-http-handler": "4.0.4",
     "axios": "github:zoran995/axios.git#geoportal",
     "base-x": "5.0.1",
     "compression": "1.8.0",
