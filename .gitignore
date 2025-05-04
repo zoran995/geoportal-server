@@ -37,3 +37,5 @@ lerna-debug.log*
 .npmrc
 .yarn
 .yarnrc.yml
+
+.env-e2e
