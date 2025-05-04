@@ -66,6 +66,8 @@ To run e2e tests execute the following command
 npm run test:e2e
 ```
 
+Note: e2e tests are using TestContainers for running test environment services, so you need to have Docker installed and running. The tests will automatically start and stop the containers, so you don't need to worry about that. Depending on your container runtime you might need to make additional configuration for TestContainers to work properly (see [TestContainers documentation](https://node.testcontainers.org/supported-container-runtimes/)).
+
 The test results are reported on the command line. No additional configuration is not needed for running unit or e2e tests.
 
 ### Test coverage

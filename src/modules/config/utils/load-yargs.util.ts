@@ -1,4 +1,5 @@
-import * as yargs from 'yargs';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 
 const DEFAULT_CONFIG_LOCATION = './serverconfig.json';
 
@@ -26,7 +27,7 @@ interface YargsConfigModuleSettings {
 export function loadYargs(
   options: YargsConfigModuleSettings = { returnLastValue: true },
 ) {
-  const argv = yargs
+  const argv = yargs(hideBin(process.argv))
     .usage('$0 [wwwroot]', true, (y) => {
       return y.positional('wwwroot', {
         describe: 'path/to/wwwroot',
@@ -76,9 +77,9 @@ export function loadYargs(
     // Yargs unhelpfully turns "--option foo --option bar" into { option: ["foo", "bar"] }.
     // Hence replace arrays with the rightmost value. This matters when `npm run` has options
     // built into it, and the user wants to override them with `npm run -- --port 3005` or something.
-    Object.keys(yargs.argv).forEach((key: string) => {
+    Object.keys(argv.argv).forEach((key: string) => {
       if (key !== '_') {
-        yargs.coerce(key, (opt) => {
+        argv.coerce(key, (opt) => {
           if (Array.isArray(opt) && opt.length > 0) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return opt[opt.length - 1];

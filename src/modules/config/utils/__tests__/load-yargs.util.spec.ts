@@ -1,11 +1,14 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const yargs = require('yargs');
-
 import { loadYargs } from '../load-yargs.util';
 
 describe('load yargs', () => {
+  const originalArgv = [...process.argv];
+
+  beforeEach(() => {
+    process.argv = [...originalArgv];
+  });
+
   it('properly load yargs', () => {
-    yargs('--port 3005');
+    process.argv.push('--port', '3005');
 
     const loadedYargs = loadYargs();
     expect(loadedYargs.port).toBe(3005);
@@ -14,14 +17,14 @@ describe('load yargs', () => {
   });
 
   it('returns only last value when returnLastValue is true', () => {
-    yargs('--port 3005 --port 3006');
+    process.argv.push('--port', '3005', '--port', '3006');
 
     const loadedYargs = loadYargs({ returnLastValue: true });
     expect(loadedYargs.port).toBe(3006);
   });
 
   it('returns all values when returnLastValue is false', () => {
-    yargs('--port 3005 --port 3006');
+    process.argv.push('--port', '3005', '--port', '3006');
 
     const loadedYargs = loadYargs({ returnLastValue: false });
     expect(Array.isArray(loadedYargs.port)).toBe(true);

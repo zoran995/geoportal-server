@@ -15,7 +15,7 @@ export class HttpsRedirectMiddleware {
       return next();
     }
 
-    if (this.httpsOptions?.httpAllowedHosts.includes(req.host)) {
+    if (this.httpsOptions?.httpAllowedHosts.includes(req.hostname)) {
       return next();
     }
 

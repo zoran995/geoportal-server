@@ -21,51 +21,51 @@ export class ProxyController {
    * Proxy request where target and duration are passed as params
    * @param params - Request params {@link ProxyWithDurationDto}
    */
-  @Get('_:duration/*')
+  @Get('_:duration/{*url}')
   @ApiBadRequestResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   async proxy(@Param() params: ProxyWithDurationDto) {
-    return this.proxyService.proxyRequest(params['0'], params.duration);
+    return this.proxyService.proxyRequest(params.url, params.duration);
   }
 
   /**
    * Proxy request where target and duration are passed as params
    * @param params - Request params {@link ProxyWithDurationDto}
    */
-  @Post('_:duration/*')
+  @Post('_:duration/{*url}')
   @ApiBody({ schema: {} })
   @ApiBadRequestResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseInterceptors(PayloadLimitInterceptor)
   async proxyPost(@Param() params: ProxyWithDurationDto) {
-    return this.proxyService.proxyRequest(params['0'], params.duration);
+    return this.proxyService.proxyRequest(params.url, params.duration);
   }
 
   /**
    * Proxy request where only target is passed as param
    * @param params - Request params {@link ProxyDto}
    */
-  @Get('*')
+  @Get('{*url}')
   @ApiBadRequestResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   async proxyDefault(@Param() params: ProxyDto) {
-    return this.proxyService.proxyRequest(params['0']);
+    return this.proxyService.proxyRequest(params.url);
   }
 
   /**
    * Proxy request where only target is passed as param
    * @param params - Request params {@link ProxyDto}
    */
-  @Post('*')
+  @Post('{*url}')
   @ApiBody({ schema: {} })
   @ApiBadRequestResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
   @UseInterceptors(PayloadLimitInterceptor)
   async proxyDefaultPost(@Param() params: ProxyDto) {
-    return this.proxyService.proxyRequest(params['0']);
+    return this.proxyService.proxyRequest(params.url);
   }
 }

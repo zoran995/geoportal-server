@@ -29,7 +29,7 @@ export class Proj4Controller {
    * @param code - EPSG Code of projection
    * @returns Proj4 definition
    */
-  @Get('epsg::code')
+  @Get('epsg\\::code')
   @ApiOperation({ summary: 'Get the projection definition using EPSG code' })
   @ApiBadRequestResponse({ description: 'Projection code is not number' })
   @ApiNotFoundResponse({ description: 'Projection was not found' })
