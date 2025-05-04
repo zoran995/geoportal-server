@@ -4,6 +4,7 @@
   "description": "A rewrite of TerriJS-Server using NestJS",
   "author": "Zoran Kokeza",
   "license": "MIT",
+  "type": "module",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
     "@zoran995:registry": "https://npm.pkg.github.com"
