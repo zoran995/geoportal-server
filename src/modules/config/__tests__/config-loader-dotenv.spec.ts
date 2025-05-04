@@ -1,5 +1,5 @@
 import { vol, DirectoryJSON } from 'memfs';
-import { ConfigLoader } from '../config-loader';
+import { ConfigLoader } from '../config-loader.js';
 
 jest.mock('fs');
 

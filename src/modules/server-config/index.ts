@@ -1,1 +1,1 @@
-export { ServerConfigModule } from './server-config.module';
+export { ServerConfigModule } from './server-config.module.js';

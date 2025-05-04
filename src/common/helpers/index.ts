@@ -1,4 +1,4 @@
-export { combineURLs } from './combineURLs';
-export { isArray } from './isArray';
-export { isDefined } from './isDefined';
-export { isObject } from './isObject';
+export { combineURLs } from './combineURLs.js';
+export { isArray } from './isArray.js';
+export { isDefined } from './isDefined.js';
+export { isObject } from './isObject.js';

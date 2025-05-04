@@ -7,9 +7,13 @@ import type { Request } from 'express';
 
 import { createMock } from '@golevelup/ts-jest';
 
-import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service';
-import { shareS3 } from '../../schema/share-s3.schema';
-import { generateShareId, idToPath, S3ShareService } from '../s3-share.service';
+import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service.js';
+import { shareS3 } from '../../schema/share-s3.schema.js';
+import {
+  generateShareId,
+  idToPath,
+  S3ShareService,
+} from '../s3-share.service.js';
 
 const mockSave = jest.fn();
 const mockResolveObject = jest.fn();
@@ -31,6 +35,7 @@ describe('S3ShareService', () => {
           protocol: 'http',
           path: '/api/share',
           ip: '127.0.0.1',
+
           headers: {
             host: 'example.co',
           },

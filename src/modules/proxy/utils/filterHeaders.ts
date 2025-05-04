@@ -1,6 +1,6 @@
 import { Socket } from 'net';
 
-import { DO_NOT_PROXY_REGEX } from '../proxy.constants';
+import { DO_NOT_PROXY_REGEX } from '../proxy.constants.js';
 
 /**
  * Filters headers that are not matched by {@link DO_NOT_PROXY_REGEX} out of an

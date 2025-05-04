@@ -7,9 +7,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DirectoryJSON, vol } from 'memfs';
 import request from 'supertest';
 
-import { AppModule } from 'src/app.module';
+import { AppModule } from 'src/app.module.js';
 
-import { NoopLoggerService } from './noop-logger.service';
+import { NoopLoggerService } from './noop-logger.service.js';
 
 jest.mock('fs');
 jest.mock('src/infrastructure/logger/logger.service');

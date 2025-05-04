@@ -8,13 +8,13 @@ import {
 import { setTimeout } from 'node:timers/promises';
 import request from 'supertest';
 
-import { AppModule } from 'src/app.module';
-import { LoggerService } from 'src/infrastructure/logger';
-import { configuration } from 'src/modules/config';
-import { ShareConfigType } from 'src/modules/share';
+import { AppModule } from 'src/app.module.js';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
+import { configuration } from 'src/modules/config/index.js';
+import { ShareConfigType } from 'src/modules/share/index.js';
+import { SHARE_OPTIONS } from 'src/modules/share/share.constants.js';
 
-import { SHARE_OPTIONS } from 'src/modules/share/share.constants';
-import { NoopLoggerService } from '../noop-logger.service';
+import { NoopLoggerService } from '../noop-logger.service.js';
 
 // in this test we can't mock file system as it will break down the testcontainers setup and tests won't work
 describe('Share Module (e2e) - S3', () => {

@@ -1,8 +1,8 @@
 import { type DynamicModule, type ModuleMetadata } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { BasicAuthGuard } from './basic-auth.guard';
-import { BASIC_AUTH_OPTIONS } from './contants';
-import type { BasicAuthenticationOptions } from './config/basic-authentication.schema';
+import { BasicAuthGuard } from './basic-auth.guard.js';
+import { BASIC_AUTH_OPTIONS } from './contants.js';
+import type { BasicAuthenticationOptions } from './config/basic-authentication.schema.js';
 
 export class BasicAuthModule {
   static forRootAsync(options: AuthModuleAsyncOptions): DynamicModule {

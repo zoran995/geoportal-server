@@ -1,8 +1,8 @@
 import type { Request } from 'express';
 
-import { LoggerService } from 'src/infrastructure/logger';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
 
-import { HttpLoggerMiddleware } from '../http-logger.middleware';
+import { HttpLoggerMiddleware } from '../http-logger.middleware.js';
 
 jest.mock('src/infrastructure/logger/logger.service');
 

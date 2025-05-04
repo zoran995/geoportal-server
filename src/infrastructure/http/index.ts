@@ -1,1 +1,1 @@
-export { AppHttpModule } from './app-http.module';
+export { AppHttpModule } from './app-http.module.js';

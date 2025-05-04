@@ -1,14 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import type { ExecutionContext } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
+import { createMock } from '@golevelup/ts-jest';
 import type { Request } from 'express';
 
-import { POST_SIZE_LIMIT } from 'src/common/interceptor';
+import { POST_SIZE_LIMIT } from 'src/common/interceptor/index.js';
 
-import { ShareController } from '../share.controller';
-import { ShareService } from '../share.service';
-import { createMock } from '@golevelup/ts-jest';
-import { SHARE_OPTIONS } from '../share.constants';
+import { SHARE_OPTIONS } from '../share.constants.js';
+import { ShareController } from '../share.controller.js';
+import { ShareService } from '../share.service.js';
 
 const mockSave = jest.fn();
 const mockResolve = jest.fn();
@@ -26,6 +26,7 @@ describe('ShareController', () => {
           protocol: 'http',
           path: '/api/share',
           ip: '127.0.0.1',
+
           headers: {
             host: 'example.co',
           },

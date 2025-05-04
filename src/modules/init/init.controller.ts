@@ -11,10 +11,10 @@ import { ApiNotFoundResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Response } from 'express';
 import sanitize from 'sanitize-filename';
 
-import { HttpExceptionFilter } from 'src/common/filters';
+import { HttpExceptionFilter } from 'src/common/filters/index.js';
 
-import { GetInitDto } from './dto/get-init.dto';
-import { InitService } from './init.service';
+import { GetInitDto } from './dto/get-init.dto.js';
+import { InitService } from './init.service.js';
 
 @ApiTags('init')
 @Controller('init')

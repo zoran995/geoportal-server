@@ -3,15 +3,17 @@ import {
   type NestExpressApplication,
   ExpressAdapter,
 } from '@nestjs/platform-express';
+
 import { configDotenv } from 'dotenv';
 import express from 'express';
 import fs from 'fs';
 import { Volume } from 'memfs';
-import { AppModule } from 'src/app.module';
-import { buildServer } from 'src/build-server';
-import type { ConfigurationType } from 'src/modules/config';
 import request from 'supertest';
 import { IUnionFs } from 'unionfs';
+
+import { AppModule } from 'src/app.module.js';
+import { buildServer } from 'src/build-server.js';
+import type { ConfigurationType } from 'src/modules/config/index.js';
 
 jest.mock('fs', () => {
   const fs = jest.requireActual(`fs`);

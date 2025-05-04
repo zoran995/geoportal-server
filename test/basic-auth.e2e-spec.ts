@@ -5,9 +5,9 @@ import { vol } from 'memfs';
 import request from 'supertest';
 import type { NextFunction, Request, Response } from 'express';
 
-import { AppModule } from 'src/app.module';
-import { BasicAuthGuard } from 'src/modules/basic-auth';
-import type { ConfigurationType } from 'src/modules/config';
+import { AppModule } from 'src/app.module.js';
+import { BasicAuthGuard } from 'src/modules/basic-auth/index.js';
+import type { ConfigurationType } from 'src/modules/config/index.js';
 
 jest.mock('fs');
 

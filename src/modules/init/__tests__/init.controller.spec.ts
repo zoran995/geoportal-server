@@ -6,12 +6,12 @@ import { Response } from 'express';
 import { vol } from 'memfs';
 import * as path from 'path';
 
-import { WWWROOT_TOKEN } from 'src/common/utils';
-import { LoggerModule } from 'src/infrastructure/logger';
+import { WWWROOT_TOKEN } from 'src/common/utils/index.js';
+import { LoggerModule } from 'src/infrastructure/logger/index.js';
 
-import { InitController } from '../init.controller';
-import { InitService } from '../init.service';
-import { INIT_OPTIONS } from '../init.constants';
+import { InitController } from '../init.controller.js';
+import { InitService } from '../init.service.js';
+import { INIT_OPTIONS } from '../init.constants.js';
 
 jest.mock('fs');
 

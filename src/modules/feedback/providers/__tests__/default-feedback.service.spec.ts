@@ -1,4 +1,4 @@
-import { DefaultFeedbackService } from '../default-feedback.service';
+import { DefaultFeedbackService } from '../default-feedback.service.js';
 
 describe('GithubFeedbackService', () => {
   let service: DefaultFeedbackService;

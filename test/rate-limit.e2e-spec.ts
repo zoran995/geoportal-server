@@ -2,11 +2,11 @@ import type { INestApplication } from '@nestjs/common';
 import { type TestingModule, Test } from '@nestjs/testing';
 import request from 'supertest';
 import { vol } from 'memfs';
-import { AppModule } from 'src/app.module';
-import type { ConfigurationType } from 'src/modules/config';
-import { RateLimiterService } from 'src/infrastructure/rate-limiter';
-import { LoggerService } from 'src/infrastructure/logger';
-import { NoopLoggerService } from './noop-logger.service';
+import { AppModule } from 'src/app.module.js';
+import type { ConfigurationType } from 'src/modules/config/index.js';
+import { RateLimiterService } from 'src/infrastructure/rate-limiter/index.js';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
+import { NoopLoggerService } from './noop-logger.service.js';
 
 jest.mock('fs');
 

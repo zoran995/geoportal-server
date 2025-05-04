@@ -3,9 +3,9 @@ import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 import { createMock } from '@golevelup/ts-jest';
 import { of, throwError } from 'rxjs';
 
-import { CreateFeedbackDto } from '../../dto/create-feedback.dto';
-import { githubFeedback } from '../../config/schema/github-feedback.schema';
-import { GithubFeedbackService } from '../github-feedback.service';
+import { CreateFeedbackDto } from '../../dto/create-feedback.dto.js';
+import { githubFeedback } from '../../config/schema/github-feedback.schema.js';
+import { GithubFeedbackService } from '../github-feedback.service.js';
 
 describe('GithubFeedbackService', () => {
   const mockExecutionContext = createMock<ExecutionContext>({

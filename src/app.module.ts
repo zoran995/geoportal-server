@@ -9,27 +9,27 @@ import { APP_PIPE } from '@nestjs/core';
 
 import { ZodValidationPipe } from 'nestjs-zod';
 
-import { HttpLoggerMiddleware } from './common/middleware';
-import { AppHttpModule } from './infrastructure/http';
-import { LoggerModule } from './infrastructure/logger';
-import { RateLimiterModule } from './infrastructure/rate-limiter';
-import { BasicAuthModule } from './modules/basic-auth';
+import { HttpLoggerMiddleware } from './common/middleware/index.js';
+import { AppHttpModule } from './infrastructure/http/index.js';
+import { LoggerModule } from './infrastructure/logger/index.js';
+import { RateLimiterModule } from './infrastructure/rate-limiter/index.js';
+import { BasicAuthModule } from './modules/basic-auth/index.js';
 import {
   AppConfigModule,
   type ConfigurationType,
   type IConfigurationType,
-} from './modules/config';
-import { FeedbackModule } from './modules/feedback';
-import { InitModule } from './modules/init';
-import { PingModule } from './modules/ping';
-import { Proj4Module } from './modules/proj4';
-import { AppServeStaticModule } from './modules/serve-static';
-import { ServerConfigModule } from './modules/server-config';
-import { ShareModule } from './modules/share';
-import { ProxyWrapperModule } from './modules/proxy-wrapper.module';
-import { ShutdownObserver } from './infrastructure/http/shutdown-observer';
-import { HTTPS_OPTIONS } from './common/utils/https-options.token';
-import { HttpsRedirectMiddleware } from './common/middleware/https-redirect.middleware';
+} from './modules/config/index.js';
+import { FeedbackModule } from './modules/feedback/index.js';
+import { InitModule } from './modules/init/index.js';
+import { PingModule } from './modules/ping/index.js';
+import { Proj4Module } from './modules/proj4/index.js';
+import { AppServeStaticModule } from './modules/serve-static/index.js';
+import { ServerConfigModule } from './modules/server-config/index.js';
+import { ShareModule } from './modules/share/index.js';
+import { ProxyWrapperModule } from './modules/proxy-wrapper.module.js';
+import { ShutdownObserver } from './infrastructure/http/shutdown-observer.js';
+import { HTTPS_OPTIONS } from './common/utils/https-options.token.js';
+import { HttpsRedirectMiddleware } from './common/middleware/https-redirect.middleware.js';
 
 @Module({
   imports: [

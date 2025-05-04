@@ -5,12 +5,12 @@ import type { Request } from 'express';
 import { lastValueFrom } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
-import { LoggerService } from 'src/infrastructure/logger';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
 
-import { formatBody } from '../common/formatBody';
-import { CreateFeedbackDto } from '../dto/create-feedback.dto';
-import { type GithubFeedbackConfigType } from '../config/schema/github-feedback.schema';
-import { AbstractFeedbackService } from './abstract-feedback.service';
+import { formatBody } from '../common/formatBody.js';
+import { CreateFeedbackDto } from '../dto/create-feedback.dto.js';
+import { type GithubFeedbackConfigType } from '../config/schema/github-feedback.schema.js';
+import { AbstractFeedbackService } from './abstract-feedback.service.js';
 
 /**
  * Create a new issue on github.

@@ -1,15 +1,15 @@
 import { HttpService } from '@nestjs/axios';
 import type { FactoryProvider } from '@nestjs/common';
 
-import { LoggerService } from 'src/infrastructure/logger';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
 
-import { FeedbackService } from './common/feedback-service';
-import { FEEDBACK_CONFIG } from './feedback.constants';
-import { DefaultFeedbackService } from './providers/default-feedback.service';
-import { GithubFeedbackService } from './providers/github-feedback.service';
-import { MailFeedbackService } from './providers/mail-feedback.service';
-import { RedmineFeedbackService } from './providers/redmine-feedback.service';
-import type { FeedbackConfigType } from './config/schema/feedback.config.schema';
+import { FeedbackService } from './common/feedback-service.js';
+import { FEEDBACK_CONFIG } from './feedback.constants.js';
+import { DefaultFeedbackService } from './providers/default-feedback.service.js';
+import { GithubFeedbackService } from './providers/github-feedback.service.js';
+import { MailFeedbackService } from './providers/mail-feedback.service.js';
+import { RedmineFeedbackService } from './providers/redmine-feedback.service.js';
+import type { FeedbackConfigType } from './config/schema/feedback.config.schema.js';
 
 export const feedbackServiceFactory: FactoryProvider = {
   provide: FeedbackService,

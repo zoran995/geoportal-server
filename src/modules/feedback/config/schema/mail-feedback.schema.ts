@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import { fqdnOrIp, portSchema } from 'src/common/validators';
+import { fqdnOrIp, portSchema } from 'src/common/validators/index.js';
 
-import { baseFeedback } from './base-feedback.schema';
+import { baseFeedback } from './base-feedback.schema.js';
 
 const mailFeedbackAuth = z.object({
   user: z

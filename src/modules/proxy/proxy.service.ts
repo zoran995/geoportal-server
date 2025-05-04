@@ -18,21 +18,21 @@ import * as http from 'http';
 import { catchError, lastValueFrom, map } from 'rxjs';
 import { URL } from 'url';
 
-import { isDefined } from 'src/common/helpers';
-import { LoggerService } from 'src/infrastructure/logger';
+import { isDefined } from 'src/common/helpers/index.js';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
 
-import { AppendParamToQueryStringDto } from './config/schema/proxy-config.dto';
+import { AppendParamToQueryStringDto } from './config/schema/proxy-config.dto.js';
 import {
   DEFAULT_MAX_AGE_SECONDS,
   PROTOCOL_REGEX,
   PROXY_OPTIONS,
-} from './proxy.constants';
-import { filterHeaders } from './utils/filterHeaders';
-import { processDuration } from './utils/processDuration';
-import { processHeaders } from './utils/processHeaders';
-import { ProxyListService } from './utils/proxy-list.service';
-import { urlValidator } from './utils/urlValidator';
-import type { ProxyOptions } from './proxy-options';
+} from './proxy.constants.js';
+import { filterHeaders } from './utils/filterHeaders.js';
+import { processDuration } from './utils/processDuration.js';
+import { processHeaders } from './utils/processHeaders.js';
+import { ProxyListService } from './utils/proxy-list.service.js';
+import { urlValidator } from './utils/urlValidator.js';
+import type { ProxyOptions } from './proxy-options.js';
 
 @Injectable({ scope: Scope.REQUEST })
 export class ProxyService {

@@ -7,12 +7,12 @@ import {
 import { lastValueFrom } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
-import { combineURLs, isDefined } from 'src/common/helpers';
-import { LoggerService } from 'src/infrastructure/logger';
+import { combineURLs, isDefined } from 'src/common/helpers/index.js';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
 
-import { ShareGistConfig } from '../schema/share-gist.schema';
-import { ShareResult } from '../interfaces/save-share-response.interface';
-import { AbstractShareService } from './abstract-share.service';
+import { ShareGistConfig } from '../schema/share-gist.schema.js';
+import { ShareResult } from '../interfaces/save-share-response.interface.js';
+import { AbstractShareService } from './abstract-share.service.js';
 import type { Request } from 'express';
 
 export class GistShareService extends AbstractShareService<ShareGistConfig> {

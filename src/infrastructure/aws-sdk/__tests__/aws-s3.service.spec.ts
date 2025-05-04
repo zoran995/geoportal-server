@@ -8,7 +8,7 @@ import {
 import { mockClient } from 'aws-sdk-client-mock';
 import { Readable } from 'stream';
 
-import { AwsS3Service } from '../aws-s3.service';
+import { AwsS3Service } from '../aws-s3.service.js';
 
 jest.mock('src/infrastructure/logger/logger.service');
 

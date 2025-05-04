@@ -5,12 +5,12 @@ import type { Request } from 'express';
 import { lastValueFrom } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
-import { LoggerService } from 'src/infrastructure/logger';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
 
-import { formatBody } from '../common/formatBody';
-import { type RedmineFeedbackConfigType } from '../config/schema/redmine-feedback.schema';
-import { CreateFeedbackDto } from '../dto/create-feedback.dto';
-import { AbstractFeedbackService } from './abstract-feedback.service';
+import { formatBody } from '../common/formatBody.js';
+import { type RedmineFeedbackConfigType } from '../config/schema/redmine-feedback.schema.js';
+import { CreateFeedbackDto } from '../dto/create-feedback.dto.js';
+import { AbstractFeedbackService } from './abstract-feedback.service.js';
 
 @Injectable()
 export class RedmineFeedbackService extends AbstractFeedbackService<RedmineFeedbackConfigType> {

@@ -8,10 +8,10 @@ import {
 import * as fs from 'fs';
 import { inRange } from 'range_check';
 
-import { isDefined } from 'src/common/helpers';
-import { LoggerService } from 'src/infrastructure/logger';
-import { PROXY_OPTIONS } from '../proxy.constants';
-import type { ProxyConfigType } from '../config/schema/proxy-config.dto';
+import { isDefined } from 'src/common/helpers/index.js';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
+import { PROXY_OPTIONS } from '../proxy.constants.js';
+import type { ProxyConfigType } from '../config/schema/proxy-config.dto.js';
 
 @Injectable()
 export class ProxyListService implements OnModuleInit, OnModuleDestroy {

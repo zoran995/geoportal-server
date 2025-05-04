@@ -2,8 +2,8 @@ import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 
 import { createMock } from '@golevelup/ts-jest';
 
-import { mailFeedback } from '../../config/schema/mail-feedback.schema';
-import { MailFeedbackService } from '../mail-feedback.service';
+import { mailFeedback } from '../../config/schema/mail-feedback.schema.js';
+import { MailFeedbackService } from '../mail-feedback.service.js';
 
 describe('MailFeedbackService', () => {
   const mockExecutionContext = createMock<ExecutionContext>({

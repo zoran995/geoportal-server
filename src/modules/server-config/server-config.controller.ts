@@ -4,9 +4,9 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import type { z } from 'zod';
 
-import type { ConfigurationType } from '../config';
-import { ProxyListService } from '../proxy';
-import { serverConfigResponse } from './schema/safe-settings.schema';
+import type { ConfigurationType } from '../config/index.js';
+import { ProxyListService } from '../proxy/index.js';
+import { serverConfigResponse } from './schema/safe-settings.schema.js';
 
 type SafeSettings = z.infer<typeof serverConfigResponse>;
 

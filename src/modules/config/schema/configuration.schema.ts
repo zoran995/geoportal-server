@@ -2,17 +2,17 @@ import { z } from 'zod';
 
 import { createZodDto } from 'nestjs-zod';
 
-import { portSchema } from 'src/common/validators';
-import { httpsSchema, serveStatic } from 'src/common/schema';
+import { portSchema } from 'src/common/validators/index.js';
+import { httpsSchema, serveStatic } from 'src/common/schema/index.js';
 
-import { rateLimit } from 'src/infrastructure/rate-limiter';
+import { rateLimit } from 'src/infrastructure/rate-limiter/index.js';
 
-import { basicAuthentication } from '../../basic-auth';
-import { feedbackConfig } from '../../feedback/config/schema/feedback.config.schema';
-import { proxyConfig } from '../../proxy';
-import { shareConfig } from '../../share/schema/share.config.schema';
+import { basicAuthentication } from '../../basic-auth/index.js';
+import { feedbackConfig } from '../../feedback/config/schema/feedback.config.schema.js';
+import { proxyConfig } from '../../proxy/index.js';
+import { shareConfig } from '../../share/schema/share.config.schema.js';
 
-import { contentSecurityPolicy } from './ContentSecurityPolicy.schema';
+import { contentSecurityPolicy } from './ContentSecurityPolicy.schema.js';
 
 export const configuration = z.object({
   compressResponse: z.boolean().default(true).describe(`

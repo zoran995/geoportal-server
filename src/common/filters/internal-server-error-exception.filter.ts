@@ -9,8 +9,8 @@ import { Response } from 'express';
 import { existsSync } from 'fs';
 import path from 'path';
 
-import { HttpExceptionFilter } from './http-exception.filter';
-import { WWWROOT_TOKEN } from '../utils';
+import { HttpExceptionFilter } from './http-exception.filter.js';
+import { WWWROOT_TOKEN } from '../utils/index.js';
 
 @Catch(InternalServerErrorException)
 export class InternalServerErrorExceptionFilter extends HttpExceptionFilter {

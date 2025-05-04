@@ -8,8 +8,8 @@ import {
 import { RateLimiterMemory, type RateLimiterRes } from 'rate-limiter-flexible';
 import type { NextFunction, Request, Response } from 'express';
 
-import type { RateLimitConfigType } from './config/rate-limit.schema';
-import { RATE_LIMITER_CONFIG } from './constants';
+import type { RateLimitConfigType } from './config/rate-limit.schema.js';
+import { RATE_LIMITER_CONFIG } from './constants.js';
 
 @Injectable()
 export class RateLimiterService {

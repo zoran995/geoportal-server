@@ -8,13 +8,13 @@ import type { Request } from 'express';
 import { createMock } from '@golevelup/ts-jest';
 import { of } from 'rxjs';
 
-import { shareGist } from '../schema/share-gist.schema';
+import { shareGist } from '../schema/share-gist.schema.js';
 import {
   shareConfig as shareConfigSchema,
   ShareConfigType,
-} from '../schema/share.config.schema';
-import { ShareServiceManager } from '../share-service-manager.service';
-import { ShareService } from '../share.service';
+} from '../schema/share.config.schema.js';
+import { ShareServiceManager } from '../share-service-manager.service.js';
+import { ShareService } from '../share.service.js';
 
 const mockHttpPost = jest.fn();
 const mockHttpGet = jest.fn();
@@ -55,6 +55,7 @@ describe('ShareService', () => {
           protocol: 'http',
           path: '/api/share',
           ip: '127.0.0.1',
+
           headers: {
             host: 'example.co',
           },

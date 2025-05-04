@@ -1,6 +1,6 @@
 import { LoggerService as NestLoggerService } from '@nestjs/common';
 
-import { LoggerService } from 'src/infrastructure/logger/logger.service';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
 
 export class NoopLoggerService
   extends LoggerService

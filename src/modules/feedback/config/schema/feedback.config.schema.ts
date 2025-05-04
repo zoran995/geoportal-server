@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import { githubFeedback } from './github-feedback.schema';
-import { mailFeedback } from './mail-feedback.schema';
-import { redmineFeedback } from './redmine-feedback.schema';
+import { githubFeedback } from './github-feedback.schema.js';
+import { mailFeedback } from './mail-feedback.schema.js';
+import { redmineFeedback } from './redmine-feedback.schema.js';
 
 export const DEFAULT_FEEDBACK_ID = '__default__';
 

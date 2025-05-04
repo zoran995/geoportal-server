@@ -19,13 +19,13 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-
-import { HttpExceptionFilter } from 'src/common/filters';
-import { PayloadLimitInterceptor } from 'src/common/interceptor';
-
-import { GetShareDto } from './dto/get-share.dto';
-import { ShareService } from './share.service';
 import type { Request } from 'express';
+
+import { HttpExceptionFilter } from 'src/common/filters/index.js';
+import { PayloadLimitInterceptor } from 'src/common/interceptor/index.js';
+
+import { GetShareDto } from './dto/get-share.dto.js';
+import { ShareService } from './share.service.js';
 
 @ApiTags('share')
 @Controller('share')

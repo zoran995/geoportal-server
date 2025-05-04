@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { POST_SIZE_LIMIT } from 'src/common/interceptor';
+import { POST_SIZE_LIMIT } from 'src/common/interceptor/index.js';
 
-import { ProxyController } from '../proxy.controller';
-import { ProxyService } from '../proxy.service';
+import { ProxyController } from '../proxy.controller.js';
+import { ProxyService } from '../proxy.service.js';
 
 const mockProxyRequest = jest.fn();
 const mockProxyService = {

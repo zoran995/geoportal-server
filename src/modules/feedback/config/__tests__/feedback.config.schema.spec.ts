@@ -1,4 +1,4 @@
-import { feedbackConfig } from '../schema/feedback.config.schema';
+import { feedbackConfig } from '../schema/feedback.config.schema.js';
 
 describe('Feedback config', () => {
   it('should pass with empty object', () => {

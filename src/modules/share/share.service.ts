@@ -1,10 +1,10 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-
-import { ShareResult } from './interfaces/save-share-response.interface';
-import { ShareServiceManager } from './share-service-manager.service';
 import type { Request } from 'express';
-import { SHARE_OPTIONS } from './share.constants';
-import type { ShareConfigType } from './schema/share.config.schema';
+
+import { ShareResult } from './interfaces/save-share-response.interface.js';
+import { ShareServiceManager } from './share-service-manager.service.js';
+import { SHARE_OPTIONS } from './share.constants.js';
+import type { ShareConfigType } from './schema/share.config.schema.js';
 
 @Injectable()
 export class ShareService {

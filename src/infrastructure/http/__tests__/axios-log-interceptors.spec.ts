@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AxiosLogInterceptor } from '../axios-log-interceptors';
+import { AxiosLogInterceptor } from '../axios-log-interceptors.js';
 
 const mockInterceptorRequestUse = jest.fn();
 const mockInterceptorResponseUse = jest.fn();

@@ -1,5 +1,5 @@
 import { vol } from 'memfs';
-import { loadEnvFile } from '../load-env.util';
+import { loadEnvFile } from '../load-env.util.js';
 
 jest.mock('fs');
 

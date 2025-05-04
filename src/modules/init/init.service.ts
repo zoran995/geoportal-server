@@ -3,10 +3,10 @@ import { Inject, Injectable, type OnModuleInit } from '@nestjs/common';
 import fs from 'fs';
 import * as path from 'path';
 
-import { WWWROOT_TOKEN } from 'src/common/utils';
+import { WWWROOT_TOKEN } from 'src/common/utils/index.js';
 
-import { INIT_OPTIONS } from './init.constants';
-import type { InitOptions } from './interfaces/init.options';
+import { INIT_OPTIONS } from './init.constants.js';
+import type { InitOptions } from './interfaces/init.options.js';
 
 @Injectable()
 export class InitService implements OnModuleInit {

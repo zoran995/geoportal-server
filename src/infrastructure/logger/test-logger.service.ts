@@ -1,4 +1,4 @@
-import { LoggerService } from './logger.service';
+import { LoggerService } from './logger.service.js';
 
 export class TestLoggerService extends LoggerService {
   override log = jest.fn();

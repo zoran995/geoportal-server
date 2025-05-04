@@ -1,9 +1,9 @@
 import type { DynamicModule } from '@nestjs/common';
 
-import { INIT_OPTIONS } from './init.constants';
-import { InitController } from './init.controller';
-import { InitService } from './init.service';
-import type { InitOptions } from './interfaces/init.options';
+import { INIT_OPTIONS } from './init.constants.js';
+import { InitController } from './init.controller.js';
+import { InitService } from './init.service.js';
+import type { InitOptions } from './interfaces/init.options.js';
 
 export class InitModule {
   static forRoot(options: InitModuleOptions): DynamicModule {

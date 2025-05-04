@@ -1,4 +1,4 @@
-import { isArray } from '../isArray';
+import { isArray } from '../isArray.js';
 
 class SimpleClass {
   constructor(public name: string) {}

@@ -1,10 +1,10 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import { WWWROOT_TOKEN } from 'src/common/utils';
+import { WWWROOT_TOKEN } from 'src/common/utils/index.js';
 
-import { ConfigLoader } from './config-loader';
-import type { ConfigurationType } from './schema/configuration.schema';
+import { ConfigLoader } from './config-loader.js';
+import type { ConfigurationType } from './schema/configuration.schema.js';
 
 @Global()
 @Module({

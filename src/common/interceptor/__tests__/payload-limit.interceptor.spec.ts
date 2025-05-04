@@ -3,7 +3,7 @@ import { ExecutionContext, PayloadTooLargeException } from '@nestjs/common';
 import { createMock } from '@golevelup/ts-jest';
 import { of } from 'rxjs';
 
-import { PayloadLimitInterceptor } from '../payload-limit.interceptor';
+import { PayloadLimitInterceptor } from '../payload-limit.interceptor.js';
 
 const createExecutionContextMock = (max: number) => {
   return createMock<ExecutionContext>({

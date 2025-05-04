@@ -3,8 +3,8 @@ import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 import { createMock } from '@golevelup/ts-jest';
 import { of, throwError } from 'rxjs';
 
-import { redmineFeedback } from '../../config/schema/redmine-feedback.schema';
-import { RedmineFeedbackService } from '../redmine-feedback.service';
+import { redmineFeedback } from '../../config/schema/redmine-feedback.schema.js';
+import { RedmineFeedbackService } from '../redmine-feedback.service.js';
 
 describe('RedmineFeedbackService', () => {
   const redmineConf = redmineFeedback.parse({

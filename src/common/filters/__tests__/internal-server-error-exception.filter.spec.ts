@@ -4,8 +4,8 @@ import { createMock } from '@golevelup/ts-jest';
 import { DirectoryJSON, fs, vol } from 'memfs';
 import path from 'path';
 
-import { HttpExceptionFilter } from '../http-exception.filter';
-import { InternalServerErrorExceptionFilter } from '../internal-server-error-exception.filter';
+import { HttpExceptionFilter } from '../http-exception.filter.js';
+import { InternalServerErrorExceptionFilter } from '../internal-server-error-exception.filter.js';
 
 jest.mock('fs');
 jest.mock('../http-exception.filter.ts');

@@ -1,13 +1,13 @@
 import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { LoggerService } from 'src/infrastructure/logger';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
 
-import { shareGist } from '../schema/share-gist.schema';
-import { shareS3 } from '../schema/share-s3.schema';
-import { GistShareService } from '../providers/gist-share.service';
-import { S3ShareService } from '../providers/s3-share.service';
-import { ShareServiceManager } from '../share-service-manager.service';
+import { shareGist } from '../schema/share-gist.schema.js';
+import { shareS3 } from '../schema/share-s3.schema.js';
+import { GistShareService } from '../providers/gist-share.service.js';
+import { S3ShareService } from '../providers/s3-share.service.js';
+import { ShareServiceManager } from '../share-service-manager.service.js';
 
 const gistConf = shareGist.parse({
   service: 'gist',

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { additionalParameters } from './additional-parameters.schema';
+import { additionalParameters } from './additional-parameters.schema.js';
 
 export const baseFeedback = z.object({
   /**

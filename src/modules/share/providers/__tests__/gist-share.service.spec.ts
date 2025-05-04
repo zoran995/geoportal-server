@@ -7,9 +7,9 @@ import {
 import type { Request } from 'express';
 import { of, throwError } from 'rxjs';
 
-import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service';
-import { shareGist } from '../../schema/share-gist.schema';
-import { GistShareService } from '../gist-share.service';
+import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service.js';
+import { shareGist } from '../../schema/share-gist.schema.js';
+import { GistShareService } from '../gist-share.service.js';
 
 describe('GistShareService', () => {
   let service: GistShareService;
@@ -23,6 +23,7 @@ describe('GistShareService', () => {
           protocol: 'http',
           path: '/api/share',
           ip: '127.0.0.1',
+
           headers: {
             host: 'example.co',
           },

@@ -11,12 +11,12 @@ import type { Request } from 'express';
 import http from 'http';
 import https from 'https';
 
-import { AwsS3Service } from 'src/infrastructure/aws-sdk/aws-s3.service';
-import { LoggerService } from 'src/infrastructure/logger';
+import { AwsS3Service } from 'src/infrastructure/aws-sdk/aws-s3.service.js';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
 
-import { ShareS3Config } from '../schema/share-s3.schema';
-import { ShareResult } from '../interfaces/save-share-response.interface';
-import { AbstractShareService } from './abstract-share.service';
+import { ShareS3Config } from '../schema/share-s3.schema.js';
+import { ShareResult } from '../interfaces/save-share-response.interface.js';
+import { AbstractShareService } from './abstract-share.service.js';
 
 const agentConfig: https.AgentOptions = {
   keepAlive: true,

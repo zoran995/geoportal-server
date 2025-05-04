@@ -6,8 +6,8 @@ import {
 
 import express from 'express';
 
-import { AppModule } from './app.module';
-import { buildServer } from './build-server';
+import { AppModule } from './app.module.js';
+import { buildServer } from './build-server.js';
 
 export async function bootstrap() {
   const server = express();

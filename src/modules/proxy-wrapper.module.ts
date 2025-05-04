@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import type { ConfigurationType } from './config';
-import { ProxyModule } from './proxy/proxy.module';
+import type { ConfigurationType } from './config/index.js';
+import { ProxyModule } from './proxy/proxy.module.js';
 
 @Module({
   imports: [

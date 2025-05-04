@@ -5,9 +5,9 @@ import {
   type ModuleMetadata,
 } from '@nestjs/common';
 
-import type { RateLimitConfigType } from './config/rate-limit.schema';
-import { RATE_LIMITER_CONFIG } from './constants';
-import { RateLimiterService } from './rate-limiter.service';
+import type { RateLimitConfigType } from './config/rate-limit.schema.js';
+import { RATE_LIMITER_CONFIG } from './constants.js';
+import { RateLimiterService } from './rate-limiter.service.js';
 
 @Global()
 @Module({})

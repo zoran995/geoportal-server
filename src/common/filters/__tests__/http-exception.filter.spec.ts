@@ -7,9 +7,9 @@ import {
 
 import { createMock } from '@golevelup/ts-jest';
 
-import { ValidationException } from '../../exceptions';
-import { GlobalExceptionFilter } from '../global-exception.filter';
-import { HttpExceptionFilter } from '../http-exception.filter';
+import { ValidationException } from '../../exceptions/index.js';
+import { GlobalExceptionFilter } from '../global-exception.filter.js';
+import { HttpExceptionFilter } from '../http-exception.filter.js';
 
 jest.mock('../global-exception.filter.ts');
 

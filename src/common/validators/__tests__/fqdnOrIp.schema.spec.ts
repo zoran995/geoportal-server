@@ -1,4 +1,4 @@
-import { fqdnOrIp } from '../fqdnOrIp.schema';
+import { fqdnOrIp } from '../fqdnOrIp.schema.js';
 
 describe('fqdnOrIp', () => {
   describe('single', () => {

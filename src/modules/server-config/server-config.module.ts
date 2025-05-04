@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 
-import { ProxyWrapperModule } from '../proxy-wrapper.module';
-import { ServerConfigController } from './server-config.controller';
+import { ProxyWrapperModule } from '../proxy-wrapper.module.js';
+import { ServerConfigController } from './server-config.controller.js';
 
 @Module({
   imports: [ProxyWrapperModule],

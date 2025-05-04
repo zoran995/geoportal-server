@@ -2,8 +2,8 @@ import { ExecutionContext } from '@nestjs/common';
 
 import { createMock } from '@golevelup/ts-jest';
 
-import { CreateFeedbackDto } from '../../dto/create-feedback.dto';
-import { formatBody } from '../formatBody';
+import { CreateFeedbackDto } from '../../dto/create-feedback.dto.js';
+import { formatBody } from '../formatBody.js';
 
 const mockExecutionContext = createMock<ExecutionContext>({
   switchToHttp: () => ({
