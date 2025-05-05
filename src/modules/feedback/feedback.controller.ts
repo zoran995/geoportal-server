@@ -7,7 +7,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { Request } from 'express';
+import type { Request } from 'express';
 
 import { FeedbackService } from './common/feedback-service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';

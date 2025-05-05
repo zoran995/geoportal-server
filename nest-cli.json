@@ -1,23 +1,20 @@
 {
+  "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "assets": [
-      "**/*.json"
-    ],
+    "deleteOutDir": true,
+    "builder": "swc",
+    "typeCheck": true,
+    "assets": ["**/*.json"],
     "plugins": [
       {
         "name": "@nestjs/swagger",
         "options": {
-          "dtoFileNameSuffix": [
-            ".entity.ts",
-            ".dto.ts"
-          ],
-          "controllerFileNameSuffix": [
-            ".controller.ts"
-          ],
-          "classValidatorShim": true,
-          "introspectComments": true
+          "dtoFileNameSuffix": [".entity.ts", ".dto.ts"],
+          "controllerFileNameSuffix": [".controller.ts"],
+          "introspectComments": true,
+          "esmCompatible": true
         }
       }
     ]

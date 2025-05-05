@@ -1,6 +1,6 @@
-import { Request } from 'express';
+import type { Request } from 'express';
 
-import { BaseFeedbackType } from '../config/schema/base-feedback.schema';
+import type { BaseFeedbackType } from '../config/schema/base-feedback.schema';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
 
 export abstract class AbstractFeedbackService<
