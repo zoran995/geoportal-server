@@ -1,7 +1,7 @@
 import type { ExecutionContext } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { createMock } from '@golevelup/ts-jest';
+import { createMock } from '@golevelup/ts-vitest';
 import type { Request } from 'express';
 
 import { POST_SIZE_LIMIT } from 'src/common/interceptor/index.js';
@@ -10,8 +10,8 @@ import { SHARE_OPTIONS } from '../share.constants.js';
 import { ShareController } from '../share.controller.js';
 import { ShareService } from '../share.service.js';
 
-const mockSave = jest.fn();
-const mockResolve = jest.fn();
+const mockSave = vi.fn();
+const mockResolve = vi.fn();
 
 const shareServiceMock = {
   save: mockSave,
@@ -60,7 +60,7 @@ describe('ShareController', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {

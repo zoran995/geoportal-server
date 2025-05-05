@@ -5,7 +5,7 @@ import { POST_SIZE_LIMIT } from 'src/common/interceptor/index.js';
 import { ProxyController } from '../proxy.controller.js';
 import { ProxyService } from '../proxy.service.js';
 
-const mockProxyRequest = jest.fn();
+const mockProxyRequest = vi.fn();
 const mockProxyService = {
   proxyRequest: mockProxyRequest,
 };
@@ -32,7 +32,7 @@ describe('ProxyController', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {

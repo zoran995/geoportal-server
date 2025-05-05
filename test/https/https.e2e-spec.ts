@@ -6,7 +6,7 @@ import {
 
 import { configDotenv } from 'dotenv';
 import express from 'express';
-import { vol, Volume } from 'memfs';
+import { vol } from 'memfs';
 import request from 'supertest';
 
 import { AppModule } from 'src/app.module.js';
@@ -112,7 +112,7 @@ describe('http/https server and redirect (e2e)', () => {
   });
 
   it('should not redirect to https when host is in httpAllowedHosts', async () => {
-    const vol = Volume.fromJSON({
+    vol.fromJSON({
       './test/https/key.pem': process.env.KEY as string,
       './test/https/cert.pem': process.env.CERT as string,
       './serverconfig.json': JSON.stringify({

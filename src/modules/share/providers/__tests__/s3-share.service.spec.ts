@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 
-import { createMock } from '@golevelup/ts-jest';
+import { createMock } from '@golevelup/ts-vitest';
 
 import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service.js';
 import { shareS3 } from '../../schema/share-s3.schema.js';
@@ -15,11 +15,11 @@ import {
   S3ShareService,
 } from '../s3-share.service.js';
 
-const mockSave = jest.fn();
-const mockResolveObject = jest.fn();
+const mockSave = vi.fn();
+const mockResolveObject = vi.fn();
 
-jest.mock('src/infrastructure/aws-sdk/aws-s3.service', () => ({
-  AwsS3Service: jest.fn().mockImplementation(() => ({
+vi.mock(import('src/infrastructure/aws-sdk/aws-s3.service.js'), () => ({
+  AwsS3Service: vi.fn().mockImplementation(() => ({
     save: mockSave,
     resolveObject: mockResolveObject,
   })),
@@ -61,7 +61,7 @@ describe('S3ShareService', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('initialization', () => {

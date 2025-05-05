@@ -2,7 +2,7 @@ import { vol } from 'memfs';
 
 import { loadJsonConfig } from '../load-json-config.util.js';
 
-jest.mock('fs');
+vi.mock('fs');
 
 const config = {
   port: 3000,

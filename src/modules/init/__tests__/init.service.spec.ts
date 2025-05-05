@@ -11,7 +11,7 @@ import { WWWROOT_TOKEN } from 'src/common/utils/index.js';
 import { INIT_OPTIONS } from '../init.constants.js';
 import { InitService } from '../init.service.js';
 
-jest.mock('fs');
+vi.mock('fs');
 
 vol.fromJSON({
   './test2/init/init2/init.json': 'hello test2 init 2',

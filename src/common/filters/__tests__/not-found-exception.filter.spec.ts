@@ -1,14 +1,14 @@
 import { ExecutionContext, NotFoundException } from '@nestjs/common';
 
-import { createMock } from '@golevelup/ts-jest';
+import { createMock } from '@golevelup/ts-vitest';
 import { DirectoryJSON, fs, vol } from 'memfs';
 import path from 'path';
 
 import { HttpExceptionFilter } from '../http-exception.filter.js';
 import { NotFoundExceptionFilter } from '../not-found-exception.filter.js';
 
-jest.mock('fs');
-jest.mock('../http-exception.filter.ts');
+vi.mock('fs');
+vi.mock(import('../http-exception.filter.js'));
 
 const volJson: DirectoryJSON = {
   './test/mockwwwroot/index.html': '<body>mock index html</body>',
@@ -16,9 +16,9 @@ const volJson: DirectoryJSON = {
 
 vol.fromJSON(volJson);
 
-const mockRedirect = jest.fn();
-const mockStatus = jest.fn();
-const mockSendFile = jest.fn();
+const mockRedirect = vi.fn();
+const mockStatus = vi.fn();
+const mockSendFile = vi.fn();
 
 const mockExecutionContext = createMock<ExecutionContext>({
   switchToHttp: () => ({
@@ -27,16 +27,16 @@ const mockExecutionContext = createMock<ExecutionContext>({
       sendFile: mockSendFile,
       redirect: mockRedirect,
     }),
-    getRequest: () => jest.fn(),
+    getRequest: () => vi.fn(),
   }),
 });
 
 describe('NotFoundExceptionFilter', () => {
   const wwwroot = './test/mockwwwroot';
-  const spyHttpException = jest.spyOn(HttpExceptionFilter.prototype, 'catch');
+  const spyHttpException = vi.spyOn(HttpExceptionFilter.prototype, 'catch');
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should properly initialize filter', () => {

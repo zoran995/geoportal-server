@@ -10,7 +10,7 @@ import { Readable } from 'stream';
 
 import { AwsS3Service } from '../aws-s3.service.js';
 
-jest.mock('src/infrastructure/logger/logger.service');
+vi.mock('src/infrastructure/logger/logger.service');
 
 const s3Mock = mockClient(S3Client);
 
@@ -26,7 +26,7 @@ describe('AwsSdkService', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {

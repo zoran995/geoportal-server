@@ -49,7 +49,7 @@ const handlers = [
   }),
 ];
 
-jest.mock('fs');
+vi.mock('fs');
 
 export const server = setupServer(...handlers);
 
@@ -88,11 +88,11 @@ describe('Share Module (e2e)', () => {
     })
       .overrideProvider(LoggerService)
       .useValue({
-        error: jest.fn(),
-        warn: jest.fn(),
-        info: jest.fn(),
-        debug: jest.fn(),
-        verbose: jest.fn(),
+        error: vi.fn(),
+        warn: vi.fn(),
+        info: vi.fn(),
+        debug: vi.fn(),
+        verbose: vi.fn(),
       })
       .compile();
 

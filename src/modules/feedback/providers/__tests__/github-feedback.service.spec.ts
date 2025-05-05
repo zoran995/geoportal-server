@@ -1,6 +1,6 @@
 import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 
-import { createMock } from '@golevelup/ts-jest';
+import { createMock } from '@golevelup/ts-vitest';
 import { of, throwError } from 'rxjs';
 
 import { CreateFeedbackDto } from '../../dto/create-feedback.dto.js';
@@ -29,7 +29,7 @@ describe('GithubFeedbackService', () => {
   });
 
   it('should send post request', async () => {
-    const httpPostMock = jest.fn();
+    const httpPostMock = vi.fn();
     httpPostMock.mockReturnValue(
       of({ ok: true, status_code: 200, message: 'Successful' }),
     );
@@ -38,7 +38,7 @@ describe('GithubFeedbackService', () => {
       {
         post: httpPostMock,
       } as never,
-      { error: jest.fn() } as never,
+      { error: vi.fn() } as never,
     );
 
     const headers = {
@@ -71,7 +71,7 @@ describe('GithubFeedbackService', () => {
       Accept: 'application/vnd.github.v3+json',
       Authorization: `Token ${githubFeedbackConfig.accessToken}`,
     };
-    const httpPostMock = jest.fn();
+    const httpPostMock = vi.fn();
     httpPostMock.mockReturnValue(throwError(() => new Error('test error')));
 
     const service = new GithubFeedbackService(
@@ -79,7 +79,7 @@ describe('GithubFeedbackService', () => {
       {
         post: httpPostMock,
       } as never,
-      { error: jest.fn() } as never,
+      { error: vi.fn() } as never,
     );
 
     try {

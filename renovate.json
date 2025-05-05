@@ -27,12 +27,11 @@
     },
     {
       "matchPackageNames": [
-        "jest",
+        "vitest",
         "memfs",
         "supertest",
-        "ts-jest",
-        "@golevelup/ts-jest",
-        "@types/jest"
+        "@golevelup/ts-vitest",
+        "@vitest/coverage-v8"
       ],
       "groupName": "testing"
     }

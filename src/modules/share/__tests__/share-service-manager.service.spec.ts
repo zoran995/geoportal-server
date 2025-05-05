@@ -40,7 +40,7 @@ const unknownService = {
   id: 'test',
 };
 
-const mockHttpPost = jest.fn();
+const mockHttpPost = vi.fn();
 
 describe('ShareServiceManager', () => {
   let service: ShareServiceManager;
@@ -57,7 +57,7 @@ describe('ShareServiceManager', () => {
         {
           provide: LoggerService,
           useValue: {
-            error: jest.fn(),
+            error: vi.fn(),
           },
         },
         ShareServiceManager,

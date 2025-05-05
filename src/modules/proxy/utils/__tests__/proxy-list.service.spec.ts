@@ -12,7 +12,7 @@ import type { INestApplication } from '@nestjs/common';
 import { LoggerService } from 'src/infrastructure/logger/index.js';
 import type { ProxyOptions } from '../../proxy-options.js';
 
-jest.mock('fs');
+vi.mock('fs');
 
 describe('ProxyListService', () => {
   let app: INestApplication;
@@ -41,7 +41,7 @@ describe('ProxyListService', () => {
         {
           provide: LoggerService,
           useValue: {
-            log: jest.fn(),
+            log: vi.fn(),
           },
         },
         {
@@ -56,7 +56,7 @@ describe('ProxyListService', () => {
   });
 
   afterEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     await app.close();
   });
 

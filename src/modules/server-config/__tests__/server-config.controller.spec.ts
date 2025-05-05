@@ -20,7 +20,7 @@ function path(obj: Record<string, unknown>, path: string) {
 
 const defaultConfig = configuration.parse({});
 
-const mockConfigGet = jest.fn();
+const mockConfigGet = vi.fn();
 
 describe('ServerConfigController', () => {
   let controller: ServerConfigController;
@@ -42,7 +42,7 @@ describe('ServerConfigController', () => {
         {
           provide: LoggerService,
           useValue: {
-            log: jest.fn(),
+            log: vi.fn(),
           },
         },
       ],

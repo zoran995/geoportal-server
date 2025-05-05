@@ -23,7 +23,7 @@ import { GithubFeedbackService } from '../providers/github-feedback.service.js';
 import { MailFeedbackService } from '../providers/mail-feedback.service.js';
 import { RedmineFeedbackService } from '../providers/redmine-feedback.service.js';
 
-jest.mock('fs');
+vi.mock('fs');
 
 describe('FeedbackModule', () => {
   const moduleFixture = Test.createTestingModule({
@@ -37,7 +37,7 @@ describe('FeedbackModule', () => {
   })
     .overrideProvider(LoggerService)
     .useValue({
-      error: jest.fn(),
+      error: vi.fn(),
     });
 
   describe('with default config', () => {

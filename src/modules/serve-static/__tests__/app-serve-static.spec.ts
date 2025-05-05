@@ -9,7 +9,7 @@ import { serveStatic, type ServeStaticType } from 'src/common/schema/index.js';
 import { AppServeStatic } from '../app-serve-static.js';
 import { SERVE_STATIC_OPTIONS } from '../serve-static.constants.js';
 
-jest.mock('fs');
+vi.mock('fs');
 
 vol.fromJSON({
   'testwwwroot/index.html': 'index.html',
@@ -47,7 +47,7 @@ describe('AppServeStatic', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {

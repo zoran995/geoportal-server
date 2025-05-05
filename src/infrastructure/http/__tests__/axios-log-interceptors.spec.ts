@@ -3,8 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { AxiosLogInterceptor } from '../axios-log-interceptors.js';
 
-const mockInterceptorRequestUse = jest.fn();
-const mockInterceptorResponseUse = jest.fn();
+const mockInterceptorRequestUse = vi.fn();
+const mockInterceptorResponseUse = vi.fn();
 
 const httpServiceMock = {
   axiosRef: {
@@ -36,7 +36,7 @@ describe('AxiosLogInterceptors', () => {
     await module.init();
   });
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should initialize', () => {

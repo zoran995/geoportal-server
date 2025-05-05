@@ -1,4 +1,4 @@
-import { createMock } from '@golevelup/ts-jest';
+import { createMock } from '@golevelup/ts-vitest';
 import {
   InternalServerErrorException,
   NotFoundException,
@@ -13,7 +13,7 @@ import { GistShareService } from '../gist-share.service.js';
 
 describe('GistShareService', () => {
   let service: GistShareService;
-  let httpServiceMock: { get: jest.Mock; post: jest.Mock };
+  let httpServiceMock: { get: vi.mock; post: vi.mock };
   let gistShareConfig: any;
 
   const mockExecutionContext = createMock<ExecutionContext>({
@@ -38,8 +38,8 @@ describe('GistShareService', () => {
 
   beforeEach(() => {
     httpServiceMock = {
-      get: jest.fn(),
-      post: jest.fn(),
+      get: vi.fn(),
+      post: vi.fn(),
     };
 
     gistShareConfig = shareGist.parse({

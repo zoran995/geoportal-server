@@ -18,31 +18,41 @@
           "type": "string",
           "minLength": 1,
           "description": "Password of the user that is used for login."
-        },
-        "rateLimit": {
-          "type": "object",
-          "properties": {
-            "freeRetries": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 2
-            },
-            "minWait": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 200
-            },
-            "maxWait": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 6000
-            }
-          },
-          "additionalProperties": false
         }
       },
-      "required": ["username", "password", "rateLimit"],
-      "additionalProperties": false
+      "required": ["username", "password"],
+      "additionalProperties": false,
+      "description": "Configuration for basic authentication. If not defined basic authentication will be disabled."
+    },
+    "rateLimit": {
+      "type": "object",
+      "properties": {
+        "points": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 5,
+          "description": "Maximum number of points can be consumed over duration."
+        },
+        "duration": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 1,
+          "description": "Number of seconds before consumed points are reset, starting from the time of the first consumed point on a key. Points will be reset every second if the duration is set to 1 second."
+        },
+        "blockDuration": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 5,
+          "description": "If blockDuration is a positive number and more points are consumed than available, the limiter prolongs points lifetime for blockDuration seconds. It rejects further consume calls for that key during this blockDuration time."
+        }
+      },
+      "additionalProperties": false,
+      "default": {
+        "points": 5,
+        "duration": 1,
+        "blockDuration": 5
+      },
+      "description": "Rate limits basic authentication requests. Note that this uses simple in-memory storage of requests, which means that the actual allowed rate will be higher when multiple terriajs-server processes. The first two wait times after `freeRetries` are `minWait`. Successive wait times are the sum of the two previous wait times, up to `maxWait`."
     },
     "port": {
       "type": "integer",
@@ -128,6 +138,10 @@
                   "prefix": {
                     "$ref": "#/properties/share/properties/availablePrefixes/items/anyOf/0/properties/prefix"
                   },
+                  "endpoint": {
+                    "type": "string",
+                    "description": "The endpoint of the S3 service"
+                  },
                   "region": {
                     "type": "string",
                     "minLength": 1,
@@ -160,6 +174,11 @@
                     "maximum": 54,
                     "default": 54,
                     "description": "The length of the random share key to generate (not including prefix), up to 54 characters. Defaults to the full length."
+                  },
+                  "forcePathStyle": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Force path style URLs for S3 requests"
                   }
                 },
                 "required": ["service", "prefix", "region", "bucket"],
@@ -167,11 +186,15 @@
               }
             ]
           },
+          "default": [],
           "description": "List of available configurations for share urls."
         }
       },
-      "required": ["availablePrefixes"],
       "additionalProperties": false,
+      "default": {
+        "maxRequestSize": 204800,
+        "availablePrefixes": []
+      },
       "description": "Configuration for the share service. If not defined share service will be disabled."
     },
     "feedback": {
@@ -180,6 +203,7 @@
         "primaryId": {
           "type": "string",
           "minLength": 1,
+          "default": "__default__",
           "description": "Which service of those defined in the options will be used when sending new feedback."
         },
         "options": {
@@ -189,10 +213,6 @@
               {
                 "type": "object",
                 "properties": {
-                  "service": {
-                    "type": "string",
-                    "const": "github"
-                  },
                   "id": {
                     "type": "string",
                     "minLength": 1
@@ -215,6 +235,10 @@
                       "additionalProperties": false
                     }
                   },
+                  "service": {
+                    "type": "string",
+                    "const": "github"
+                  },
                   "issuesUrl": {
                     "type": "string",
                     "format": "uri",
@@ -231,21 +255,21 @@
                     "description": "Http user agent."
                   }
                 },
-                "required": ["service", "id", "issuesUrl", "accessToken"],
+                "required": ["id", "service", "issuesUrl", "accessToken"],
                 "additionalProperties": false
               },
               {
                 "type": "object",
                 "properties": {
-                  "service": {
-                    "type": "string",
-                    "const": "mail"
-                  },
                   "id": {
                     "$ref": "#/properties/feedback/properties/options/items/anyOf/0/properties/id"
                   },
                   "additionalParameters": {
                     "$ref": "#/properties/feedback/properties/options/items/anyOf/0/properties/additionalParameters"
+                  },
+                  "service": {
+                    "type": "string",
+                    "const": "mail"
                   },
                   "smtpHost": {
                     "anyOf": [
@@ -269,7 +293,7 @@
                     "description": "Hostname or IP address of smtp server to connect to."
                   },
                   "smtpPort": {
-                    "type": "number",
+                    "type": "integer",
                     "minimum": 0,
                     "maximum": 65535,
                     "description": "Port of smtp server to connect to."
@@ -303,21 +327,21 @@
                     "description": "Email to which feedback will be sent."
                   }
                 },
-                "required": ["service", "id", "smtpHost", "smtpPort", "email"],
+                "required": ["id", "service", "smtpHost", "smtpPort", "email"],
                 "additionalProperties": false
               },
               {
                 "type": "object",
                 "properties": {
-                  "service": {
-                    "type": "string",
-                    "const": "redmine"
-                  },
                   "id": {
                     "$ref": "#/properties/feedback/properties/options/items/anyOf/0/properties/id"
                   },
                   "additionalParameters": {
                     "$ref": "#/properties/feedback/properties/options/items/anyOf/0/properties/additionalParameters"
+                  },
+                  "service": {
+                    "type": "string",
+                    "const": "redmine"
                   },
                   "project_id": {
                     "type": "integer",
@@ -341,8 +365,8 @@
                   }
                 },
                 "required": [
-                  "service",
                   "id",
+                  "service",
                   "project_id",
                   "issuesUrl",
                   "username",
@@ -354,8 +378,10 @@
           }
         }
       },
-      "required": ["options"],
       "additionalProperties": false,
+      "default": {
+        "primaryId": "__default__"
+      },
       "description": "Configuration for the feedback service. If not defined feedback service will be disabled."
     },
     "proxy": {
@@ -377,8 +403,7 @@
           "items": {
             "anyOf": [
               {
-                "type": "string",
-                "pattern": "^(?!-)(?!.*--)(?!.*\\.\\.)(?!.*\\.$)[a-zA-Z0-9-]{1,63}(?<!-)(\\.[a-zA-Z0-9-]{1,63})*$"
+                "$ref": "#/properties/feedback/properties/options/items/anyOf/1/properties/smtpHost/anyOf/0"
               },
               {},
               {
@@ -440,17 +465,24 @@
           "anyOf": [
             {
               "type": "string",
-              "pattern": "^(?!-)(?!.*--)(?!.*\\.\\.)(?!.*\\.$)[a-zA-Z0-9-]{1,63}(?<!-)(\\.[a-zA-Z0-9-]{1,63})*$"
+              "format": "uri"
             },
-            {},
             {
-              "type": "string",
               "anyOf": [
                 {
-                  "format": "ipv4"
+                  "$ref": "#/properties/feedback/properties/options/items/anyOf/1/properties/smtpHost/anyOf/0"
                 },
+                {},
                 {
-                  "format": "ipv6"
+                  "type": "string",
+                  "anyOf": [
+                    {
+                      "format": "ipv4"
+                    },
+                    {
+                      "format": "ipv6"
+                    }
+                  ]
                 }
               ]
             }
@@ -458,56 +490,34 @@
           "description": "Pass requests through to another proxy upstream."
         },
         "bypassUpstreamProxyHosts": {
-          "type": "array",
-          "maxItems": 125,
-          "items": {
-            "type": "array",
-            "items": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "boolean"
-              }
-            ],
-            "minItems": 2,
-            "maxItems": 2
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
           },
           "description": "A list of hosts that should bypass the upstream proxy."
         },
         "appendParamToQueryString": {
-          "type": "array",
-          "maxItems": 125,
-          "items": {
+          "type": "object",
+          "additionalProperties": {
             "type": "array",
-            "items": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "array",
-                "items": {
+            "items": {
+              "type": "object",
+              "properties": {
+                "regexPattern": {
+                  "type": "string",
+                  "description": "A regex pattern used to test whether parameters should be attached. Set to '.' to match everything."
+                },
+                "params": {
                   "type": "object",
-                  "properties": {
-                    "regexPattern": {
-                      "type": "string",
-                      "description": "A regex pattern used to test whether parameters should be attached. Set to '.' to match everything."
-                    },
-                    "params": {
-                      "type": "object",
-                      "additionalProperties": {
-                        "type": "string"
-                      },
-                      "description": "Parameters that should be appended to the request."
-                    }
+                  "additionalProperties": {
+                    "type": "string"
                   },
-                  "required": ["regexPattern", "params"],
-                  "additionalProperties": false
+                  "description": "Parameters that should be appended to the request."
                 }
-              }
-            ],
-            "minItems": 2,
-            "maxItems": 2
+              },
+              "required": ["regexPattern", "params"],
+              "additionalProperties": false
+            }
           },
           "description": "An array of options which you to inform which additional parameters are appended to the url querystring."
         },
@@ -538,6 +548,7 @@
             },
             "additionalProperties": false
           },
+          "default": {},
           "description": "A map of proxy authentication configurations."
         }
       },
@@ -569,7 +580,8 @@
           "::/128",
           "2001:db8::/32",
           "ff00::/8"
-        ]
+        ],
+        "proxyAuth": {}
       },
       "description": "Configuration for the proxy service."
     },
@@ -611,6 +623,11 @@
         }
       },
       "additionalProperties": false,
+      "default": {
+        "serveStatic": true,
+        "resolvePathRelativeToWwwroot": "/index.html",
+        "resolveUnmatchedPathsWithIndexHtml": false
+      },
       "description": "Configuration for serving static files."
     },
     "csp": {
@@ -661,6 +678,45 @@
         "frameSrc": [],
         "frameAncestors": []
       }
+    },
+    "wwwroot": {
+      "type": "string",
+      "default": "./wwwroot"
+    },
+    "https": {
+      "type": "object",
+      "properties": {
+        "keyPath": {
+          "type": "string",
+          "description": "Private key in PEM format. PEM allows the option of private key being encrypted. Encrypted keys will be decrypted with passphrase if provided."
+        },
+        "certPath": {
+          "type": "string"
+        },
+        "passphrase": {
+          "type": "string",
+          "description": "Passphrase for the private key. If the key is encrypted, this option is required."
+        },
+        "redirectToHttps": {
+          "type": "boolean",
+          "default": false,
+          "description": "Redirect HTTP requests to HTTPS. This is useful when running behind a reverse proxy that handles HTTPS."
+        },
+        "httpAllowedHosts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": ["localhost"],
+          "description": "List of hosts that are allowed to make HTTP requests. This is mostly useful to allow non-https access to localhost in development."
+        },
+        "strictTransportSecurity": {
+          "type": "string",
+          "description": "The value of the Strict-Transport-Security header. This header tells browsers to always use HTTPS when connecting to the server. This is useful when running behind a reverse proxy that handles HTTPS. Ignored if redirectToHttps is false."
+        }
+      },
+      "required": ["keyPath", "certPath"],
+      "additionalProperties": false
     }
   },
   "additionalProperties": false,

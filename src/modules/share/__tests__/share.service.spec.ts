@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 
-import { createMock } from '@golevelup/ts-jest';
+import { createMock } from '@golevelup/ts-vitest';
 import { of } from 'rxjs';
 
 import { shareGist } from '../schema/share-gist.schema.js';
@@ -16,8 +16,8 @@ import {
 import { ShareServiceManager } from '../share-service-manager.service.js';
 import { ShareService } from '../share.service.js';
 
-const mockHttpPost = jest.fn();
-const mockHttpGet = jest.fn();
+const mockHttpPost = vi.fn();
+const mockHttpGet = vi.fn();
 
 class HttpServiceMock {
   post = mockHttpPost;
@@ -25,9 +25,9 @@ class HttpServiceMock {
 }
 
 class LoggerServiceMock {
-  log = jest.fn();
-  verbose = jest.fn();
-  error = jest.fn();
+  log = vi.fn();
+  verbose = vi.fn();
+  error = vi.fn();
 }
 
 const gistConfig = shareGist.parse({
@@ -64,17 +64,17 @@ describe('ShareService', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('save', () => {
-    it('should throw a NotFoundException when newPrefix is not specified in config', () => {
+    it('should throw a NotFoundException when newPrefix is not specified in config', async () => {
       const req = mockExecutionContext.switchToHttp().getRequest<Request>();
       const shareConf = { ...shareConfig, newPrefix: undefined };
 
       const service = new ShareService(shareConf, shareServiceManager);
 
-      expect(() => service.save({}, req)).rejects.toThrow();
+      await expect(() => service.save({}, req)).rejects.toThrow();
     });
 
     it('should throw a NotFoundException when there is no availablePrefixes configured', async () => {
@@ -83,7 +83,9 @@ describe('ShareService', () => {
       await shareServiceManager.initializeProviders([]);
       const service = new ShareService(shareConfig, shareServiceManager);
 
-      expect(() => service.save({}, req)).rejects.toThrow(NotFoundException);
+      await expect(() => service.save({}, req)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('properly saves', async () => {
@@ -93,7 +95,7 @@ describe('ShareService', () => {
       await shareServiceManager.initializeProviders([gistConfig]);
       const service = new ShareService(shareConfig, shareServiceManager);
 
-      const shareServiceSpy = jest.spyOn(service, 'save');
+      const shareServiceSpy = vi.spyOn(service, 'save');
       const result = await service.save({}, req);
       expect(shareServiceSpy).toHaveBeenCalledTimes(1);
       expect(result).toEqual({
@@ -112,7 +114,7 @@ describe('ShareService', () => {
       await shareServiceManager.initializeProviders([gistConfig]);
       const service = new ShareService(shareConfig, shareServiceManager);
 
-      expect(() => service.resolve('testId')).rejects.toThrow(
+      await expect(() => service.resolve('testId')).rejects.toThrow(
         BadRequestException,
       );
     });
@@ -135,7 +137,7 @@ describe('ShareService', () => {
       await shareServiceManager.initializeProviders([]);
       const service = new ShareService(shareConfig, shareServiceManager);
 
-      expect(() => service.resolve('test1-id')).rejects.toThrow(
+      await expect(() => service.resolve('test1-id')).rejects.toThrow(
         NotFoundException,
       );
     });

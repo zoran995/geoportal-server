@@ -1,6 +1,6 @@
 import { ExecutionContext } from '@nestjs/common';
 
-import { createMock } from '@golevelup/ts-jest';
+import { createMock } from '@golevelup/ts-vitest';
 
 import { CreateFeedbackDto } from '../../dto/create-feedback.dto.js';
 import { formatBody } from '../formatBody.js';
