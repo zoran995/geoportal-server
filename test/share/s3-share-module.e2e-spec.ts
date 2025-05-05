@@ -75,7 +75,7 @@ describe('Share Module (e2e) - S3', () => {
     app = moduleFixture.createNestApplication();
     app.setGlobalPrefix('api');
     await app.init();
-  });
+  }, 60000);
 
   it('should save share via s3 provider', async () => {
     const response = await request(app.getHttpServer())
