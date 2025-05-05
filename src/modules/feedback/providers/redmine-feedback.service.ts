@@ -1,10 +1,8 @@
-import { HttpService } from '@nestjs/axios';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 import type { Request } from 'express';
-import { lastValueFrom } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
 
+import { AppHttpService } from 'src/infrastructure/http/app-http-service.js';
 import { LoggerService } from 'src/infrastructure/logger/index.js';
 
 import { formatBody } from '../common/formatBody.js';
@@ -16,42 +14,37 @@ import { AbstractFeedbackService } from './abstract-feedback.service.js';
 export class RedmineFeedbackService extends AbstractFeedbackService<RedmineFeedbackConfigType> {
   constructor(
     protected readonly options: RedmineFeedbackConfigType,
-    private readonly httpService: HttpService,
+    private readonly httpService: AppHttpService,
     private readonly logger: LoggerService,
   ) {
     super(options);
   }
 
   async post(feedback: CreateFeedbackDto, request: Request): Promise<unknown> {
-    return lastValueFrom(
-      this.httpService
-        .post(
-          this.options.issuesUrl,
-          {
-            issue: {
-              project_id: this.options.project_id,
-              subject: feedback.title,
-              description: formatBody(
-                feedback,
-                request,
-                this.options.additionalParameters,
-              ),
-            },
+    try {
+      const response = await this.httpService.post(
+        this.options.issuesUrl,
+        {
+          issue: {
+            project_id: this.options.project_id,
+            subject: feedback.title,
+            description: formatBody(
+              feedback,
+              request,
+              this.options.additionalParameters,
+            ),
           },
-          {
-            auth: {
-              username: this.options.username,
-              password: this.options.password,
-            },
-          },
-        )
-        .pipe(
-          map((res) => res.data as Record<string, unknown>),
-          catchError((e) => {
-            this.logger.error(`Creating feedback failed`, e as never);
-            throw new InternalServerErrorException();
-          }),
-        ),
-    );
+        },
+        {
+          username: this.options.username,
+          password: this.options.password,
+        },
+      );
+
+      return response;
+    } catch (e) {
+      this.logger.error(`Creating feedback failed`, e as never);
+      throw new InternalServerErrorException();
+    }
   }
 }
