@@ -1,4 +1,4 @@
-import { urlValidator } from '../urlValidator';
+import { urlValidator } from '../urlValidator.js';
 
 describe('proxy urlValidator', () => {
   it('return true on http url', () => {

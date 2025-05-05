@@ -1,9 +1,9 @@
 import { ExecutionContext, PayloadTooLargeException } from '@nestjs/common';
 
-import { createMock } from '@golevelup/ts-jest';
+import { createMock } from '@golevelup/ts-vitest';
 import { of } from 'rxjs';
 
-import { PayloadLimitInterceptor } from '../payload-limit.interceptor';
+import { PayloadLimitInterceptor } from '../payload-limit.interceptor.js';
 
 const createExecutionContextMock = (max: number) => {
   return createMock<ExecutionContext>({
@@ -42,18 +42,19 @@ describe('PayloadLimitInterceptor', () => {
     }
   });
 
-  it('should return data', (done) => {
-    const mockExecutionContext = createExecutionContextMock(60);
-    interceptor.intercept(mockExecutionContext, next).subscribe({
-      next: (value) => {
-        expect(value).toEqual(returnData);
-      },
-      error: (err) => {
-        throw err;
-      },
-      complete: () => {
-        done();
-      },
-    });
-  });
+  it('should return data', () =>
+    new Promise((done) => {
+      const mockExecutionContext = createExecutionContextMock(60);
+      interceptor.intercept(mockExecutionContext, next).subscribe({
+        next: (value) => {
+          expect(value).toEqual(returnData);
+        },
+        error: (err) => {
+          throw err;
+        },
+        complete: () => {
+          done('success');
+        },
+      });
+    }));
 });

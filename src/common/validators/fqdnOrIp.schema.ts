@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { portSchema } from './port.schema';
-import { fqdn } from './fqdn.schema';
+import { portSchema } from './port.schema.js';
+import { fqdn } from './fqdn.schema.js';
 
 const ipWithPort = (ipVersion?: 'v4' | 'v6') => {
   return z.custom<string>(

@@ -1,15 +1,14 @@
-import type { z } from 'zod';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import type { z } from 'zod';
 
-import { configuration } from '../../config';
+import { configuration } from '../../config/index.js';
 
-import { ProxyListService } from '../../proxy';
-import { ShareConfigType } from '../../share';
-import { ServerConfigController } from '../server-config.controller';
-import type { serverConfigResponse } from '../schema/safe-settings.schema';
-import { LoggerService } from '../../../infrastructure/logger';
-import { PROXY_OPTIONS } from 'src/modules/proxy/proxy.constants';
+import { LoggerService } from '../../../infrastructure/logger/index.js';
+import { PROXY_OPTIONS, ProxyListService } from '../../proxy/index.js';
+import { ShareConfigType } from '../../share/index.js';
+import type { serverConfigResponse } from '../schema/safe-settings.schema.js';
+import { ServerConfigController } from '../server-config.controller.js';
 
 function path(obj: Record<string, unknown>, path: string) {
   try {
@@ -21,7 +20,7 @@ function path(obj: Record<string, unknown>, path: string) {
 
 const defaultConfig = configuration.parse({});
 
-const mockConfigGet = jest.fn();
+const mockConfigGet = vi.fn();
 
 describe('ServerConfigController', () => {
   let controller: ServerConfigController;
@@ -43,7 +42,7 @@ describe('ServerConfigController', () => {
         {
           provide: LoggerService,
           useValue: {
-            log: jest.fn(),
+            log: vi.fn(),
           },
         },
       ],

@@ -1,10 +1,19 @@
 import { vol } from 'memfs';
-import { loadEnvFile } from '../load-env.util';
+import { loadEnvFile } from '../load-env.util.js';
 
-jest.mock('fs');
+vi.hoisted(async () => {
+  const fsMock = await import('memfs');
+
+  require.cache.fs = { exports: fsMock } as never;
+});
+
+vi.mock('fs');
+vi.mock('node:fs');
 
 vol.fromJSON({
-  './test/.env': 'port=9999',
+  './test/.env': `
+  port=9999
+  `,
   './.env': 'port1=1000',
 });
 

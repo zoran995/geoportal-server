@@ -6,13 +6,13 @@ import { http, HttpResponse, passthrough } from 'msw';
 import { setupServer } from 'msw/node';
 import request from 'supertest';
 
-import { AppModule } from 'src/app.module';
-import { LoggerService } from 'src/infrastructure/logger/logger.service';
+import { AppModule } from 'src/app.module.js';
+import { LoggerService } from 'src/infrastructure/logger/logger.service.js';
+import type { ProxyConfigType } from 'src/modules/proxy/config/schema/proxy-config.dto.js';
 
-import { NoopLoggerService } from './noop-logger.service';
-import type { ProxyConfigType } from 'src/modules/proxy/config/schema/proxy-config.dto';
+import { NoopLoggerService } from './helpers/noop-logger.service.js';
 
-jest.mock('fs');
+vi.mock('fs');
 
 const localRequestHandler = http.all('*', ({ request }) => {
   if (request.url.includes('127.0.0.1')) {

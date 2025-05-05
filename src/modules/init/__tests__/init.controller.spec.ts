@@ -1,19 +1,19 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 
-import { createMock } from '@golevelup/ts-jest';
+import { createMock } from '@golevelup/ts-vitest';
 import { Response } from 'express';
 import { vol } from 'memfs';
 import * as path from 'path';
 
-import { WWWROOT_TOKEN } from 'src/common/utils';
-import { LoggerModule } from 'src/infrastructure/logger';
+import { WWWROOT_TOKEN } from 'src/common/utils/index.js';
+import { LoggerModule } from 'src/infrastructure/logger/index.js';
 
-import { InitController } from '../init.controller';
-import { InitService } from '../init.service';
-import { INIT_OPTIONS } from '../init.constants';
+import { InitController } from '../init.controller.js';
+import { InitService } from '../init.service.js';
+import { INIT_OPTIONS } from '../init.constants.js';
 
-jest.mock('fs');
+vi.mock('fs');
 
 vol.fromJSON({
   './test/init/init.json': 'hello init',
@@ -49,7 +49,7 @@ describe('InitController', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -58,7 +58,7 @@ describe('InitController', () => {
 
   it('should sanitize filename', () => {
     expect.assertions(3);
-    const getFilePathSpy = jest.spyOn(initService, 'getFilePath');
+    const getFilePathSpy = vi.spyOn(initService, 'getFilePath');
     try {
       controller.serveInitFile(
         { fileName: '../serverconfig.json' },

@@ -1,4 +1,4 @@
-import { processHeaders } from '../processHeaders';
+import { processHeaders } from '../processHeaders.js';
 
 describe('proxy processHeaders', () => {
   it('properly set headers', () => {

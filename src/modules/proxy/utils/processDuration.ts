@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 
-import { DURATION_REGEX, DURATION_UNITS } from '../proxy.constants';
+import { DURATION_REGEX, DURATION_UNITS } from '../proxy.constants.js';
 
 /**
  * Interpret the max age as a duration in Varnish notation

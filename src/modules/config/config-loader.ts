@@ -1,10 +1,10 @@
-import { isArray, isObject } from 'src/common/helpers';
+import { isArray, isObject } from 'src/common/helpers/index.js';
 
-import { ConfigurationType } from './schema/configuration.schema';
-import { loadEnvFile } from './utils/load-env.util';
-import { loadJsonConfig } from './utils/load-json-config.util';
-import { loadYargs, YargsConfigType } from './utils/load-yargs.util';
-import { validate } from './validators/config.validator';
+import { ConfigurationType } from './schema/configuration.schema.js';
+import { loadEnvFile } from './utils/load-env.util.js';
+import { loadJsonConfig } from './utils/load-json-config.util.js';
+import { loadYargs, YargsConfigType } from './utils/load-yargs.util.js';
+import { validate } from './validators/config.validator.js';
 
 export declare type IConfigurationType = ConfigurationType & YargsConfigType;
 

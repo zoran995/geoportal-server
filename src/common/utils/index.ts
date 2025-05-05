@@ -1,1 +1,1 @@
-export { WWWROOT_TOKEN } from './wwwroot_token';
+export { WWWROOT_TOKEN } from './wwwroot_token.js';

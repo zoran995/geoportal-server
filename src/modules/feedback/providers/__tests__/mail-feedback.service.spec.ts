@@ -1,9 +1,9 @@
 import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 
-import { createMock } from '@golevelup/ts-jest';
+import { createMock } from '@golevelup/ts-vitest';
 
-import { mailFeedback } from '../../config/schema/mail-feedback.schema';
-import { MailFeedbackService } from '../mail-feedback.service';
+import { mailFeedback } from '../../config/schema/mail-feedback.schema.js';
+import { MailFeedbackService } from '../mail-feedback.service.js';
 
 describe('MailFeedbackService', () => {
   const mockExecutionContext = createMock<ExecutionContext>({
@@ -29,13 +29,13 @@ describe('MailFeedbackService', () => {
   });
 
   it('should properly send feedback', async () => {
-    const sendMailMock = jest
+    const sendMailMock = vi
       .fn()
       .mockReturnValue(Promise.resolve('test mail success'));
 
     const service: MailFeedbackService = new MailFeedbackService(
       mailConf,
-      { error: jest.fn() } as never,
+      { error: vi.fn() } as never,
       {
         sendMail: sendMailMock,
       } as never,
@@ -46,13 +46,13 @@ describe('MailFeedbackService', () => {
 
   it('should throw an error InternalServerErrorException', async () => {
     expect.assertions(1);
-    const sendMailMock = jest
+    const sendMailMock = vi
       .fn()
       .mockReturnValue(Promise.reject('test sending email failed'));
 
     const service: MailFeedbackService = new MailFeedbackService(
       mailConf,
-      { error: jest.fn() } as never,
+      { error: vi.fn() } as never,
       {
         sendMail: sendMailMock,
       } as never,

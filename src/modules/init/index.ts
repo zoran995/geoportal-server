@@ -1,1 +1,1 @@
-export { InitModule } from './init.module';
+export { InitModule } from './init.module.js';

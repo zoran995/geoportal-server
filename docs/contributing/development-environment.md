@@ -52,7 +52,7 @@ yarn run lint
 
 ## Testing
 
-We are using jest as our testing framework. To run unit tests execute the following command
+We are using vitest as our testing framework. To run unit tests execute the following command
 
 ```sh
 npm test

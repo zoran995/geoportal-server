@@ -1,9 +1,9 @@
 import type { Request } from 'express';
 
-import type { LoggerService } from 'src/infrastructure/logger';
+import type { LoggerService } from 'src/infrastructure/logger/index.js';
 
-import { ShareType } from '../schema/share.schema';
-import { ShareResult } from '../interfaces/save-share-response.interface';
+import { ShareType } from '../schema/share.schema.js';
+import { ShareResult } from '../interfaces/save-share-response.interface.js';
 
 interface IShareProvider {
   save(data: ShareData, req: Request): Promise<ShareResult>;

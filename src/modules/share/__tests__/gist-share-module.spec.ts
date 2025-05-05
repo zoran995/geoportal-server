@@ -4,12 +4,15 @@ import { http, HttpResponse, passthrough } from 'msw';
 import { setupServer } from 'msw/node';
 import request from 'supertest';
 
-import { AppHttpModule } from 'src/infrastructure/http';
-import { LoggerModule, LoggerService } from 'src/infrastructure/logger';
-import { AppConfigModule } from 'src/modules/config';
+import { AppHttpModule } from 'src/infrastructure/http/index.js';
+import {
+  LoggerModule,
+  LoggerService,
+} from 'src/infrastructure/logger/index.js';
+import { AppConfigModule } from 'src/modules/config/index.js';
 
-import { shareConfig } from '../schema/share.config.schema';
-import { ShareModule } from '../share.module';
+import { shareConfig } from '../schema/share.config.schema.js';
+import { ShareModule } from '../share.module.js';
 
 const handlers = [
   // we need to let local request pass through
@@ -46,7 +49,7 @@ const handlers = [
   }),
 ];
 
-jest.mock('fs');
+vi.mock('fs');
 
 export const server = setupServer(...handlers);
 
@@ -85,11 +88,11 @@ describe('Share Module (e2e)', () => {
     })
       .overrideProvider(LoggerService)
       .useValue({
-        error: jest.fn(),
-        warn: jest.fn(),
-        info: jest.fn(),
-        debug: jest.fn(),
-        verbose: jest.fn(),
+        error: vi.fn(),
+        warn: vi.fn(),
+        info: vi.fn(),
+        debug: vi.fn(),
+        verbose: vi.fn(),
       })
       .compile();
 

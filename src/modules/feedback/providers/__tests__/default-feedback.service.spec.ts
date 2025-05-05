@@ -1,4 +1,5 @@
-import { DefaultFeedbackService } from '../default-feedback.service';
+import { NotImplementedException } from '@nestjs/common';
+import { DefaultFeedbackService } from '../default-feedback.service.js';
 
 describe('GithubFeedbackService', () => {
   let service: DefaultFeedbackService;
@@ -8,12 +9,15 @@ describe('GithubFeedbackService', () => {
   });
 
   it('should throw error', async () => {
-    expect.assertions(1);
+    expect.assertions(2);
 
     try {
       await service.post();
     } catch (err) {
-      expect(err).toEqual(new Error('Feedback creation not supported.'));
+      expect(err).toBeInstanceOf(NotImplementedException);
+      expect((err as NotImplementedException).message).toBe(
+        'Feedback creation not supported.',
+      );
     }
   });
 });

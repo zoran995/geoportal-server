@@ -1,6 +1,6 @@
 import { NotImplementedException } from '@nestjs/common';
-import { DEFAULT_FEEDBACK_ID } from '../config/schema/feedback.config.schema';
-import { AbstractFeedbackService } from './abstract-feedback.service';
+import { DEFAULT_FEEDBACK_ID } from '../config/schema/feedback.config.schema.js';
+import { AbstractFeedbackService } from './abstract-feedback.service.js';
 
 export class DefaultFeedbackService extends AbstractFeedbackService {
   constructor() {

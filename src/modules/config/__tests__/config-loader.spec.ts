@@ -1,7 +1,12 @@
 import { vol, DirectoryJSON } from 'memfs';
-import { ConfigLoader } from '../config-loader';
+import { ConfigLoader } from '../config-loader.js';
 
-jest.mock('fs');
+vi.mock('fs');
+vi.hoisted(async () => {
+  const fsMock = await import('memfs');
+
+  require.cache.fs = { exports: fsMock } as never;
+});
 
 const volJson: DirectoryJSON = {
   './test/serverconfig1.json': JSON.stringify({ port: 3001 }),
@@ -31,7 +36,7 @@ const volJson: DirectoryJSON = {
 vol.fromJSON(volJson);
 
 describe('ConfigLoader', () => {
-  const validateMock = jest.fn((config: unknown) => {
+  const validateMock = vi.fn((config: unknown) => {
     return config as never;
   });
 
@@ -156,7 +161,7 @@ describe('ConfigLoader', () => {
     });
 
     afterEach(() => {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
     });
   });
 

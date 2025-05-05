@@ -11,18 +11,23 @@ import { NestFactory } from '@nestjs/core';
 import { DirectoryJSON, fs, vol } from 'memfs';
 import supertest from 'supertest';
 
-import { AppModule } from 'src/app.module';
-import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
-import { InternalServerErrorExceptionFilter } from 'src/common/filters/internal-server-error-exception.filter';
-import { NotFoundExceptionFilter } from 'src/common/filters/not-found-exception.filter';
-import { type ServeStaticType } from 'src/common/schema';
-import { WWWROOT_TOKEN } from 'src/common/utils';
-import type { ConfigurationType } from 'src/modules/config';
+import { AppModule } from 'src/app.module.js';
+import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter.js';
+import { InternalServerErrorExceptionFilter } from 'src/common/filters/internal-server-error-exception.filter.js';
+import { NotFoundExceptionFilter } from 'src/common/filters/not-found-exception.filter.js';
+import { type ServeStaticType } from 'src/common/schema/index.js';
+import { WWWROOT_TOKEN } from 'src/common/utils/index.js';
+import type { ConfigurationType } from 'src/modules/config/index.js';
 
-import { NoopLoggerService } from './noop-logger.service';
+import { NoopLoggerService } from './helpers/noop-logger.service.js';
 
-jest.mock('fs');
-jest.mock('src/infrastructure/logger/logger.service');
+vi.mock('fs');
+vi.hoisted(async () => {
+  const fsMock = await import('memfs');
+
+  require.cache.fs = { exports: fsMock } as never;
+});
+vi.mock(import('src/infrastructure/logger/logger.service.js'));
 
 const routingOff: Partial<ServeStaticType> = {
   serveStatic: true,
@@ -301,7 +306,7 @@ describe('Serve static (e2e)', () => {
   });
 
   afterEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     await app?.close();
   });
 });

@@ -8,11 +8,11 @@ import { Response } from 'express';
 import { existsSync } from 'fs';
 import path, { extname } from 'path';
 
-import { isDefined } from 'src/common/helpers';
-import { type ServeStaticType } from 'src/common/schema';
-import { WWWROOT_TOKEN } from 'src/common/utils';
+import { isDefined } from 'src/common/helpers/index.js';
+import { type ServeStaticType } from 'src/common/schema/index.js';
+import { WWWROOT_TOKEN } from 'src/common/utils/index.js';
 
-import { SERVE_STATIC_OPTIONS } from './serve-static.constants';
+import { SERVE_STATIC_OPTIONS } from './serve-static.constants.js';
 
 @Injectable()
 export class AppServeStatic implements ServeStaticModuleOptionsFactory {

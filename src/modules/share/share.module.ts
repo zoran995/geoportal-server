@@ -4,13 +4,13 @@ import {
   type ModuleMetadata,
 } from '@nestjs/common';
 
-import { POST_SIZE_LIMIT } from 'src/common/interceptor';
+import { POST_SIZE_LIMIT } from 'src/common/interceptor/index.js';
 
-import type { ShareConfigType } from './schema/share.config.schema';
-import { ShareServiceManager } from './share-service-manager.service';
-import { SHARE_OPTIONS } from './share.constants';
-import { ShareController } from './share.controller';
-import { ShareService } from './share.service';
+import type { ShareConfigType } from './schema/share.config.schema.js';
+import { ShareServiceManager } from './share-service-manager.service.js';
+import { SHARE_OPTIONS } from './share.constants.js';
+import { ShareController } from './share.controller.js';
+import { ShareService } from './share.service.js';
 
 export class ShareModule {
   static forRoot(options: ShareModuleOptions): DynamicModule {

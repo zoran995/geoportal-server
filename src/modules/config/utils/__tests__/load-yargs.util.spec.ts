@@ -1,4 +1,4 @@
-import { loadYargs } from '../load-yargs.util';
+import { loadYargs } from '../load-yargs.util.js';
 
 describe('load yargs', () => {
   const originalArgv = [...process.argv];

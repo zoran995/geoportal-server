@@ -4,8 +4,8 @@ import { Response } from 'express';
 import { existsSync } from 'fs';
 import path from 'path';
 
-import type { ServeStaticType } from '../schema';
-import { HttpExceptionFilter } from './http-exception.filter';
+import type { ServeStaticType } from '../schema/index.js';
+import { HttpExceptionFilter } from './http-exception.filter.js';
 
 @Catch(NotFoundException)
 export class NotFoundExceptionFilter extends HttpExceptionFilter {

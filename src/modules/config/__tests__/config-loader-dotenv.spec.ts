@@ -1,7 +1,12 @@
 import { vol, DirectoryJSON } from 'memfs';
-import { ConfigLoader } from '../config-loader';
+import { ConfigLoader } from '../config-loader.js';
 
-jest.mock('fs');
+vi.mock('fs');
+vi.hoisted(async () => {
+  const fsMock = await import('memfs');
+
+  require.cache.fs = { exports: fsMock } as never;
+});
 
 const volJson: DirectoryJSON = {
   './test/dotenv-expand.json': JSON.stringify({
@@ -98,7 +103,7 @@ const volJson: DirectoryJSON = {
 vol.fromJSON(volJson);
 
 describe('ConfigLoader tests based on dotenv repository', () => {
-  const validateMock = jest.fn((config: unknown) => {
+  const validateMock = vi.fn((config: unknown) => {
     return config as never;
   });
 

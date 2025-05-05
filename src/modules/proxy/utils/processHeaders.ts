@@ -1,4 +1,4 @@
-import { filterHeaders } from './filterHeaders';
+import { filterHeaders } from './filterHeaders.js';
 
 /**
  * Filters out headers that shouldn't be proxied, overrides caching so files are

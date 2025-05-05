@@ -4,7 +4,7 @@ import { Global, Module } from '@nestjs/common';
 import http from 'http';
 import https from 'https';
 
-import { AxiosLogInterceptor } from './axios-log-interceptors';
+import { AxiosLogInterceptor } from './axios-log-interceptors.js';
 
 const agentConfig: https.AgentOptions = {
   keepAlive: true,

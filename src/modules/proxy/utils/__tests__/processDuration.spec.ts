@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 
-import { processDuration } from '../processDuration';
+import { processDuration } from '../processDuration.js';
 
 describe('proxy process duration', () => {
   it('properly process milliseconds', () => {

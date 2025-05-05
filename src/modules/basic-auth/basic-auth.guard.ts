@@ -8,8 +8,8 @@ import {
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 
-import type { BasicAuthenticationOptions } from './config/basic-authentication.schema';
-import { BASIC_AUTH_OPTIONS } from './contants';
+import type { BasicAuthenticationOptions } from './config/basic-authentication.schema.js';
+import { BASIC_AUTH_OPTIONS } from './contants.js';
 
 const CREDENTIALS_REGEXP =
   /^ *(?:[Bb][Aa][Ss][Ii][Cc]) +([A-Za-z0-9._~+/-]+=*) *$/;

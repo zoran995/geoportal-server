@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { baseFeedback } from './base-feedback.schema';
+import { baseFeedback } from './base-feedback.schema.js';
 
 export const redmineFeedback = baseFeedback.extend({
   service: z.literal('redmine'),

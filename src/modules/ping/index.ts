@@ -1,1 +1,1 @@
-export { PingModule } from './ping.module';
+export { PingModule } from './ping.module.js';

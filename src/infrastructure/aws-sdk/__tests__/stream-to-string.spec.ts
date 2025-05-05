@@ -1,6 +1,6 @@
 import { Readable } from 'stream';
 
-import { streamToString } from '../stream-to-string';
+import { streamToString } from '../stream-to-string.js';
 
 describe('streamToString', () => {
   it('streamToString(stream)', async () => {

@@ -5,14 +5,14 @@ import { fs, vol } from 'memfs';
 import {
   proxyConfig,
   type ProxyConfigType,
-} from '../../config/schema/proxy-config.dto';
-import { DEFAULT_BLACKLIST, PROXY_OPTIONS } from '../../proxy.constants';
-import { ProxyListService } from '../proxy-list.service';
+} from '../../config/schema/proxy-config.dto.js';
+import { DEFAULT_BLACKLIST, PROXY_OPTIONS } from '../../proxy.constants.js';
+import { ProxyListService } from '../proxy-list.service.js';
 import type { INestApplication } from '@nestjs/common';
-import { LoggerService } from 'src/infrastructure/logger';
-import type { ProxyOptions } from '../../proxy-options';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
+import type { ProxyOptions } from '../../proxy-options.js';
 
-jest.mock('fs');
+vi.mock('fs');
 
 describe('ProxyListService', () => {
   let app: INestApplication;
@@ -41,7 +41,7 @@ describe('ProxyListService', () => {
         {
           provide: LoggerService,
           useValue: {
-            log: jest.fn(),
+            log: vi.fn(),
           },
         },
         {
@@ -56,7 +56,7 @@ describe('ProxyListService', () => {
   });
 
   afterEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     await app.close();
   });
 

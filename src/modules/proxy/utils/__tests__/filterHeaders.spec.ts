@@ -1,4 +1,4 @@
-import { filterHeaders } from '../filterHeaders';
+import { filterHeaders } from '../filterHeaders.js';
 
 describe('proxy filterHeaders', () => {
   const headers: Record<string, string> = {

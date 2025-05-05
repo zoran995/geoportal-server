@@ -7,12 +7,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DirectoryJSON, vol } from 'memfs';
 import request from 'supertest';
 
-import { AppModule } from 'src/app.module';
+import { AppModule } from 'src/app.module.js';
 
-import { NoopLoggerService } from './noop-logger.service';
+import { NoopLoggerService } from './helpers/noop-logger.service.js';
 
-jest.mock('fs');
-jest.mock('src/infrastructure/logger/logger.service');
+vi.mock('fs');
+vi.mock(import('src/infrastructure/logger/logger.service.js'));
 
 const volJson: DirectoryJSON = {
   './serverconfig.json': JSON.stringify({}),

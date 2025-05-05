@@ -1,6 +1,6 @@
 import { EncodingOption, existsSync, readFileSync } from 'fs';
 
-import { ConfigurationType } from '../schema/configuration.schema';
+import { ConfigurationType } from '../schema/configuration.schema.js';
 
 interface ILoadJsonConfigOptions {
   filePath: string | string[];

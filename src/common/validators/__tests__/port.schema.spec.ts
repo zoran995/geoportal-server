@@ -1,4 +1,4 @@
-import { portSchema } from '../port.schema';
+import { portSchema } from '../port.schema.js';
 
 describe('portSchema', () => {
   it('should return true for valid port numbers', () => {

@@ -5,16 +5,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { createMock } from '@golevelup/ts-jest';
+import { createMock } from '@golevelup/ts-vitest';
 
-import { ValidationException } from '../../exceptions';
-import { GlobalExceptionFilter } from '../global-exception.filter';
-import { HttpExceptionFilter } from '../http-exception.filter';
+import { ValidationException } from '../../exceptions/index.js';
+import { GlobalExceptionFilter } from '../global-exception.filter.js';
+import { HttpExceptionFilter } from '../http-exception.filter.js';
 
-jest.mock('../global-exception.filter.ts');
+vi.mock(import('../global-exception.filter.js'));
 
-const mockStatusJson = jest.fn();
-const mockStatus = jest.fn().mockReturnValue({
+const mockStatusJson = vi.fn();
+const mockStatus = vi.fn().mockReturnValue({
   json: mockStatusJson,
 });
 const mockExecutionContext = createMock<ExecutionContext>({
@@ -23,13 +23,13 @@ const mockExecutionContext = createMock<ExecutionContext>({
       status: mockStatus,
     }),
     getRequest: () =>
-      jest.fn().mockReturnValue({
+      vi.fn().mockReturnValue({
         url: 'test-url',
       }),
   }),
 });
 
-const spyGlobalExceptionCatch = jest.spyOn(
+const spyGlobalExceptionCatch = vi.spyOn(
   GlobalExceptionFilter.prototype,
   'catch',
 );
@@ -42,7 +42,7 @@ describe('HttpExceptionFilter', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should properly initialize filter', () => {

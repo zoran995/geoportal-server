@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { Proj4Controller } from '../proj4.controller';
-import { Proj4Service } from '../proj4.service';
+import { Proj4Controller } from '../proj4.controller.js';
+import { Proj4Service } from '../proj4.service.js';
 
-const mockGetDefinition = jest.fn();
+const mockGetDefinition = vi.fn();
 
 describe('Proj4Controller', () => {
   let controller: Proj4Controller;

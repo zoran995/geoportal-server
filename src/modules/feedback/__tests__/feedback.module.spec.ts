@@ -8,19 +8,22 @@ import { http, HttpResponse, passthrough } from 'msw';
 import { setupServer } from 'msw/node';
 import request from 'supertest';
 
-import { AppHttpModule } from 'src/infrastructure/http';
-import { LoggerModule, LoggerService } from 'src/infrastructure/logger';
-import { AppConfigModule } from 'src/modules/config';
+import { AppHttpModule } from 'src/infrastructure/http/index.js';
+import {
+  LoggerModule,
+  LoggerService,
+} from 'src/infrastructure/logger/index.js';
+import { AppConfigModule } from 'src/modules/config/index.js';
 
-import { FeedbackService } from '../common/feedback-service';
-import { feedbackConfig } from '../config/schema/feedback.config.schema';
-import { FeedbackModule } from '../feedback.module';
-import { DefaultFeedbackService } from '../providers/default-feedback.service';
-import { GithubFeedbackService } from '../providers/github-feedback.service';
-import { MailFeedbackService } from '../providers/mail-feedback.service';
-import { RedmineFeedbackService } from '../providers/redmine-feedback.service';
+import { FeedbackService } from '../common/feedback-service.js';
+import { feedbackConfig } from '../config/schema/feedback.config.schema.js';
+import { FeedbackModule } from '../feedback.module.js';
+import { DefaultFeedbackService } from '../providers/default-feedback.service.js';
+import { GithubFeedbackService } from '../providers/github-feedback.service.js';
+import { MailFeedbackService } from '../providers/mail-feedback.service.js';
+import { RedmineFeedbackService } from '../providers/redmine-feedback.service.js';
 
-jest.mock('fs');
+vi.mock('fs');
 
 describe('FeedbackModule', () => {
   const moduleFixture = Test.createTestingModule({
@@ -34,7 +37,7 @@ describe('FeedbackModule', () => {
   })
     .overrideProvider(LoggerService)
     .useValue({
-      error: jest.fn(),
+      error: vi.fn(),
     });
 
   describe('with default config', () => {

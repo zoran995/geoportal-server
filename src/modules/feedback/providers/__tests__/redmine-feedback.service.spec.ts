@@ -1,10 +1,10 @@
 import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 
-import { createMock } from '@golevelup/ts-jest';
+import { createMock } from '@golevelup/ts-vitest';
 import { of, throwError } from 'rxjs';
 
-import { redmineFeedback } from '../../config/schema/redmine-feedback.schema';
-import { RedmineFeedbackService } from '../redmine-feedback.service';
+import { redmineFeedback } from '../../config/schema/redmine-feedback.schema.js';
+import { RedmineFeedbackService } from '../redmine-feedback.service.js';
 
 describe('RedmineFeedbackService', () => {
   const redmineConf = redmineFeedback.parse({
@@ -30,7 +30,7 @@ describe('RedmineFeedbackService', () => {
   const req = mockExecutionContext.switchToHttp().getRequest();
 
   it('should send post request', async () => {
-    const httpPostMock = jest
+    const httpPostMock = vi
       .fn()
       .mockReturnValue(
         of({ ok: true, status_code: 200, message: 'Successful' }),
@@ -45,7 +45,7 @@ describe('RedmineFeedbackService', () => {
       {
         post: httpPostMock,
       } as never,
-      { error: jest.fn() } as never,
+      { error: vi.fn() } as never,
     );
     await service.post({}, req as never);
 
@@ -70,7 +70,7 @@ describe('RedmineFeedbackService', () => {
       password: redmineConf.password,
     };
 
-    const httpPostMock = jest
+    const httpPostMock = vi
       .fn()
       .mockReturnValue(throwError(() => new Error('test error')));
 
@@ -79,7 +79,7 @@ describe('RedmineFeedbackService', () => {
       {
         post: httpPostMock,
       } as never,
-      { error: jest.fn() } as never,
+      { error: vi.fn() } as never,
     );
 
     try {

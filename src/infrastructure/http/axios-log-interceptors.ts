@@ -2,7 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 
-import { LoggerService } from 'src/infrastructure/logger';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
 
 type AxiosRequestConfigMetadata = AxiosRequestConfig<unknown> & {
   metadata?: {

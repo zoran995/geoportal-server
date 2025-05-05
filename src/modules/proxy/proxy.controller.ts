@@ -7,10 +7,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { PayloadLimitInterceptor } from 'src/common/interceptor';
+import { PayloadLimitInterceptor } from 'src/common/interceptor/index.js';
 
-import { ProxyDto, ProxyWithDurationDto } from './dto/proxy.dto';
-import { ProxyService } from './proxy.service';
+import { ProxyDto, ProxyWithDurationDto } from './dto/proxy.dto.js';
+import { ProxyService } from './proxy.service.js';
 
 @Controller('proxy')
 @ApiTags('proxy')

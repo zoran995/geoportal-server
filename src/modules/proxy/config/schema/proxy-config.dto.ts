@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-import { fqdnOrIp } from 'src/common/validators';
+import { fqdnOrIp } from 'src/common/validators/index.js';
 
-import { DEFAULT_BLACKLIST, DEFAULT_MAX_SIZE } from '../../proxy.constants';
-import { proxyAuthConfig } from './proxy-auth-config.dto';
+import { DEFAULT_BLACKLIST, DEFAULT_MAX_SIZE } from '../../proxy.constants.js';
+import { proxyAuthConfig } from './proxy-auth-config.dto.js';
 import { createZodDto } from 'nestjs-zod';
 
 const appendParamToQueryString = z.object({

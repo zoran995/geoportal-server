@@ -1,7 +1,7 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { Proj4Service } from '../proj4.service';
+import { Proj4Service } from '../proj4.service.js';
 
 describe('Proj4Service', () => {
   let service: Proj4Service;

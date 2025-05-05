@@ -13,13 +13,13 @@ import {
   HttpExceptionFilter,
   InternalServerErrorExceptionFilter,
   NotFoundExceptionFilter,
-} from './common/filters';
-import { WWWROOT_TOKEN } from './common/utils';
-import { ShutdownObserver } from './infrastructure/http/shutdown-observer';
-import { LoggerService } from './infrastructure/logger';
-import { RateLimiterService } from './infrastructure/rate-limiter';
-import { BasicAuthGuard } from './modules/basic-auth';
-import { type IConfigurationType } from './modules/config';
+} from './common/filters/index.js';
+import { WWWROOT_TOKEN } from './common/utils/index.js';
+import { ShutdownObserver } from './infrastructure/http/shutdown-observer.js';
+import { LoggerService } from './infrastructure/logger/index.js';
+import { RateLimiterService } from './infrastructure/rate-limiter/index.js';
+import { BasicAuthGuard } from './modules/basic-auth/index.js';
+import { type IConfigurationType } from './modules/config/index.js';
 
 /**
  *

@@ -1,4 +1,4 @@
-import { createMock } from '@golevelup/ts-jest';
+import { createMock } from '@golevelup/ts-vitest';
 import {
   InternalServerErrorException,
   NotFoundException,
@@ -7,13 +7,13 @@ import {
 import type { Request } from 'express';
 import { of, throwError } from 'rxjs';
 
-import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service';
-import { shareGist } from '../../schema/share-gist.schema';
-import { GistShareService } from '../gist-share.service';
+import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service.js';
+import { shareGist } from '../../schema/share-gist.schema.js';
+import { GistShareService } from '../gist-share.service.js';
 
 describe('GistShareService', () => {
   let service: GistShareService;
-  let httpServiceMock: { get: jest.Mock; post: jest.Mock };
+  let httpServiceMock: { get: vi.mock; post: vi.mock };
   let gistShareConfig: any;
 
   const mockExecutionContext = createMock<ExecutionContext>({
@@ -23,6 +23,7 @@ describe('GistShareService', () => {
           protocol: 'http',
           path: '/api/share',
           ip: '127.0.0.1',
+
           headers: {
             host: 'example.co',
           },
@@ -37,8 +38,8 @@ describe('GistShareService', () => {
 
   beforeEach(() => {
     httpServiceMock = {
-      get: jest.fn(),
-      post: jest.fn(),
+      get: vi.fn(),
+      post: vi.fn(),
     };
 
     gistShareConfig = shareGist.parse({

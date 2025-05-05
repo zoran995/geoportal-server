@@ -1,10 +1,10 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { LoggerService } from 'src/infrastructure/logger';
-import type { ShareGistConfig } from './schema/share-gist.schema';
-import type { ShareS3Config } from './schema/share-s3.schema';
-import type { AbstractShareService } from './providers/abstract-share.service';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
+import type { ShareGistConfig } from './schema/share-gist.schema.js';
+import type { ShareS3Config } from './schema/share-s3.schema.js';
+import type { AbstractShareService } from './providers/abstract-share.service.js';
 
 @Injectable()
 export class ShareServiceManager {
@@ -42,12 +42,14 @@ export class ShareServiceManager {
     switch (config.service) {
       case 'gist': {
         const { GistShareService } = await import(
-          './providers/gist-share.service'
+          './providers/gist-share.service.js'
         );
         return new GistShareService(config, this.httpService, this.logger);
       }
       case 's3': {
-        const { S3ShareService } = await import('./providers/s3-share.service');
+        const { S3ShareService } = await import(
+          './providers/s3-share.service.js'
+        );
         return new S3ShareService(config, this.logger);
       }
       default:

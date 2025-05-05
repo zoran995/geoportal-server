@@ -6,7 +6,7 @@ ts-node ./merge-coverage.ts --report ./coverage0/coverage-final.json --report ./
 */
 
 import fs from 'fs';
-import { CoverageMapData, createCoverageMap } from 'istanbul-lib-coverage';
+import istanbulLibCoverage from 'istanbul-lib-coverage';
 import libReport from 'istanbul-lib-report';
 import reports from 'istanbul-reports';
 
@@ -20,11 +20,11 @@ async function main() {
     'coverage/e2e/coverage-final.json',
   ];
 
-  const map = createCoverageMap();
+  const map = istanbulLibCoverage.createCoverageMap();
 
   reportFiles.forEach((file) => {
     const fileReport = fs.readFileSync(file, { encoding: 'utf8' });
-    map.merge(JSON.parse(fileReport) as CoverageMapData);
+    map.merge(JSON.parse(fileReport) as istanbulLibCoverage.CoverageMapData);
   });
 
   const context = libReport.createContext({

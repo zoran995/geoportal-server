@@ -1,10 +1,10 @@
 import { ExecutionContext } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { createMock } from '@golevelup/ts-jest';
+import { createMock } from '@golevelup/ts-vitest';
 
-import { FeedbackService } from '../common/feedback-service';
-import { FeedbackController } from '../feedback.controller';
+import { FeedbackService } from '../common/feedback-service.js';
+import { FeedbackController } from '../feedback.controller.js';
 
 describe('FeedbackController', () => {
   let controller: FeedbackController;
@@ -20,7 +20,7 @@ describe('FeedbackController', () => {
     }),
   });
 
-  const postMock = jest.fn();
+  const postMock = vi.fn();
 
   const mockFeedbackService = {
     post: postMock,

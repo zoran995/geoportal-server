@@ -1,11 +1,11 @@
 import { ExecutionContext, NotFoundException } from '@nestjs/common';
 
-import { createMock } from '@golevelup/ts-jest';
+import { createMock } from '@golevelup/ts-vitest';
 
-import { GlobalExceptionFilter } from '../global-exception.filter';
+import { GlobalExceptionFilter } from '../global-exception.filter.js';
 
-const mockStatusJson = jest.fn();
-const mockStatus = jest.fn().mockReturnValue({
+const mockStatusJson = vi.fn();
+const mockStatus = vi.fn().mockReturnValue({
   json: mockStatusJson,
 });
 const mockExecutionContext = createMock<ExecutionContext>({
@@ -14,7 +14,7 @@ const mockExecutionContext = createMock<ExecutionContext>({
       status: mockStatus,
     }),
     getRequest: () =>
-      jest.fn().mockReturnValue({
+      vi.fn().mockReturnValue({
         url: 'test-url',
       }),
   }),
@@ -28,7 +28,7 @@ describe('GlobalExceptionFilter', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should properly initialize filter', () => {

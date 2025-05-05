@@ -1,10 +1,10 @@
 import type { Request } from 'express';
 
-import { LoggerService } from 'src/infrastructure/logger';
+import { LoggerService } from 'src/infrastructure/logger/logger.service.js';
 
-import { HttpLoggerMiddleware } from '../http-logger.middleware';
+import { HttpLoggerMiddleware } from '../http-logger.middleware.js';
 
-jest.mock('src/infrastructure/logger/logger.service');
+vi.mock(import('src/infrastructure/logger/logger.service.js'));
 
 const reqMockObject: Partial<Request> = {
   body: 'test-body',
@@ -12,14 +12,15 @@ const reqMockObject: Partial<Request> = {
   query: { test: 'query' },
   originalUrl: '/test',
   protocol: 'http',
-  get: jest.fn().mockReturnValue('example.com'),
+  get: vi.fn().mockReturnValue('example.com'),
 };
 
-const mockNext = jest.fn();
+const mockNext = vi.fn();
 const mockRes = {};
 
 describe('HttpLoggerMiddleware', () => {
   let httpLogger: HttpLoggerMiddleware;
+
   beforeEach(() => {
     (LoggerService as any).mockClear();
     httpLogger = new HttpLoggerMiddleware();

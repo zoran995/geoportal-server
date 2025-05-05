@@ -1,4 +1,4 @@
-import { combineURLs } from '../combineURLs';
+import { combineURLs } from '../combineURLs.js';
 
 describe('combineUrls', () => {
   const url = 'http://test.com/';

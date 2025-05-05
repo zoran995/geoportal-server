@@ -9,9 +9,9 @@ import {
 
 import type { Request } from 'express';
 
-import { FeedbackService } from './common/feedback-service';
-import { CreateFeedbackDto } from './dto/create-feedback.dto';
-import type { AbstractFeedbackService } from './providers/abstract-feedback.service';
+import { FeedbackService } from './common/feedback-service.js';
+import { CreateFeedbackDto } from './dto/create-feedback.dto.js';
+import type { AbstractFeedbackService } from './providers/abstract-feedback.service.js';
 
 @Controller('feedback')
 @ApiTags('feedback')

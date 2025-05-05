@@ -4,10 +4,10 @@ import {
   type ModuleMetadata,
 } from '@nestjs/common';
 
-import { feedbackServiceFactory } from './feeback-service.factory';
-import { FeedbackController } from './feedback.controller';
-import { FEEDBACK_CONFIG } from './feedback.constants';
-import type { FeedbackConfigType } from './config/schema/feedback.config.schema';
+import { feedbackServiceFactory } from './feeback-service.factory.js';
+import { FeedbackController } from './feedback.controller.js';
+import { FEEDBACK_CONFIG } from './feedback.constants.js';
+import type { FeedbackConfigType } from './config/schema/feedback.config.schema.js';
 
 @Module({})
 export class FeedbackModule {

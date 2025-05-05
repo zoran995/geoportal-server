@@ -1,6 +1,6 @@
-import { LoggerService } from 'src/infrastructure/logger';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
 
-import { configuration } from '../schema/configuration.schema';
+import { configuration } from '../schema/configuration.schema.js';
 
 /* enum Environment {Development = 'development', Production = 'production',
   Test = 'test', Provision = 'provision',

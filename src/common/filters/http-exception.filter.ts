@@ -2,8 +2,8 @@ import { ArgumentsHost, Catch, HttpException } from '@nestjs/common';
 
 import type { Request, Response } from 'express';
 
-import { ValidationException } from '../exceptions';
-import { GlobalExceptionFilter } from './global-exception.filter';
+import { ValidationException } from '../exceptions/index.js';
+import { GlobalExceptionFilter } from './global-exception.filter.js';
 
 @Catch()
 export class HttpExceptionFilter extends GlobalExceptionFilter {

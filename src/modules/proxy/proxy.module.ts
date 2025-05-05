@@ -4,13 +4,13 @@ import {
   type ModuleMetadata,
 } from '@nestjs/common';
 
-import { POST_SIZE_LIMIT } from 'src/common/interceptor';
+import { POST_SIZE_LIMIT } from 'src/common/interceptor/index.js';
 
-import type { ProxyOptions } from './proxy-options';
-import { PROXY_OPTIONS } from './proxy.constants';
-import { ProxyController } from './proxy.controller';
-import { ProxyService } from './proxy.service';
-import { ProxyListService } from './utils/proxy-list.service';
+import type { ProxyOptions } from './proxy-options.js';
+import { PROXY_OPTIONS } from './proxy.constants.js';
+import { ProxyController } from './proxy.controller.js';
+import { ProxyService } from './proxy.service.js';
+import { ProxyListService } from './utils/proxy-list.service.js';
 
 @Module({})
 export class ProxyModule {

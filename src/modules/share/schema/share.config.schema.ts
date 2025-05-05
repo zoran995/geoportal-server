@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { shareGist } from './share-gist.schema';
-import { shareS3 } from './share-s3.schema';
+import { shareGist } from './share-gist.schema.js';
+import { shareS3 } from './share-s3.schema.js';
 
 export const shareConfig = z.object({
   newPrefix: z

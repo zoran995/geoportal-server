@@ -1,18 +1,21 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
     "declaration": true,
     "declarationMap": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2017",
+    "noUncheckedSideEffectImports": true,
+    "target": "ES2023",
     "sourceMap": true,
     "outDir": "./dist",    
     "baseUrl": "./",
     "incremental": true,
     "strict": true,
+    "types": ["vitest/globals"]
   },
   "exclude": ["node_modules", "dist"]
 }

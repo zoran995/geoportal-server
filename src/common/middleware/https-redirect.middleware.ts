@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
 
-import type { HttpsOptions } from '../schema';
-import { HTTPS_OPTIONS } from '../utils/https-options.token';
+import type { HttpsOptions } from '../schema/index.js';
+import { HTTPS_OPTIONS } from '../utils/https-options.token.js';
 
 @Injectable()
 export class HttpsRedirectMiddleware {

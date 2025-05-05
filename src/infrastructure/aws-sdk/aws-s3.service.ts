@@ -15,10 +15,10 @@ import {
 } from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
 
-import { LoggerService } from 'src/infrastructure/logger';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
 
-import { AWS_CONFIG_OPTIONS } from './aws-s3.contants';
-import { streamToString } from './stream-to-string';
+import { AWS_CONFIG_OPTIONS } from './aws-s3.contants.js';
+import { streamToString } from './stream-to-string.js';
 
 @Injectable()
 export class AwsS3Service {

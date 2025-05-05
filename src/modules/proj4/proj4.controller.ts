@@ -15,9 +15,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { HttpExceptionFilter } from 'src/common/filters';
+import { HttpExceptionFilter } from 'src/common/filters/index.js';
 
-import { Proj4Service } from './proj4.service';
+import { Proj4Service } from './proj4.service.js';
 
 @Controller('proj4def')
 @ApiTags('proj4')
