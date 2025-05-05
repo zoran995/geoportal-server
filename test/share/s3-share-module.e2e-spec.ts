@@ -14,12 +14,10 @@ import { configuration } from 'src/modules/config/index.js';
 import { ShareConfigType } from 'src/modules/share/index.js';
 import { SHARE_OPTIONS } from 'src/modules/share/share.constants.js';
 
-import { NoopLoggerService } from '../noop-logger.service.js';
+import { NoopLoggerService } from '../helpers/noop-logger.service.js';
 
 // in this test we can't mock file system as it will break down the testcontainers setup and tests won't work
 describe('Share Module (e2e) - S3', () => {
-  jest.setTimeout(60000);
-
   let app: INestApplication;
   let localstackContainer: StartedLocalStackContainer;
 
@@ -90,13 +88,13 @@ describe('Share Module (e2e) - S3', () => {
         id: 's3-aqJr26G16vOvgbBGgrfzSYLIcy',
       }),
     );
-  });
+  }, 60000);
 
   it('should resolve share via s3 provider', async () => {
     await request(app.getHttpServer())
       .get('/api/share/s3-aqJr26G16vOvgbBGgrfzSYLIcy')
       .expect(200, { data: 'test content' });
-  });
+  }, 60000);
 
   afterAll(async () => {
     await app.close();

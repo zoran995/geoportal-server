@@ -9,10 +9,10 @@ import request from 'supertest';
 
 import { AppModule } from 'src/app.module.js';
 
-import { NoopLoggerService } from './noop-logger.service.js';
+import { NoopLoggerService } from './helpers/noop-logger.service.js';
 
-jest.mock('fs');
-jest.mock('src/infrastructure/logger/logger.service');
+vi.mock('fs');
+vi.mock('src/infrastructure/logger/logger.service');
 
 const volJson: DirectoryJSON = {
   './serverconfig.json': JSON.stringify({}),

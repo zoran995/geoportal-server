@@ -15,6 +15,7 @@
     "baseUrl": "./",
     "incremental": true,
     "strict": true,
+    "types": ["vitest/globals"]
   },
   "exclude": ["node_modules", "dist"]
 }

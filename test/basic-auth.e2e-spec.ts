@@ -9,7 +9,7 @@ import { AppModule } from 'src/app.module.js';
 import { BasicAuthGuard } from 'src/modules/basic-auth/index.js';
 import type { ConfigurationType } from 'src/modules/config/index.js';
 
-jest.mock('fs');
+vi.mock('fs');
 
 describe('Basic auth', () => {
   let app: INestApplication;
