@@ -121,6 +121,7 @@ describe('Proxy (e2e)', () => {
     doCommonTest('get');
 
     describe('before redirect', () => {
+      // eslint-disable-next-line vitest/no-commented-out-tests
       // it('should follow redirect', async () => {
       //   vol.fromJSON({
       //     './serverconfig.json': JSON.stringify({
@@ -135,6 +136,7 @@ describe('Proxy (e2e)', () => {
       //   await agent.get(`/proxy/${url}test/redirect`).expect(200);
       //   app.close();
       // });
+      // eslint-disable-next-line vitest/no-commented-out-tests
       // it('should block redirect to blacklisted host', async () => {
       //   const { app, agent } = await buildApp('./redirect2.json');
       //   const { url } = agent.get('/');
@@ -794,7 +796,7 @@ function doCommonTest(methodName: 'get' | 'post') {
       server.close();
     });
 
-    it('no params appended when mismatch in regex', async () => {
+    it('no params appended when mismatch in regex1', async () => {
       vol.fromJSON({
         './serverconfig.json': JSON.stringify({
           proxy: {
@@ -854,7 +856,7 @@ function doCommonTest(methodName: 'get' | 'post') {
       server.close();
     });
 
-    it('no params appended when mismatch in regex', async () => {
+    it('no params appended when mismatch in regex2', async () => {
       vol.fromJSON({
         './serverconfig.json': JSON.stringify({
           proxy: {
@@ -911,7 +913,7 @@ function doCommonTest(methodName: 'get' | 'post') {
       server.close();
     });
 
-    it('no params appended when mismatch in regex', async () => {
+    it('no params appended when mismatch in regex3', async () => {
       vol.fromJSON({
         './serverconfig.json': JSON.stringify({
           proxy: {
@@ -967,7 +969,7 @@ function doCommonTest(methodName: 'get' | 'post') {
       server.close();
     });
 
-    it('no params appended when mismatch in regex', async () => {
+    it('no params appended when mismatch in regex4', async () => {
       vol.fromJSON({
         './serverconfig.json': JSON.stringify({
           proxy: {

@@ -119,7 +119,7 @@ describe('ShareService', () => {
       );
     });
 
-    it('properly resolves ', async () => {
+    it('properly resolves', async () => {
       const data = { files: [{ content: 'test content' }] };
       mockHttpGet.mockReturnValue(of({ data }));
 
@@ -130,7 +130,7 @@ describe('ShareService', () => {
 
       expect(result).toBe('test content');
     });
-    it('throws a NotFoundException on unknown prefix ', async () => {
+    it('throws a NotFoundException on unknown prefix', async () => {
       const data = { files: [{ content: 'test' }] };
 
       mockHttpGet.mockReturnValue(of({ data }));

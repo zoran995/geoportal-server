@@ -68,7 +68,9 @@ export class ProxyService {
 
     if (this.proxyOptions.appendParamToQueryString) {
       const host = this.proxyOptions.appendParamToQueryString[remoteUrl.host];
-      host && this.appendParamToQuery(host, remoteUrl);
+      if (host) {
+        this.appendParamToQuery(host, remoteUrl);
+      }
     }
 
     let proxy: AxiosProxyConfig | undefined;
@@ -230,7 +232,7 @@ export class ProxyService {
                 });
               } else if (err.getResponse) {
                 throw Object.create(err, {
-                  response: { value: err.getResponse().toString() },
+                  response: { value: JSON.stringify(err.getResponse()) },
                 });
               }
             } else if (err.code === 'ECONNREFUSED') {

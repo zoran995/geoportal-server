@@ -48,7 +48,7 @@ describe('MailFeedbackService', () => {
     expect.assertions(1);
     const sendMailMock = vi
       .fn()
-      .mockReturnValue(Promise.reject('test sending email failed'));
+      .mockReturnValue(Promise.reject(new Error('test sending email failed')));
 
     const service: MailFeedbackService = new MailFeedbackService(
       mailConf,

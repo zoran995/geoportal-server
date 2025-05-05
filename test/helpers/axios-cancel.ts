@@ -50,7 +50,7 @@ export class CancelToken {
 
   public throwIfRequested() {
     if (this.reason) {
-      throw this.reason;
+      throw new Error(this.reason.message);
     }
   }
 }

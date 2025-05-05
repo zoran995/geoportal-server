@@ -290,7 +290,7 @@ describe('Serve static (e2e)', () => {
       );
     });
 
-    it('should return Content-type json for czml', async () => {
+    it('should return Content-type json for glsl', async () => {
       ({ app, agent } = await buildApp(
         './routingOnConfig',
         './test/mockwwwroot',
