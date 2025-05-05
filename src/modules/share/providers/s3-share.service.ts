@@ -84,12 +84,13 @@ export class S3ShareService extends AbstractShareService<ShareS3Config> {
 
         return this.buildResponse(id, req);
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
+        const error = err as Error;
         this.logger.error(
           `An error occurred while saving to S3 Bucket ${params.Bucket}: ${
-            err.message as never
+            error.message as never
           }`,
-          `[S3Share]: ${JSON.stringify(err.message)}`,
+          `[S3Share]: ${JSON.stringify(error.message)}`,
         );
         throw new InternalServerErrorException();
       });
@@ -109,8 +110,9 @@ export class S3ShareService extends AbstractShareService<ShareS3Config> {
       .then((data: string) => {
         return JSON.parse(data) as Record<string, unknown>;
       })
-      .catch((err) => {
-        this.logger.error(err.message, `error[S3]: ${JSON.stringify(err)}`);
+      .catch((err: unknown) => {
+        const error = err as Error;
+        this.logger.error(error.message, `error[S3]: ${JSON.stringify(error)}`);
         throw new NotFoundException();
       });
   }

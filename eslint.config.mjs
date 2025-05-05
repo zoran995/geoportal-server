@@ -6,9 +6,16 @@ import tseslint from 'typescript-eslint';
 export default tseslint.config(
   eslint.configs.recommended,
   tseslint.configs.recommendedTypeChecked,
+  tseslint.configs.strictTypeChecked,
+  tseslint.configs.stylisticTypeChecked,
   prettierRecommended,
   {
-    ignores: ['**/node_modules/**', 'dist/**'],
+    ignores: [
+      '**/node_modules/**',
+      'dist/**',
+      'coverage/**',
+      'eslint.config.mjs',
+    ],
   },
   {
     languageOptions: {
@@ -29,6 +36,14 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/restrict-template-expressions': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/no-unnecessary-condition': 'off',
+    },
+  },
+  {
+    files: ['**/*.module.ts'],
+    rules: {
+      '@typescript-eslint/no-extraneous-class': 'off',
     },
   },
   {

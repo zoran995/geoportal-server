@@ -10,7 +10,7 @@ import { HttpExceptionFilter } from './http-exception.filter.js';
 @Catch(NotFoundException)
 export class NotFoundExceptionFilter extends HttpExceptionFilter {
   constructor(
-    private readonly serveStatic: ServeStaticType,
+    private readonly serveStatic: ServeStaticType | undefined,
     private readonly wwwroot: string,
   ) {
     super();

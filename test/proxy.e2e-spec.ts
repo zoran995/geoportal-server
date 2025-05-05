@@ -175,7 +175,7 @@ function doCommonTest(methodName: 'get' | 'post') {
     });
 
     afterAll(async () => {
-      await app?.close();
+      await app.close();
       server.close();
     });
   });
@@ -263,7 +263,7 @@ function doCommonTest(methodName: 'get' | 'post') {
           .expect(200, { data: 'response success root' })
           .expect('Cache-Control', 'public,max-age=1209600');
 
-        expect(response.headers['Connection']).not.toBeDefined();
+        expect(response.headers.Connection).not.toBeDefined();
       });
 
       it('should not set max age on error response', async () => {
@@ -359,7 +359,7 @@ function doCommonTest(methodName: 'get' | 'post') {
     });
 
     afterAll(async () => {
-      await app?.close();
+      await app.close();
       server.close();
     });
   });

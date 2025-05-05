@@ -48,7 +48,7 @@ export abstract class AbstractShareService<T extends ShareType = ShareType>
     const shareId = `${this.prefix}-${id}`;
     const url = `${req.protocol}://${req.headers.host}${req.path}/${shareId}`;
     return {
-      id: `${shareId}`,
+      id: shareId,
       path: `${req.path}/${shareId}`,
       url,
     };

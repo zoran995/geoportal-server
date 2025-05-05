@@ -54,7 +54,7 @@ export class AwsS3Service {
     try {
       const { Body: body } = await this._s3.send(getObjectCommand);
       if (body instanceof Readable) {
-        return streamToString(body);
+        return await streamToString(body);
       }
       throw new InternalServerErrorException();
     } catch (err) {

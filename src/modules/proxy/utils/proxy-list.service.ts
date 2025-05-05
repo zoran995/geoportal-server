@@ -45,7 +45,7 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
 
   isWhitelisted(host: string) {
     for (const domain of this.#whitelist) {
-      if (host.indexOf(domain, host.length - domain.length) !== -1) {
+      if (host.includes(domain, host.length - domain.length)) {
         return true;
       }
     }

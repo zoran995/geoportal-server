@@ -20,7 +20,7 @@ export class BasicAuthGuard implements CanActivate {
   constructor(
     @Optional()
     @Inject(BASIC_AUTH_OPTIONS)
-    private readonly options: BasicAuthenticationOptions,
+    private readonly options?: BasicAuthenticationOptions,
   ) {}
 
   canActivate(context: ExecutionContext): boolean {

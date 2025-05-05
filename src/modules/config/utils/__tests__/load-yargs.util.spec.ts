@@ -28,7 +28,7 @@ describe('load yargs', () => {
 
     const loadedYargs = loadYargs({ returnLastValue: false });
     expect(Array.isArray(loadedYargs.port)).toBe(true);
-    expect((<any>loadedYargs.port).length).toBe(2);
+    expect((loadedYargs.port as any).length).toBe(2);
     expect(loadedYargs.port).toStrictEqual([3005, 3006]);
   });
 });

@@ -13,7 +13,7 @@ export class BasicAuthModule {
         {
           provide: BASIC_AUTH_OPTIONS,
           useFactory: options.useFactory,
-          inject: options.inject || [],
+          inject: options.inject ?? [],
         },
         {
           provide: APP_GUARD,

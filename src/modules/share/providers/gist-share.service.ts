@@ -40,7 +40,7 @@ export class GistShareService extends AbstractShareService<ShareGistConfig> {
       Accept: 'application/vnd.github.v3+json',
     };
     if (isDefined(this.config.accessToken)) {
-      headers['Authorization'] = `Token ${this.config.accessToken}`;
+      headers.Authorization = `Token ${this.config.accessToken}`;
     }
     return lastValueFrom(
       this.httpService
@@ -86,7 +86,7 @@ export class GistShareService extends AbstractShareService<ShareGistConfig> {
       Accept: 'application/vnd.github.v3+json',
     };
     if (this.config.accessToken !== undefined) {
-      headers['Authorization'] = `Token ${this.config.accessToken}`;
+      headers.Authorization = `Token ${this.config.accessToken}`;
     }
     const getUrl = combineURLs(this.config.apiUrl, id);
     return lastValueFrom(

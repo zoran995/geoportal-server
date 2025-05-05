@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { of, throwError } from 'rxjs';
+import type { Mock } from 'vitest';
 
 import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service.js';
 import { shareGist } from '../../schema/share-gist.schema.js';
@@ -13,7 +14,7 @@ import { GistShareService } from '../gist-share.service.js';
 
 describe('GistShareService', () => {
   let service: GistShareService;
-  let httpServiceMock: { get: vi.mock; post: vi.mock };
+  let httpServiceMock: { get: Mock; post: Mock };
   let gistShareConfig: any;
 
   const mockExecutionContext = createMock<ExecutionContext>({
@@ -83,9 +84,9 @@ describe('GistShareService', () => {
         const result = await service.save({ conf: 'test' }, req);
 
         expect(result).toEqual({
-          id: `${gistShareConfig.prefix}-${'testId'}`,
-          path: `/api/share/${gistShareConfig.prefix}-${'testId'}`,
-          url: `http://example.co/api/share/${gistShareConfig.prefix}-${'testId'}`,
+          id: `${gistShareConfig.prefix}-testId`,
+          path: `/api/share/${gistShareConfig.prefix}-testId`,
+          url: `http://example.co/api/share/${gistShareConfig.prefix}-testId`,
         });
       });
     });
@@ -156,7 +157,7 @@ describe('GistShareService', () => {
         await service.resolve('test');
 
         expect(httpServiceMock.get).toHaveBeenCalledWith(
-          `${gistShareConfig.apiUrl}/${'test'}`,
+          `${gistShareConfig.apiUrl}/test`,
           {
             headers: {
               ...defaultHeaders,

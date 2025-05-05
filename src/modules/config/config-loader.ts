@@ -8,6 +8,7 @@ import { validate } from './validators/config.validator.js';
 
 export declare type IConfigurationType = ConfigurationType & YargsConfigType;
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class ConfigLoader {
   static load(validator = validate): IConfigurationType {
     const yargsConfig = loadYargs();
@@ -51,15 +52,15 @@ export class ConfigLoader {
       // match the operators `:+`, `+`, `:-`, and `-`
       const opRegex = /(:\+|\+|:-|-)/;
       // find first match
-      const opMatch = expression.match(opRegex);
-      const splitter = (opMatch ? opMatch[0] : null) as string;
+      const opMatch = opRegex.exec(expression);
+      const splitter = (opMatch ? opMatch[0] : null)!;
 
       const r = expression.split(splitter as never);
 
       let defaultValue;
       let value;
 
-      const key = r.shift() as string;
+      const key = r.shift()!;
 
       if ([':+', '+'].includes(splitter as never)) {
         defaultValue = env[key] ? r.join(splitter as never) : '';

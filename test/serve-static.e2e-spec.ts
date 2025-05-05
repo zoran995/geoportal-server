@@ -79,6 +79,7 @@ export class TestController {
   imports: [AppModule],
   controllers: [TestController],
 })
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 class TestModule {}
 
 async function buildApp(configFile: string, wwwrootPath?: string) {
@@ -307,6 +308,6 @@ describe('Serve static (e2e)', () => {
 
   afterEach(async () => {
     vi.clearAllMocks();
-    await app?.close();
+    await app.close();
   });
 });
