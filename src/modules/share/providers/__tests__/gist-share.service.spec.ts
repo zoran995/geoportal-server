@@ -5,7 +5,6 @@ import {
   type ExecutionContext,
 } from '@nestjs/common';
 import type { Request } from 'express';
-import { of, throwError } from 'rxjs';
 import type { Mock } from 'vitest';
 
 import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service.js';
@@ -61,7 +60,7 @@ describe('GistShareService', () => {
     describe('when saving successfully', () => {
       it('should send post request with correct headers and auth token', async () => {
         const req = mockExecutionContext.switchToHttp().getRequest<Request>();
-        httpServiceMock.post.mockReturnValue(of({ data: { id: 'test' } }));
+        httpServiceMock.post.mockResolvedValue({ id: 'test' });
 
         await service.save({ conf: 'test' }, req);
 
@@ -79,7 +78,7 @@ describe('GistShareService', () => {
 
       it('should return prefixed id', async () => {
         const req = mockExecutionContext.switchToHttp().getRequest<Request>();
-        httpServiceMock.post.mockReturnValue(of({ data: { id: 'testId' } }));
+        httpServiceMock.post.mockResolvedValue({ id: 'testId' });
 
         const result = await service.save({ conf: 'test' }, req);
 
@@ -103,7 +102,7 @@ describe('GistShareService', () => {
 
       it('should not include authorization header', async () => {
         const req = mockExecutionContext.switchToHttp().getRequest<Request>();
-        httpServiceMock.post.mockReturnValue(of({ data: { id: 'test' } }));
+        httpServiceMock.post.mockResolvedValue({ id: 'test' });
 
         await service.save({ conf: 'test' }, req);
 
@@ -116,18 +115,9 @@ describe('GistShareService', () => {
     });
 
     describe('when errors occur', () => {
-      it('should throw NotFoundException when response data is missing', async () => {
-        const req = mockExecutionContext.switchToHttp().getRequest<Request>();
-        httpServiceMock.post.mockReturnValue(of({}));
-
-        await expect(service.save({ conf: 'test' }, req)).rejects.toThrow(
-          NotFoundException,
-        );
-      });
-
       it('should throw NotFoundException when id is missing', async () => {
         const req = mockExecutionContext.switchToHttp().getRequest<Request>();
-        httpServiceMock.post.mockReturnValue(of({ data: {} }));
+        httpServiceMock.post.mockResolvedValue({});
 
         await expect(service.save({ conf: 'test' }, req)).rejects.toThrow(
           NotFoundException,
@@ -136,9 +126,7 @@ describe('GistShareService', () => {
 
       it('should throw InternalServerErrorException on API error', async () => {
         const req = mockExecutionContext.switchToHttp().getRequest<Request>();
-        httpServiceMock.post.mockReturnValue(
-          throwError(() => new Error('test error')),
-        );
+        httpServiceMock.post.mockRejectedValue(new Error('test error'));
 
         await expect(service.save({ conf: 'test' }, req)).rejects.toThrow(
           InternalServerErrorException,
@@ -150,9 +138,9 @@ describe('GistShareService', () => {
   describe('resolve', () => {
     describe('when resolving successfully', () => {
       it('should send get request with correct headers and auth token', async () => {
-        httpServiceMock.get.mockReturnValue(
-          of({ data: { files: { '1st': 'first file' } } }),
-        );
+        httpServiceMock.get.mockResolvedValue({
+          files: { '1st': 'first file' },
+        });
 
         await service.resolve('test');
 
@@ -168,16 +156,12 @@ describe('GistShareService', () => {
       });
 
       it('should return first file content', async () => {
-        httpServiceMock.get.mockReturnValue(
-          of({
-            data: {
-              files: {
-                '1st': { content: '1st file content' },
-                '2nd': { content: '2nd' },
-              },
-            },
-          }),
-        );
+        httpServiceMock.get.mockResolvedValue({
+          files: {
+            '1st': { content: '1st file content' },
+            '2nd': { content: '2nd' },
+          },
+        });
 
         const result = await service.resolve('test');
 
@@ -187,7 +171,7 @@ describe('GistShareService', () => {
 
     describe('when errors occur', () => {
       it('should throw NotFoundException when files are undefined', async () => {
-        httpServiceMock.get.mockReturnValue(of({ data: { files: undefined } }));
+        httpServiceMock.get.mockResolvedValue({ files: undefined });
 
         await expect(service.resolve('test')).rejects.toThrow(
           NotFoundException,
@@ -195,7 +179,7 @@ describe('GistShareService', () => {
       });
 
       it('should throw NotFoundException when files are empty', async () => {
-        httpServiceMock.get.mockReturnValue(of({ data: { files: {} } }));
+        httpServiceMock.get.mockResolvedValue({ files: {} });
 
         await expect(service.resolve('test')).rejects.toThrow(
           NotFoundException,
@@ -203,9 +187,7 @@ describe('GistShareService', () => {
       });
 
       it('should throw NotFoundException on API error', async () => {
-        httpServiceMock.get.mockReturnValue(
-          throwError(() => new Error('test error')),
-        );
+        httpServiceMock.get.mockRejectedValue(new Error('test error'));
 
         await expect(service.resolve('test')).rejects.toThrow(
           NotFoundException,

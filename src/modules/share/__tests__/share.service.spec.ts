@@ -6,7 +6,6 @@ import {
 import type { Request } from 'express';
 
 import { createMock } from '@golevelup/ts-vitest';
-import { of } from 'rxjs';
 
 import { shareGist } from '../schema/share-gist.schema.js';
 import {
@@ -90,7 +89,7 @@ describe('ShareService', () => {
 
     it('properly saves', async () => {
       const req = mockExecutionContext.switchToHttp().getRequest<Request>();
-      mockHttpPost.mockReturnValue(of({ data: { id: 'test-gist-id' } }));
+      mockHttpPost.mockResolvedValue({ id: 'test-gist-id' });
 
       await shareServiceManager.initializeProviders([gistConfig]);
       const service = new ShareService(shareConfig, shareServiceManager);
@@ -108,8 +107,7 @@ describe('ShareService', () => {
 
   describe('resolve', () => {
     it('throws an error when id is in form prefix-id', async () => {
-      const data = { files: [{ content: 'test content' }] };
-      mockHttpGet.mockReturnValue(of({ data }));
+      mockHttpGet.mockResolvedValue({ files: [{ content: 'test content' }] });
 
       await shareServiceManager.initializeProviders([gistConfig]);
       const service = new ShareService(shareConfig, shareServiceManager);
@@ -120,8 +118,7 @@ describe('ShareService', () => {
     });
 
     it('properly resolves', async () => {
-      const data = { files: [{ content: 'test content' }] };
-      mockHttpGet.mockReturnValue(of({ data }));
+      mockHttpGet.mockResolvedValue({ files: [{ content: 'test content' }] });
 
       await shareServiceManager.initializeProviders([gistConfig]);
       const service = new ShareService(shareConfig, shareServiceManager);
@@ -131,9 +128,7 @@ describe('ShareService', () => {
       expect(result).toBe('test content');
     });
     it('throws a NotFoundException on unknown prefix', async () => {
-      const data = { files: [{ content: 'test' }] };
-
-      mockHttpGet.mockReturnValue(of({ data }));
+      mockHttpGet.mockResolvedValue({ files: [{ content: 'test' }] });
       await shareServiceManager.initializeProviders([]);
       const service = new ShareService(shareConfig, shareServiceManager);
 
