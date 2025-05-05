@@ -1,6 +1,6 @@
 # Geoportal-Server
 
-[![Build Status](https://github.com/zoran995/geoportal-server/actions/workflows/ci.yaml/badge.svg?branch=master&event=push)](https://github.com/zoran995/geoportal-server/actions/workflows/ci.yaml)
+[![Build Status](https://github.com/zoran995/geoportal-server/actions/workflows/ci.yaml/badge.svg?branch=main&event=push)](https://github.com/zoran995/geoportal-server/actions/workflows/ci.yaml)
 
 A rewrite of [TerriaJS-Server](https://github.com/TerriaJS/terriajs-server) using [NestJS](https://nestjs.com/) architecture.
 
