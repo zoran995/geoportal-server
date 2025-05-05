@@ -1,6 +1,6 @@
-import { Request } from 'express';
+import type { Request } from 'express';
 
-import { AdditionalParametersType } from '../config/schema/additional-parameters.schema';
+import type { AdditionalParametersType } from '../config/schema/additional-parameters.schema';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
 
 export function formatBody(

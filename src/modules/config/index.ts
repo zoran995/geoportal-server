@@ -1,6 +1,6 @@
 export { AppConfigModule } from './app-config.module';
-export { ConfigLoader, IConfigurationType } from './config-loader';
+export { ConfigLoader, type IConfigurationType } from './config-loader';
 export {
   configuration,
-  ConfigurationType,
+  type ConfigurationType,
 } from './schema/configuration.schema';

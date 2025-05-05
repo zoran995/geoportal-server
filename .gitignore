@@ -39,3 +39,4 @@ lerna-debug.log*
 .yarnrc.yml
 
 .env-e2e
+src/metadata.ts

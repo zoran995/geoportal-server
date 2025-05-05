@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { Response } from 'express';
+import type { Response } from 'express';
 import sanitize from 'sanitize-filename';
 
 import { HttpExceptionFilter } from 'src/common/filters';

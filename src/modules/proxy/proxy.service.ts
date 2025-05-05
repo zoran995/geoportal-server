@@ -13,7 +13,7 @@ import {
 import { REQUEST } from '@nestjs/core';
 
 import { AxiosProxyConfig } from 'axios';
-import { Request } from 'express';
+import type { Request } from 'express';
 import * as http from 'http';
 import { catchError, lastValueFrom, map } from 'rxjs';
 import { URL } from 'url';

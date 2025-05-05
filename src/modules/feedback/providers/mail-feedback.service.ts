@@ -1,11 +1,11 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
-import { Request } from 'express';
+import type { Request } from 'express';
 import nodemailer from 'nodemailer';
 
 import { formatBody } from '../common/formatBody';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
-import { MailFeedbackConfigType } from '../config/schema/mail-feedback.schema';
+import { type MailFeedbackConfigType } from '../config/schema/mail-feedback.schema';
 import { AbstractFeedbackService } from './abstract-feedback.service';
 import { LoggerService } from 'src/infrastructure/logger';
 

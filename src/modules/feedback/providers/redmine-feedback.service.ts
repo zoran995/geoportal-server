@@ -1,14 +1,14 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
-import { Request } from 'express';
+import type { Request } from 'express';
 import { lastValueFrom } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 import { LoggerService } from 'src/infrastructure/logger';
 
 import { formatBody } from '../common/formatBody';
-import { RedmineFeedbackConfigType } from '../config/schema/redmine-feedback.schema';
+import { type RedmineFeedbackConfigType } from '../config/schema/redmine-feedback.schema';
 import { CreateFeedbackDto } from '../dto/create-feedback.dto';
 import { AbstractFeedbackService } from './abstract-feedback.service';
 
