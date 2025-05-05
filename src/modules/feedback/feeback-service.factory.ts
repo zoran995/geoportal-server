@@ -1,7 +1,7 @@
 import type { FactoryProvider } from '@nestjs/common';
 
 import { LoggerService } from 'src/infrastructure/logger/index.js';
-import { AppHttpService } from 'src/infrastructure/http/app-http-service.js';
+import { AppHttpService } from 'src/infrastructure/http/index.js';
 
 import { FeedbackService } from './common/feedback-service.js';
 import { FEEDBACK_CONFIG } from './feedback.constants.js';

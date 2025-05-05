@@ -6,7 +6,7 @@ import {
 import { type Request } from 'express';
 
 import { combineURLs, isDefined } from 'src/common/helpers/index.js';
-import { AppHttpService } from 'src/infrastructure/http/app-http-service.js';
+import { AppHttpService } from 'src/infrastructure/http/index.js';
 import { LoggerService } from 'src/infrastructure/logger/index.js';
 
 import { ShareResult } from '../interfaces/save-share-response.interface.js';

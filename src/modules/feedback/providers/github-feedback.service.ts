@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 import type { Request } from 'express';
 
-import { AppHttpService } from 'src/infrastructure/http/app-http-service.js';
+import { AppHttpService } from 'src/infrastructure/http/index.js';
 import { LoggerService } from 'src/infrastructure/logger/index.js';
 
 import { formatBody } from '../common/formatBody.js';

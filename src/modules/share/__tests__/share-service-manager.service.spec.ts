@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { LoggerService } from 'src/infrastructure/logger/index.js';
-import { AppHttpService } from 'src/infrastructure/http/app-http-service.js';
+import { AppHttpService } from 'src/infrastructure/http/index.js';
 
 import { shareGist } from '../schema/share-gist.schema.js';
 import { shareS3 } from '../schema/share-s3.schema.js';
