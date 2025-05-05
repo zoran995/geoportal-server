@@ -7,10 +7,9 @@ export default mergeConfig(
   defineConfig({
     test: {
       passWithNoTests: true,
-      include: ['test/**/*.e2e-spec.ts'],
-      retry: 1,
+      include: ['src/**/*.spec.ts'],
       coverage: {
-        reportsDirectory: 'coverage/e2e',
+        reportsDirectory: 'coverage/unit',
       },
     },
   }),

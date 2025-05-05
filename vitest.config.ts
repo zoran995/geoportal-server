@@ -15,10 +15,10 @@ export default defineConfig({
     coverage: {
       reporter: ['text', 'json', 'html'],
       include: ['src/**/*.ts'],
-      reportsDirectory: 'coverage/unit',
       exclude: [
         'src/main.ts',
-        '**/*.module.ts$", "**/index.ts',
+        '**/*.module.ts$',
+        '**/index.ts',
         '__tests__/**',
       ],
     },

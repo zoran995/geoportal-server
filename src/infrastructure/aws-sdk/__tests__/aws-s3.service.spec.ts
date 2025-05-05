@@ -10,7 +10,7 @@ import { Readable } from 'stream';
 
 import { AwsS3Service } from '../aws-s3.service.js';
 
-vi.mock('src/infrastructure/logger/logger.service');
+vi.mock(import('src/infrastructure/logger/logger.service.js'));
 
 const s3Mock = mockClient(S3Client);
 

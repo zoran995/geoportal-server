@@ -11,7 +11,7 @@ import { ValidationException } from '../../exceptions/index.js';
 import { GlobalExceptionFilter } from '../global-exception.filter.js';
 import { HttpExceptionFilter } from '../http-exception.filter.js';
 
-vi.mock('../global-exception.filter.ts');
+vi.mock(import('../global-exception.filter.js'));
 
 const mockStatusJson = vi.fn();
 const mockStatus = vi.fn().mockReturnValue({

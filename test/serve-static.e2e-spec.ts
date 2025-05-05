@@ -22,7 +22,12 @@ import type { ConfigurationType } from 'src/modules/config/index.js';
 import { NoopLoggerService } from './helpers/noop-logger.service.js';
 
 vi.mock('fs');
-vi.mock('src/infrastructure/logger/logger.service');
+vi.hoisted(async () => {
+  const fsMock = await import('memfs');
+
+  require.cache.fs = { exports: fsMock } as never;
+});
+vi.mock(import('src/infrastructure/logger/logger.service.js'));
 
 const routingOff: Partial<ServeStaticType> = {
   serveStatic: true,
@@ -54,6 +59,8 @@ const volJson: DirectoryJSON = {
   './routingBadPathConfig': JSON.stringify({ serveStatic: routingBadPath }),
   './serveStaticOff': JSON.stringify({ serveStatic: undefined }),
 };
+
+vol.fromJSON(volJson);
 
 @Controller('test')
 export class TestController {
@@ -100,12 +107,9 @@ async function buildApp(configFile: string, wwwrootPath?: string) {
   return { app, agent };
 }
 
-describe.skip('Serve static (e2e)', () => {
+describe('Serve static (e2e)', () => {
   let app: INestApplication;
   let agent: ReturnType<typeof supertest.agent>;
-  beforeEach(() => {
-    vol.fromJSON(volJson);
-  });
 
   describe('should return 404', () => {
     it('with bad wwwroot', async () => {
@@ -121,7 +125,7 @@ describe.skip('Serve static (e2e)', () => {
         './routingBadPathConfig',
         './test/mockwwwroot',
       ));
-      await agent.get('/blah2').expect(404);
+      await agent.get('/blah2').expect(404).expect('Content-Type', /html/);
     });
 
     it('when serve static off', async () => {
@@ -129,7 +133,7 @@ describe.skip('Serve static (e2e)', () => {
         './serveStaticOff',
         './test/mockwwwroot',
       ));
-      await agent.get('/blah2').expect(404);
+      await agent.get('/blah2').expect(404).expect('Content-Type', /html/);
     });
   });
 
@@ -147,13 +151,15 @@ describe.skip('Serve static (e2e)', () => {
         './routingOffConfig',
         './test/mockwwwroot',
       ));
-      await agent.get('/actual-html-file.html').expect(200);
-      // .expect('Content-Type', /html/)
-      // .then((response) => {
-      //   expect(response.text).toBe(
-      //     fs.readFileSync('./test/mockwwwroot/actual-html-file.html', 'utf8'),
-      //   );
-      // });
+      await agent
+        .get('/actual-html-file.html')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .then((response) => {
+          expect(response.text).toBe(
+            fs.readFileSync('./test/mockwwwroot/actual-html-file.html', 'utf8'),
+          );
+        });
     });
 
     it('should return an actual json file', async () => {
@@ -174,7 +180,7 @@ describe.skip('Serve static (e2e)', () => {
   });
 
   describe('with routing on', () => {
-    it.only('should return 404', async () => {
+    it('should return 404', async () => {
       ({ app, agent } = await buildApp(
         './routingOnConfig',
         './test/mockwwwroot',
@@ -300,7 +306,7 @@ describe.skip('Serve static (e2e)', () => {
   });
 
   afterEach(async () => {
-    // vi.clearAllMocks();
+    vi.clearAllMocks();
     await app?.close();
   });
 });
