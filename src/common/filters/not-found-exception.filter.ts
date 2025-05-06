@@ -4,6 +4,8 @@ import { Response } from 'express';
 import { existsSync } from 'fs';
 import path from 'path';
 
+import { LoggerService } from 'src/infrastructure/logger/index.js';
+
 import type { ServeStaticType } from '../schema/index.js';
 import { HttpExceptionFilter } from './http-exception.filter.js';
 
@@ -12,8 +14,9 @@ export class NotFoundExceptionFilter extends HttpExceptionFilter {
   constructor(
     private readonly serveStatic: ServeStaticType | undefined,
     private readonly wwwroot: string,
+    logger: LoggerService,
   ) {
-    super();
+    super(logger);
   }
   catch(exception: NotFoundException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();

@@ -55,11 +55,12 @@ export const buildServer = async (
   app.setGlobalPrefix('api');
   const wwwroot = app.get<string>(WWWROOT_TOKEN);
   app.useGlobalFilters(
-    new HttpExceptionFilter(),
-    new InternalServerErrorExceptionFilter(wwwroot),
+    new HttpExceptionFilter(logger),
+    new InternalServerErrorExceptionFilter(wwwroot, logger),
     new NotFoundExceptionFilter(
       configService.get('serveStatic', { infer: true }),
       wwwroot,
+      logger,
     ),
   );
 
