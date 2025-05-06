@@ -57,7 +57,11 @@ describe('S3ShareService', () => {
   });
 
   beforeEach(() => {
-    service = new S3ShareService(s3Config, new TestLoggerService());
+    service = new S3ShareService(
+      s3Config,
+      new TestLoggerService(),
+      new TestLoggerService(),
+    );
   });
 
   afterEach(() => {

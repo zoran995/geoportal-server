@@ -1,0 +1,1 @@
+export const GOT_INSTANCE_TOKEN = Symbol('GOT_INSTANCE_TOKEN');

@@ -22,6 +22,7 @@ import { DefaultFeedbackService } from '../providers/default-feedback.service.js
 import { GithubFeedbackService } from '../providers/github-feedback.service.js';
 import { MailFeedbackService } from '../providers/mail-feedback.service.js';
 import { RedmineFeedbackService } from '../providers/redmine-feedback.service.js';
+import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service.js';
 
 vi.mock('fs');
 
@@ -36,9 +37,7 @@ describe('FeedbackModule', () => {
     ],
   })
     .overrideProvider(LoggerService)
-    .useValue({
-      error: vi.fn(),
-    });
+    .useClass(TestLoggerService);
 
   describe('with default config', () => {
     let app: INestApplication;

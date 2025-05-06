@@ -6,7 +6,8 @@ import {
 import type { Request } from 'express';
 
 import { createMock } from '@golevelup/ts-vitest';
-import { of } from 'rxjs';
+
+import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service.js';
 
 import { shareGist } from '../schema/share-gist.schema.js';
 import {
@@ -22,12 +23,6 @@ const mockHttpGet = vi.fn();
 class HttpServiceMock {
   post = mockHttpPost;
   get = mockHttpGet;
-}
-
-class LoggerServiceMock {
-  log = vi.fn();
-  verbose = vi.fn();
-  error = vi.fn();
 }
 
 const gistConfig = shareGist.parse({
@@ -46,7 +41,8 @@ const shareConfig: ShareConfigType = shareConfigSchema.parse({
 describe('ShareService', () => {
   const shareServiceManager = new ShareServiceManager(
     new HttpServiceMock() as never,
-    new LoggerServiceMock() as never,
+    new TestLoggerService() as never,
+    new TestLoggerService() as never,
   );
   const mockExecutionContext = createMock<ExecutionContext>({
     switchToHttp: () => ({
@@ -90,7 +86,7 @@ describe('ShareService', () => {
 
     it('properly saves', async () => {
       const req = mockExecutionContext.switchToHttp().getRequest<Request>();
-      mockHttpPost.mockReturnValue(of({ data: { id: 'test-gist-id' } }));
+      mockHttpPost.mockResolvedValue({ id: 'test-gist-id' });
 
       await shareServiceManager.initializeProviders([gistConfig]);
       const service = new ShareService(shareConfig, shareServiceManager);
@@ -108,8 +104,7 @@ describe('ShareService', () => {
 
   describe('resolve', () => {
     it('throws an error when id is in form prefix-id', async () => {
-      const data = { files: [{ content: 'test content' }] };
-      mockHttpGet.mockReturnValue(of({ data }));
+      mockHttpGet.mockResolvedValue({ files: [{ content: 'test content' }] });
 
       await shareServiceManager.initializeProviders([gistConfig]);
       const service = new ShareService(shareConfig, shareServiceManager);
@@ -120,8 +115,7 @@ describe('ShareService', () => {
     });
 
     it('properly resolves', async () => {
-      const data = { files: [{ content: 'test content' }] };
-      mockHttpGet.mockReturnValue(of({ data }));
+      mockHttpGet.mockResolvedValue({ files: [{ content: 'test content' }] });
 
       await shareServiceManager.initializeProviders([gistConfig]);
       const service = new ShareService(shareConfig, shareServiceManager);
@@ -131,9 +125,7 @@ describe('ShareService', () => {
       expect(result).toBe('test content');
     });
     it('throws a NotFoundException on unknown prefix', async () => {
-      const data = { files: [{ content: 'test' }] };
-
-      mockHttpGet.mockReturnValue(of({ data }));
+      mockHttpGet.mockResolvedValue({ files: [{ content: 'test' }] });
       await shareServiceManager.initializeProviders([]);
       const service = new ShareService(shareConfig, shareServiceManager);
 

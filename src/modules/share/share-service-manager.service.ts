@@ -1,18 +1,20 @@
-import { HttpService } from '@nestjs/axios';
 import { Injectable, NotFoundException } from '@nestjs/common';
 
+import { AppHttpService } from 'src/infrastructure/http/index.js';
 import { LoggerService } from 'src/infrastructure/logger/index.js';
+
+import type { AbstractShareService } from './providers/abstract-share.service.js';
 import type { ShareGistConfig } from './schema/share-gist.schema.js';
 import type { ShareS3Config } from './schema/share-s3.schema.js';
-import type { AbstractShareService } from './providers/abstract-share.service.js';
 
 @Injectable()
 export class ShareServiceManager {
   readonly providers = new Map<string, AbstractShareService>();
 
   constructor(
-    private readonly httpService: HttpService,
+    private readonly httpService: AppHttpService,
     private readonly logger: LoggerService,
+    private readonly awsLogger: LoggerService,
   ) {}
 
   async initializeProviders(
@@ -50,7 +52,7 @@ export class ShareServiceManager {
         const { S3ShareService } = await import(
           './providers/s3-share.service.js'
         );
-        return new S3ShareService(config, this.logger);
+        return new S3ShareService(config, this.logger, this.awsLogger);
       }
       default:
         throw new Error(

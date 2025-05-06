@@ -1,24 +1,22 @@
-import { HttpService } from '@nestjs/axios';
 import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 
-import { lastValueFrom } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { type Request } from 'express';
 
 import { combineURLs, isDefined } from 'src/common/helpers/index.js';
+import { AppHttpService } from 'src/infrastructure/http/index.js';
 import { LoggerService } from 'src/infrastructure/logger/index.js';
 
-import { ShareGistConfig } from '../schema/share-gist.schema.js';
 import { ShareResult } from '../interfaces/save-share-response.interface.js';
+import { ShareGistConfig } from '../schema/share-gist.schema.js';
 import { AbstractShareService } from './abstract-share.service.js';
-import type { Request } from 'express';
 
 export class GistShareService extends AbstractShareService<ShareGistConfig> {
   constructor(
     protected readonly config: ShareGistConfig,
-    private readonly httpService: HttpService,
+    private readonly httpService: AppHttpService,
     logger: LoggerService,
   ) {
     super(config, logger);
@@ -42,39 +40,31 @@ export class GistShareService extends AbstractShareService<ShareGistConfig> {
     if (isDefined(this.config.accessToken)) {
       headers.Authorization = `Token ${this.config.accessToken}`;
     }
-    return lastValueFrom(
-      this.httpService
-        .post<{ id: string }>(
-          this.config.apiUrl,
-          {
-            files: gistFile,
-            description: this.config.description,
-            public: false,
-          },
-          { headers },
-        )
-        .pipe(
-          map((res) => {
-            if (!isDefined(res.data) || !isDefined(res.data.id)) {
-              this.logger.error(
-                `Got bad response from server: `,
-                res.data as never,
-              );
-              throw new NotFoundException();
-            }
+    try {
+      const respose = await this.httpService.post<{ id: string }>(
+        this.config.apiUrl,
+        {
+          files: gistFile,
+          description: this.config.description,
+          public: false,
+        },
+        { headers },
+      );
 
-            this.logger.verbose(`Created Gist with ID '${res.data.id}`);
-            return this.buildResponse(res.data.id, req);
-          }),
-          catchError((e: unknown) => {
-            this.logger.error(`Creating share url failed`, e as never);
-            if (e instanceof NotFoundException) {
-              throw e;
-            }
-            throw new InternalServerErrorException();
-          }),
-        ),
-    );
+      if (!isDefined(respose.id)) {
+        this.logger.error(`Got bad response from server: `, respose as never);
+        throw new NotFoundException();
+      }
+
+      this.logger.verbose(`Created Gist with ID '${respose.id}`);
+      return this.buildResponse(respose.id, req);
+    } catch (e) {
+      this.logger.error(`Creating share url failed`, e as never);
+      if (e instanceof NotFoundException) {
+        throw e;
+      }
+      throw new InternalServerErrorException();
+    }
   }
 
   /**
@@ -89,27 +79,24 @@ export class GistShareService extends AbstractShareService<ShareGistConfig> {
       headers.Authorization = `Token ${this.config.accessToken}`;
     }
     const getUrl = combineURLs(this.config.apiUrl, id);
-    return lastValueFrom(
-      this.httpService
-        .get<{
-          files: Record<string, { content: Record<string, unknown> }>;
-        }>(getUrl, { headers: headers })
-        .pipe(
-          map((res) => {
-            if (
-              !isDefined(res.data.files) ||
-              Object.keys(res.data.files).length === 0
-            ) {
-              throw new NotFoundException();
-            }
-            this.logger.verbose(`Getting share url succeeded`);
-            return res.data.files[Object.keys(res.data.files)[0]].content;
-          }),
-          catchError((e) => {
-            this.logger.debug(`Getting share url failed with: '${e.message}'`);
-            throw new NotFoundException();
-          }),
-        ),
-    );
+    try {
+      const response = await this.httpService.get<{
+        files: Record<string, { content: Record<string, unknown> }>;
+      }>(getUrl, { headers: headers });
+
+      if (
+        !isDefined(response.files) ||
+        Object.keys(response.files).length === 0
+      ) {
+        throw new NotFoundException();
+      }
+      this.logger.verbose(`Getting share url succeeded`);
+      return response.files[Object.keys(response.files)[0]].content;
+    } catch (e) {
+      this.logger.debug(
+        `Getting share url failed with: '${(e as Error).message}'`,
+      );
+      throw new NotFoundException();
+    }
   }
 }

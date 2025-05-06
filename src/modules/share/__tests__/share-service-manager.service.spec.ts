@@ -1,7 +1,11 @@
-import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { LoggerService } from 'src/infrastructure/logger/index.js';
+import {
+  LoggerModule,
+  LoggerService,
+} from 'src/infrastructure/logger/index.js';
+import { AppHttpService } from 'src/infrastructure/http/index.js';
+import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service.js';
 
 import { shareGist } from '../schema/share-gist.schema.js';
 import { shareS3 } from '../schema/share-s3.schema.js';
@@ -44,28 +48,27 @@ const mockHttpPost = vi.fn();
 
 describe('ShareServiceManager', () => {
   let service: ShareServiceManager;
-  let httpService: HttpService;
+  let httpService: AppHttpService;
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [LoggerModule],
       providers: [
         {
-          provide: HttpService,
+          provide: AppHttpService,
           useValue: {
             post: mockHttpPost,
           },
         },
-        {
-          provide: LoggerService,
-          useValue: {
-            error: vi.fn(),
-          },
-        },
+
         ShareServiceManager,
       ],
-    }).compile();
+    })
+      .overrideProvider(LoggerService)
+      .useClass(TestLoggerService)
+      .compile();
 
     service = module.get<ShareServiceManager>(ShareServiceManager);
-    httpService = module.get<HttpService>(HttpService);
+    httpService = module.get<AppHttpService>(AppHttpService);
   });
 
   it('should be defined', () => {

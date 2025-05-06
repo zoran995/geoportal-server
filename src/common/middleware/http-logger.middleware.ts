@@ -6,7 +6,9 @@ import { LoggerService } from 'src/infrastructure/logger/index.js';
 
 @Injectable()
 export class HttpLoggerMiddleware implements NestMiddleware {
-  private readonly logger = new LoggerService(HttpLoggerMiddleware.name);
+  constructor(private readonly logger: LoggerService) {
+    this.logger.setContext(HttpLoggerMiddleware.name);
+  }
 
   use(req: Request, _res: Response, next: NextFunction) {
     const { body, params, query } = req;

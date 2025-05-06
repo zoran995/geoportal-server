@@ -119,31 +119,6 @@ async function buildApp() {
 describe('Proxy (e2e)', () => {
   describe('/ (GET)', () => {
     doCommonTest('get');
-
-    describe('before redirect', () => {
-      // eslint-disable-next-line vitest/no-commented-out-tests
-      // it('should follow redirect', async () => {
-      //   vol.fromJSON({
-      //     './serverconfig.json': JSON.stringify({
-      //       proxy: {
-      //         proxyAllDomains: true,
-      //         blacklistedAddresses: ['202.168.1.1'],
-      //       },
-      //     }),
-      //   });
-      //   const { app } = await buildApp();
-      //   const { url } = request(app.getHttpServer()).get('/');
-      //   await agent.get(`/proxy/${url}test/redirect`).expect(200);
-      //   app.close();
-      // });
-      // eslint-disable-next-line vitest/no-commented-out-tests
-      // it('should block redirect to blacklisted host', async () => {
-      //   const { app, agent } = await buildApp('./redirect2.json');
-      //   const { url } = agent.get('/');
-      //   await agent.get(`/proxy/${url}test/redirect2`).expect(403);
-      //   app.close();
-      // });
-    });
   });
 
   describe('/ (POST)', () => {
@@ -385,6 +360,7 @@ function doCommonTest(methodName: 'get' | 'post') {
       });
 
       const { app } = await buildApp();
+      // app.use();
 
       await request(app.getHttpServer())
         [methodName]('/api/proxy/example.com')
@@ -434,7 +410,7 @@ function doCommonTest(methodName: 'get' | 'post') {
         .expect(200);
 
       await app.close();
-    });
+    }, 1000000);
 
     afterAll(() => {
       server.close();
@@ -636,6 +612,108 @@ function doCommonTest(methodName: 'get' | 'post') {
       await request(app.getHttpServer())
         [methodName]('/api/proxy/https://example.com/auth')
         .expect(200, { data: 'properly set header and auth' });
+
+      await app.close();
+      server.close();
+    });
+
+    it('should retry without auth header if auth fails', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            allowProxyFor: ['example.com'],
+            blacklistedAddresses: ['202.168.1.1'],
+            proxyAuth: {
+              'example.com': {
+                authorization: 'blahfaceauth',
+              },
+            },
+          } satisfies Partial<ProxyConfigType>,
+        }),
+      });
+
+      const server = setupServer(
+        ...[
+          localRequestHandler,
+          http.all('https://example.com/auth', ({ request }) => {
+            if (request.headers.get('Authorization') === 'blahfaceauth') {
+              new HttpResponse(null, { status: 403 });
+            }
+
+            return HttpResponse.json({ data: 'response success' });
+          }),
+        ],
+      );
+
+      server.listen({
+        onUnhandledRequest: 'error',
+      });
+
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com/auth')
+        .expect(200, { data: 'response success' });
+
+      await app.close();
+      server.close();
+    });
+
+    it('should retry with proxy auth when fails with user supplied auth', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            allowProxyFor: ['example.com'],
+            blacklistedAddresses: ['202.168.1.1'],
+            proxyAuth: {
+              'example.com': {
+                authorization: 'blahfaceauth',
+              },
+            },
+          } satisfies Partial<ProxyConfigType>,
+        }),
+      });
+
+      const server = setupServer(
+        ...[
+          localRequestHandler,
+          http.all('https://example.com/auth', ({ request }) => {
+            if (request.headers.get('Authorization') === 'testUserAuth') {
+              new HttpResponse(null, {
+                status: 403,
+                statusText: 'Forbidden 1',
+              });
+            }
+
+            if (request.headers.get('Authorization') === 'blahfaceauth') {
+              new HttpResponse(null, {
+                status: 403,
+                statusText: 'Forbidden 2',
+              });
+            }
+
+            return new HttpResponse(null, {
+              status: 403,
+              statusText: 'Forbidden 3',
+            });
+          }),
+        ],
+      );
+
+      server.listen({
+        onUnhandledRequest: 'error',
+      });
+
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com/auth')
+        .expect(403, {
+          statusCode: 403,
+          message: 'Response code 403 (Forbidden 3)',
+        });
 
       await app.close();
       server.close();
@@ -1022,6 +1100,88 @@ function doCommonTest(methodName: 'get' | 'post') {
         });
 
       await app.close();
+      server.close();
+    });
+  });
+
+  describe('redirects', () => {
+    let app: INestApplication;
+    const server = setupServer(...handlers);
+
+    beforeAll(async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            blacklistedAddresses: ['202.168.1.1'],
+          },
+        }),
+      });
+
+      ({ app } = await buildApp());
+
+      server.listen({
+        onUnhandledRequest: 'error',
+      });
+    });
+
+    it('should follow redirect', async () => {
+      const url = 'https://example.com/redirect';
+      await request(app.getHttpServer())
+        [methodName](`/api/proxy/${url}`)
+        .expect(200, { data: 'response success' });
+
+      await app.close();
+    });
+
+    it('should block redirect to blacklisted host', async () => {
+      const url = 'https://example.com/redirect2';
+
+      await request(app.getHttpServer())
+        [methodName](`/api/proxy/${url}`)
+        .expect(403, {
+          statusCode: 403,
+          error: 'Forbidden',
+          message: 'Host is not in list of allowed hosts: 202.168.1.1',
+        });
+
+      await app.close();
+      server.close();
+    });
+  });
+
+  describe('should block socket connection on blacklisted host', () => {
+    let app: INestApplication;
+    const server = setupServer(...handlers);
+
+    beforeAll(async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            blacklistedAddresses: ['127.0.0.1'],
+          },
+        }),
+      });
+
+      ({ app } = await buildApp());
+
+      server.listen({
+        onUnhandledRequest: 'error',
+      });
+    });
+
+    it('should block connection to restricted ip address', async () => {
+      const url = 'https://example.com';
+
+      await request(app.getHttpServer())
+        [methodName](`/api/proxy/${url}`)
+        .expect(403);
+
+      await app.close();
+    }, 20000);
+
+    afterAll(() => {
       server.close();
     });
   });

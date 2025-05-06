@@ -1,7 +1,7 @@
-import { HttpService } from '@nestjs/axios';
 import type { FactoryProvider } from '@nestjs/common';
 
 import { LoggerService } from 'src/infrastructure/logger/index.js';
+import { AppHttpService } from 'src/infrastructure/http/index.js';
 
 import { FeedbackService } from './common/feedback-service.js';
 import { FEEDBACK_CONFIG } from './feedback.constants.js';
@@ -15,7 +15,7 @@ export const feedbackServiceFactory: FactoryProvider = {
   provide: FeedbackService,
   useFactory: (
     feedbackConfig: FeedbackConfigType,
-    httpService: HttpService,
+    httpService: AppHttpService,
     logger: LoggerService,
   ) => {
     const primaryId = feedbackConfig?.primaryId;
@@ -34,5 +34,5 @@ export const feedbackServiceFactory: FactoryProvider = {
         return new DefaultFeedbackService();
     }
   },
-  inject: [FEEDBACK_CONFIG, HttpService, LoggerService],
+  inject: [FEEDBACK_CONFIG, AppHttpService, LoggerService],
 };

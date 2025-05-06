@@ -42,9 +42,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.802.0",
-    "@golevelup/ts-vitest": "0.5.2",
     "@eslint/js": "^9.26.0",
-    "@nestjs/axios": "4.0.0",
+    "@golevelup/ts-vitest": "0.5.2",
     "@nestjs/common": "11.1.0",
     "@nestjs/config": "4.0.2",
     "@nestjs/core": "11.1.0",
@@ -52,12 +51,13 @@
     "@nestjs/serve-static": "5.0.3",
     "@nestjs/swagger": "11.1.6",
     "@smithy/node-http-handler": "4.0.4",
-    "axios": "github:zoran995/axios.git#geoportal",
     "base-x": "5.0.1",
     "compression": "1.8.0",
     "dotenv": "16.5.0",
     "dotenv-expand": "12.0.2",
+    "got": "^14.4.7",
     "helmet": "8.1.0",
+    "hpagent": "^1.2.0",
     "nestjs-zod": "4.3.1",
     "nodemailer": "7.0.0",
     "proj4-cli-defs": "1.0.0",
@@ -88,8 +88,8 @@
     "@types/yargs": "17.0.33",
     "@typescript-eslint/eslint-plugin": "8.31.1",
     "@typescript-eslint/parser": "8.31.1",
-    "@vitest/eslint-plugin": "^1.1.44",
     "@vitest/coverage-v8": "3.1.2",
+    "@vitest/eslint-plugin": "^1.1.44",
     "aws-sdk-client-mock": "4.1.0",
     "eslint": "9.26.0",
     "eslint-config-prettier": "10.1.2",
@@ -107,8 +107,5 @@
     "unplugin-swc": "1.5.2",
     "vitest": "3.1.2",
     "zod-to-json-schema": "3.24.5"
-  },
-  "resolutions": {
-    "axios": "github:zoran995/axios.git#geoportal"
   }
 }

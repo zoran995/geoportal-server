@@ -1,17 +1,12 @@
-import { NestFactory } from '@nestjs/core';
-import {
-  ExpressAdapter,
-  NestExpressApplication,
-} from '@nestjs/platform-express';
-
+import { Test } from '@nestjs/testing';
 import { configDotenv } from 'dotenv';
-import express from 'express';
 import { vol } from 'memfs';
 import request from 'supertest';
 
 import { AppModule } from 'src/app.module.js';
-import { buildServer } from 'src/build-server.js';
+import { LoggerService } from 'src/infrastructure/logger/logger.service.js';
 import { ConfigurationType } from 'src/modules/config/index.js';
+import { NoopLoggerService } from 'test/helpers/noop-logger.service.js';
 
 vi.mock('fs');
 
@@ -34,16 +29,17 @@ describe('http/https server and redirect (e2e)', () => {
       }),
     });
 
-    const server = express();
-    const app = await NestFactory.create<NestExpressApplication>(
-      AppModule,
-      new ExpressAdapter(server),
-      {
-        bufferLogs: true,
-      },
-    );
+    const moduleFixture = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(LoggerService)
+      .useClass(NoopLoggerService)
+      .compile();
 
-    await buildServer(app, server);
+    const app = moduleFixture.createNestApplication();
+    app.setGlobalPrefix('api');
+    await app.init();
+
     await request(app.getHttpServer()).get('/api/serverConfig').expect(200);
 
     await app.close();
@@ -64,16 +60,17 @@ describe('http/https server and redirect (e2e)', () => {
       }),
     });
 
-    const server = express();
-    const app = await NestFactory.create<NestExpressApplication>(
-      AppModule,
-      new ExpressAdapter(server),
-      {
-        bufferLogs: true,
-      },
-    );
+    const moduleFixture = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(LoggerService)
+      .useClass(NoopLoggerService)
+      .compile();
 
-    await buildServer(app, server);
+    const app = moduleFixture.createNestApplication();
+    app.setGlobalPrefix('api');
+    await app.init();
+
     await request(app.getHttpServer()).get('/api/serverConfig').expect(200);
 
     await app.close();
@@ -94,16 +91,17 @@ describe('http/https server and redirect (e2e)', () => {
       }),
     });
 
-    const server = express();
-    const app = await NestFactory.create<NestExpressApplication>(
-      AppModule,
-      new ExpressAdapter(server),
-      {
-        bufferLogs: true,
-      },
-    );
+    const moduleFixture = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(LoggerService)
+      .useClass(NoopLoggerService)
+      .compile();
 
-    await buildServer(app, server);
+    const app = moduleFixture.createNestApplication();
+    app.setGlobalPrefix('api');
+    await app.init();
+
     await request(app.getHttpServer())
       .get('/api/serverConfig')
       .expect(301, /https:\/\/127.0.0.1:\d+\/api\/serverConfig/);
@@ -126,15 +124,16 @@ describe('http/https server and redirect (e2e)', () => {
       }),
     });
 
-    const server = express();
-    const app = await NestFactory.create<NestExpressApplication>(
-      AppModule,
-      new ExpressAdapter(server),
-      {
-        bufferLogs: true,
-      },
-    );
-    await buildServer(app, server);
+    const moduleFixture = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(LoggerService)
+      .useClass(NoopLoggerService)
+      .compile();
+
+    const app = moduleFixture.createNestApplication();
+    app.setGlobalPrefix('api');
+    await app.init();
 
     await request(app.getHttpServer()).get('/api/serverConfig').expect(200);
 
@@ -157,15 +156,16 @@ describe('http/https server and redirect (e2e)', () => {
       }),
     });
 
-    const server = express();
-    const app = await NestFactory.create<NestExpressApplication>(
-      AppModule,
-      new ExpressAdapter(server),
-      {
-        bufferLogs: true,
-      },
-    );
-    await buildServer(app, server);
+    const moduleFixture = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(LoggerService)
+      .useClass(NoopLoggerService)
+      .compile();
+
+    const app = moduleFixture.createNestApplication();
+    app.setGlobalPrefix('api');
+    await app.init();
 
     await request(app.getHttpServer())
       .get('/api/serverConfig')

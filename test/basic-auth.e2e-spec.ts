@@ -1,13 +1,15 @@
 import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 
+import type { NextFunction, Request, Response } from 'express';
 import { vol } from 'memfs';
 import request from 'supertest';
-import type { NextFunction, Request, Response } from 'express';
 
 import { AppModule } from 'src/app.module.js';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
 import { BasicAuthGuard } from 'src/modules/basic-auth/index.js';
 import type { ConfigurationType } from 'src/modules/config/index.js';
+import { NoopLoggerService } from './helpers/noop-logger.service.js';
 
 vi.mock('fs');
 
@@ -33,7 +35,10 @@ describe('Basic auth', () => {
 
     const moduleFixture = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(LoggerService)
+      .useClass(NoopLoggerService)
+      .compile();
 
     app = moduleFixture.createNestApplication();
 

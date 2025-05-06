@@ -3,6 +3,9 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 
 import { AppModule } from 'src/app.module.js';
+import { LoggerService } from 'src/infrastructure/logger/logger.service.js';
+
+import { NoopLoggerService } from './helpers/noop-logger.service.js';
 
 describe('Proj4 endpoint (e2e)', () => {
   let app: INestApplication;
@@ -10,7 +13,10 @@ describe('Proj4 endpoint (e2e)', () => {
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(LoggerService)
+      .useClass(NoopLoggerService)
+      .compile();
 
     app = moduleFixture.createNestApplication();
     app.setGlobalPrefix('api');

@@ -5,6 +5,7 @@ import { DirectoryJSON, vol } from 'memfs';
 import request from 'supertest';
 
 import { AppModule } from 'src/app.module.js';
+import { LoggerService } from 'src/infrastructure/logger/logger.service.js';
 
 import { NoopLoggerService } from './helpers/noop-logger.service.js';
 
@@ -23,7 +24,10 @@ describe('AppController (e2e)', () => {
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(LoggerService)
+      .useClass(NoopLoggerService)
+      .compile();
 
     app = moduleFixture.createNestApplication();
     app.useLogger(new NoopLoggerService());

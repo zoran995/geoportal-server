@@ -1,7 +1,6 @@
 import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 
 import { createMock } from '@golevelup/ts-vitest';
-import { of, throwError } from 'rxjs';
 
 import { CreateFeedbackDto } from '../../dto/create-feedback.dto.js';
 import { githubFeedback } from '../../config/schema/github-feedback.schema.js';
@@ -30,9 +29,11 @@ describe('GithubFeedbackService', () => {
 
   it('should send post request', async () => {
     const httpPostMock = vi.fn();
-    httpPostMock.mockReturnValue(
-      of({ ok: true, status_code: 200, message: 'Successful' }),
-    );
+    httpPostMock.mockResolvedValue({
+      ok: true,
+      status_code: 200,
+      message: 'Successful',
+    });
     const service = new GithubFeedbackService(
       githubFeedbackConfig,
       {
@@ -54,7 +55,7 @@ describe('GithubFeedbackService', () => {
       comment: 'test',
     };
 
-    await service.post(payload, req as never);
+    const response = await service.post(payload, req as never);
 
     expect(httpPostMock).toHaveBeenCalledTimes(1);
     expect(httpPostMock).toHaveBeenCalledWith(
@@ -62,6 +63,9 @@ describe('GithubFeedbackService', () => {
       expect.anything(),
       { headers },
     );
+    expect(response).toEqual({
+      result: 'SUCCESS',
+    });
   });
 
   it('should throw an InternalServerErrorException', async () => {
@@ -72,7 +76,7 @@ describe('GithubFeedbackService', () => {
       Authorization: `Token ${githubFeedbackConfig.accessToken}`,
     };
     const httpPostMock = vi.fn();
-    httpPostMock.mockReturnValue(throwError(() => new Error('test error')));
+    httpPostMock.mockRejectedValue(new Error('test error'));
 
     const service = new GithubFeedbackService(
       githubFeedbackConfig,

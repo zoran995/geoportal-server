@@ -1,7 +1,6 @@
 import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 
 import { createMock } from '@golevelup/ts-vitest';
-import { of, throwError } from 'rxjs';
 
 import { redmineFeedback } from '../../config/schema/redmine-feedback.schema.js';
 import { RedmineFeedbackService } from '../redmine-feedback.service.js';
@@ -32,9 +31,8 @@ describe('RedmineFeedbackService', () => {
   it('should send post request', async () => {
     const httpPostMock = vi
       .fn()
-      .mockReturnValue(
-        of({ ok: true, status_code: 200, message: 'Successful' }),
-      );
+      .mockResolvedValue({ ok: true, status_code: 200, message: 'Successful' });
+
     const auth = {
       username: redmineConf.username,
       password: redmineConf.password,
@@ -47,7 +45,7 @@ describe('RedmineFeedbackService', () => {
       } as never,
       { error: vi.fn() } as never,
     );
-    await service.post({}, req as never);
+    const result = await service.post({}, req as never);
 
     expect(httpPostMock).toHaveBeenCalledTimes(1);
     expect(httpPostMock).toHaveBeenCalledWith(
@@ -59,8 +57,14 @@ describe('RedmineFeedbackService', () => {
           description: expect.anything(),
         },
       },
-      { auth },
+      { ...auth },
     );
+
+    expect(result).toEqual({
+      ok: true,
+      status_code: 200,
+      message: 'Successful',
+    });
   });
 
   it('should throw an InternalServerErrorException', async () => {
@@ -70,9 +74,7 @@ describe('RedmineFeedbackService', () => {
       password: redmineConf.password,
     };
 
-    const httpPostMock = vi
-      .fn()
-      .mockReturnValue(throwError(() => new Error('test error')));
+    const httpPostMock = vi.fn().mockRejectedValue(new Error('test error'));
 
     const service = new RedmineFeedbackService(
       redmineConf,
@@ -95,7 +97,7 @@ describe('RedmineFeedbackService', () => {
             description: expect.anything(),
           },
         },
-        { auth },
+        { ...auth },
       );
       expect(err).toBeInstanceOf(InternalServerErrorException);
     }

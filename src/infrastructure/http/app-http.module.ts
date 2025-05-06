@@ -1,27 +1,24 @@
-import { HttpModule as BaseHttpModule } from '@nestjs/axios';
 import { Global, Module } from '@nestjs/common';
 
-import http from 'http';
-import https from 'https';
-
-import { AxiosLogInterceptor } from './axios-log-interceptors.js';
-
-const agentConfig: https.AgentOptions = {
-  keepAlive: true,
-  maxSockets: 2,
-  maxFreeSockets: 2,
-  timeout: 60000,
-};
+import { AppHttpService } from './app-http-service.js';
+import { GOT_INSTANCE_TOKEN } from './constants.js';
+import { GotLoggingInstance } from './got-log-instance.js';
 
 @Global()
 @Module({
-  imports: [
-    BaseHttpModule.register({
-      httpAgent: new http.Agent(agentConfig),
-      httpsAgent: new https.Agent(agentConfig),
-    }),
+  imports: [],
+  providers: [
+    GotLoggingInstance,
+    {
+      provide: GOT_INSTANCE_TOKEN,
+      useFactory: (gotLoggingInstance: GotLoggingInstance) => {
+        return gotLoggingInstance.gotInstance;
+      },
+      inject: [GotLoggingInstance],
+    },
+
+    AppHttpService,
   ],
-  providers: [AxiosLogInterceptor],
-  exports: [BaseHttpModule],
+  exports: [AppHttpService],
 })
-export class AppHttpModule extends BaseHttpModule {}
+export class AppHttpModule {}
