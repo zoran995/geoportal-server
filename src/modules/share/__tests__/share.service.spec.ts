@@ -7,6 +7,8 @@ import type { Request } from 'express';
 
 import { createMock } from '@golevelup/ts-vitest';
 
+import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service.js';
+
 import { shareGist } from '../schema/share-gist.schema.js';
 import {
   shareConfig as shareConfigSchema,
@@ -21,12 +23,6 @@ const mockHttpGet = vi.fn();
 class HttpServiceMock {
   post = mockHttpPost;
   get = mockHttpGet;
-}
-
-class LoggerServiceMock {
-  log = vi.fn();
-  verbose = vi.fn();
-  error = vi.fn();
 }
 
 const gistConfig = shareGist.parse({
@@ -45,7 +41,8 @@ const shareConfig: ShareConfigType = shareConfigSchema.parse({
 describe('ShareService', () => {
   const shareServiceManager = new ShareServiceManager(
     new HttpServiceMock() as never,
-    new LoggerServiceMock() as never,
+    new TestLoggerService() as never,
+    new TestLoggerService() as never,
   );
   const mockExecutionContext = createMock<ExecutionContext>({
     switchToHttp: () => ({
