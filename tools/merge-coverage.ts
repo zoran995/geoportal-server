@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/require-await */
 /* SOURCE: https://github.com/facebook/jest/issues/2418#issuecomment-478932514 */
-/* tslint:disable:no-console */
 /*
 ts-node ./merge-coverage.ts --report ./coverage0/coverage-final.json --report ./coverage1/coverage-final.json
 */

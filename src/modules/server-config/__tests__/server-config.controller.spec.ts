@@ -13,7 +13,7 @@ import { ServerConfigController } from '../server-config.controller.js';
 function path(obj: Record<string, unknown>, path: string) {
   try {
     return eval('obj.' + path);
-  } catch (e) {
+  } catch {
     return undefined;
   }
 }

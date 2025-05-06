@@ -52,7 +52,7 @@ export class AxiosLogInterceptor implements OnModuleInit {
       },
       (error) => {
         this.logger.error(error);
-        return Promise.reject(error);
+        return Promise.reject(error as Error);
       },
     );
   }

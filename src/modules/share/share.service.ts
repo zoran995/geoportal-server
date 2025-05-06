@@ -43,7 +43,7 @@ export class ShareService {
   }
 
   private parseShareId(id: string): [string, string] {
-    const match = id.match(/^(?:([^-]+)-)?(.+)$/);
+    const match = /^(?:([^-]+)-)?(.+)$/.exec(id);
 
     if (!match || match.length < 3 || !match[1] || !match[2]) {
       throw new BadRequestException('Invalid share id format');

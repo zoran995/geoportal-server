@@ -23,7 +23,7 @@ describe('proxy process duration', () => {
     const duration = processDuration('2d');
     expect(duration).toBe(172800);
   });
-  it('properly process week ', () => {
+  it('properly process week', () => {
     const duration = processDuration('2w');
     expect(duration).toBe(1209600);
   });

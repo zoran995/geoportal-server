@@ -129,7 +129,7 @@ describe('NotFoundExceptionFilter', () => {
   });
 
   it('calls super error filter when serve static undefined', () => {
-    const filter = new NotFoundExceptionFilter(undefined as never, wwwroot);
+    const filter = new NotFoundExceptionFilter(undefined, wwwroot);
 
     filter.catch(new NotFoundException(), mockExecutionContext);
     expect(spyHttpException).toHaveBeenCalledTimes(1);

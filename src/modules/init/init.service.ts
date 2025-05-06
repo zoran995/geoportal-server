@@ -44,7 +44,7 @@ export class InitService implements OnModuleInit {
       : process.cwd();
 
     let filePath: string | undefined = undefined;
-    this.initPaths?.some((initPath) => {
+    this.initPaths.some((initPath) => {
       const resolvedPath = path.resolve(configFileBase, initPath, fileName);
       if (fs.existsSync(resolvedPath)) {
         filePath = resolvedPath;

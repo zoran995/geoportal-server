@@ -32,6 +32,6 @@ export class RateLimiterModule {
 
 interface RateLimiterAsyncOptions extends Pick<ModuleMetadata, 'imports'> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  inject: any[];
+  inject?: any[];
   useFactory: (...args: never[]) => Promise<RateLimitConfigType>;
 }

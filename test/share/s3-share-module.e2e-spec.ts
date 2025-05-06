@@ -98,6 +98,6 @@ describe('Share Module (e2e) - S3', () => {
 
   afterAll(async () => {
     await app.close();
-    await localstackContainer?.stop();
+    await localstackContainer.stop();
   });
 });

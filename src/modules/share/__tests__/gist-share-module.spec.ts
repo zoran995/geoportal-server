@@ -30,7 +30,6 @@ const handlers = [
   }),
 
   http.get('https://api.github.com/gists/:gistId', ({ params }) => {
-    params.gistId;
     if (params.gistId === 'test-response-id') {
       return HttpResponse.json({
         files: {

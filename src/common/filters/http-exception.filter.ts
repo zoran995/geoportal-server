@@ -9,7 +9,8 @@ import { GlobalExceptionFilter } from './global-exception.filter.js';
 export class HttpExceptionFilter extends GlobalExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     if (!(exception instanceof HttpException)) {
-      return super.catch(exception, host);
+      super.catch(exception, host);
+      return;
     }
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();

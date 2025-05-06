@@ -37,7 +37,7 @@ export class AppServeStatic implements ServeStaticModuleOptionsFactory {
     let wwwroot;
     try {
       wwwroot = path.resolve(this.wwwroot);
-    } catch (err) {
+    } catch {
       wwwroot = this.wwwroot;
     }
 

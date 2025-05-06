@@ -11,15 +11,17 @@ export class HttpsRedirectMiddleware {
   ) {}
 
   use(req: Request, res: Response, next: NextFunction) {
-    if (!this.httpsOptions || !this.httpsOptions.redirectToHttps) {
-      return next();
+    if (!this.httpsOptions?.redirectToHttps) {
+      next();
+      return;
     }
 
-    if (this.httpsOptions?.httpAllowedHosts.includes(req.hostname)) {
-      return next();
+    if (this.httpsOptions.httpAllowedHosts.includes(req.hostname)) {
+      next();
+      return;
     }
 
-    if (this.httpsOptions?.strictTransportSecurity) {
+    if (this.httpsOptions.strictTransportSecurity) {
       res.setHeader(
         'Strict-Transport-Security',
         this.httpsOptions.strictTransportSecurity,
@@ -27,7 +29,8 @@ export class HttpsRedirectMiddleware {
     }
 
     if (req.secure) {
-      return next();
+      next();
+      return;
     }
 
     const host = req.headers.host;

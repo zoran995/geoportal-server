@@ -36,6 +36,7 @@ export class InitController {
     if (!filePath) {
       throw new NotFoundException();
     }
-    return res.sendFile(filePath);
+    res.sendFile(filePath);
+    return;
   }
 }

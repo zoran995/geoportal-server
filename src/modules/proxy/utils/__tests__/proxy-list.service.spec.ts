@@ -23,6 +23,7 @@ describe('ProxyListService', () => {
   };
   const setConfig = (target: Partial<ProxyConfigType>) => {
     Object.getOwnPropertyNames(options).forEach((key) => {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete options[key as keyof ProxyOptions];
     });
 

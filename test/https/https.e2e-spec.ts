@@ -26,8 +26,8 @@ describe('http/https server and redirect (e2e)', () => {
 
   it('should not redirect to https when https disabled', async () => {
     vol.fromJSON({
-      './test/https/key.pem': process.env.KEY as string,
-      './test/https/cert.pem': process.env.CERT as string,
+      './test/https/key.pem': process.env.KEY!,
+      './test/https/cert.pem': process.env.CERT!,
       './serverconfig.json': JSON.stringify({
         port: 23322,
         https: undefined,
@@ -51,8 +51,8 @@ describe('http/https server and redirect (e2e)', () => {
 
   it('should not redirect to https when redirect not active', async () => {
     vol.fromJSON({
-      './test/https/key.pem': process.env.KEY as string,
-      './test/https/cert.pem': process.env.CERT as string,
+      './test/https/key.pem': process.env.KEY!,
+      './test/https/cert.pem': process.env.CERT!,
       './serverconfig.json': JSON.stringify({
         port: 23322,
         https: {
@@ -81,8 +81,8 @@ describe('http/https server and redirect (e2e)', () => {
 
   it('should redirect to https when redirect active', async () => {
     vol.fromJSON({
-      './test/https/key.pem': process.env.KEY as string,
-      './test/https/cert.pem': process.env.CERT as string,
+      './test/https/key.pem': process.env.KEY!,
+      './test/https/cert.pem': process.env.CERT!,
       './serverconfig.json': JSON.stringify({
         port: 23322,
         https: {
@@ -113,8 +113,8 @@ describe('http/https server and redirect (e2e)', () => {
 
   it('should not redirect to https when host is in httpAllowedHosts', async () => {
     vol.fromJSON({
-      './test/https/key.pem': process.env.KEY as string,
-      './test/https/cert.pem': process.env.CERT as string,
+      './test/https/key.pem': process.env.KEY!,
+      './test/https/cert.pem': process.env.CERT!,
       './serverconfig.json': JSON.stringify({
         port: 23322,
         https: {
@@ -143,8 +143,8 @@ describe('http/https server and redirect (e2e)', () => {
 
   it('should set Strict-Transport-Security header when redirecting to https', async () => {
     vol.fromJSON({
-      './test/https/key.pem': process.env.KEY as string,
-      './test/https/cert.pem': process.env.CERT as string,
+      './test/https/key.pem': process.env.KEY!,
+      './test/https/cert.pem': process.env.CERT!,
       './serverconfig.json': JSON.stringify({
         port: 23322,
         https: {

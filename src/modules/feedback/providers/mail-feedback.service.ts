@@ -37,7 +37,7 @@ export class MailFeedbackService extends AbstractFeedbackService<MailFeedbackCon
         text: formatBody(feedback, request, this.options.additionalParameters),
       })
       .then((data) => data)
-      .catch((e) => {
+      .catch((e: unknown) => {
         this.logger.error(`Creating feedback failed`, e as never);
         throw new InternalServerErrorException();
       });

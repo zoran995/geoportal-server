@@ -55,7 +55,8 @@ describe('Rate limit(e2e)', () => {
             .end((err, res) => {
               count++;
               if (err || res.statusCode !== 200) {
-                return done(err ?? new Error('Expected 200 status code'));
+                done(err ?? new Error('Expected 200 status code'));
+                return;
               }
               if (count === 10) {
                 clearInterval(interval);
@@ -80,9 +81,11 @@ describe('Rate limit(e2e)', () => {
             if (count === 11) {
               if (res.statusCode === 429) {
                 clearInterval(interval);
-                return done('success');
+                done('success');
+                return;
               } else {
-                return done(new Error('Expected request to be rejected'));
+                done(new Error('Expected request to be rejected'));
+                return;
               }
             }
             expect(res.statusCode).toBe(200);

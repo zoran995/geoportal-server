@@ -68,14 +68,15 @@ export class ProxyService {
 
     if (this.proxyOptions.appendParamToQueryString) {
       const host = this.proxyOptions.appendParamToQueryString[remoteUrl.host];
-      host && this.appendParamToQuery(host, remoteUrl);
+      if (host) {
+        this.appendParamToQuery(host, remoteUrl);
+      }
     }
 
     let proxy: AxiosProxyConfig | undefined;
     if (
       this.proxyOptions.upstreamProxy &&
-      (!this.proxyOptions.bypassUpstreamProxyHosts ||
-        !this.proxyOptions.bypassUpstreamProxyHosts[remoteUrl.host])
+      !this.proxyOptions.bypassUpstreamProxyHosts?.[remoteUrl.host]
     ) {
       const url = new URL(this.proxyOptions.upstreamProxy);
       proxy = {
@@ -129,12 +130,12 @@ export class ProxyService {
     const proxyHeaders = { ...headers };
     const authRequired = this.proxyOptions.proxyAuth[remoteUrl.host];
 
-    if (!retryWithoutAuth && authRequired && !headers['authorization']) {
+    if (!retryWithoutAuth && authRequired && !headers.authorization) {
       // identify that we tried using proxy auth headers
       proxyAuthCredentials = true;
       if (authRequired.authorization) {
         // http basic auth.
-        proxyHeaders['authorization'] = authRequired.authorization;
+        proxyHeaders.authorization = authRequired.authorization;
       }
       if (authRequired.headers) {
         // a mechanism to pass arbitrary headers.
@@ -142,11 +143,7 @@ export class ProxyService {
           proxyHeaders[header.name] = header.value;
         });
       }
-    } else if (
-      !retryWithoutAuth &&
-      !headers['authorization'] &&
-      !authRequired
-    ) {
+    } else if (!retryWithoutAuth && !headers.authorization && !authRequired) {
       retryWithoutAuth = true;
     }
 
@@ -154,16 +151,19 @@ export class ProxyService {
       this.httpService
         .request({
           method: this.request.method === 'POST' ? 'POST' : 'GET',
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-template-expression
           url: `${remoteUrl.href}`,
           headers: proxyHeaders,
           responseType: 'arraybuffer',
           proxy,
           data: this.request.method === 'POST' ? this.request.body : undefined,
           maxBodyLength: this.proxyOptions.postSizeLimit,
-          beforeRedirect: (options, { headers }) =>
-            this.beforeRedirect(headers, remoteUrl),
-          onHttpSocketEvent: (config: NodeJS.Socket) =>
-            this.onHttpSocketEvent(config),
+          beforeRedirect: (options, { headers }) => {
+            this.beforeRedirect(headers, remoteUrl);
+          },
+          onHttpSocketEvent: (config: NodeJS.Socket) => {
+            this.onHttpSocketEvent(config);
+          },
         })
         .pipe(
           map((response) => {
@@ -190,7 +190,7 @@ export class ProxyService {
             ) {
               if (
                 authRequired &&
-                headers['authorization'] &&
+                headers.authorization &&
                 !proxyAuthCredentials
               ) {
                 // User specified an authentication header to this request which
@@ -230,7 +230,7 @@ export class ProxyService {
                 });
               } else if (err.getResponse) {
                 throw Object.create(err, {
-                  response: { value: err.getResponse().toString() },
+                  response: { value: JSON.stringify(err.getResponse()) },
                 });
               }
             } else if (err.code === 'ECONNREFUSED') {
@@ -263,7 +263,8 @@ export class ProxyService {
       // we default to the remote url host.
       const redirectHost =
         typeof url.host === 'string' ? url.host : remoteUrl.host;
-      return this.proxyAllowedHost(redirectHost);
+      this.proxyAllowedHost(redirectHost);
+      return;
     }
     // redirect could not be completed
     throw new InternalServerErrorException();
@@ -313,7 +314,7 @@ export class ProxyService {
         if (remoteUrl.search === null || remoteUrl.search === '') {
           remoteUrl.search = paramsString;
         } else {
-          const joiner = remoteUrl.search.indexOf('?') >= 0 ? '&' : '?';
+          const joiner = remoteUrl.search.includes('?') ? '&' : '?';
           remoteUrl.search += joiner + paramsString;
         }
       }
@@ -325,7 +326,7 @@ export class ProxyService {
    * @param headers - request headers
    */
   private deleteAuthorizationHeader(headers: Record<string, unknown>) {
-    delete headers['authorization'];
+    delete headers.authorization;
     return headers;
   }
 

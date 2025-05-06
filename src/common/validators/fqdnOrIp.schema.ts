@@ -5,7 +5,7 @@ import { fqdn } from './fqdn.schema.js';
 
 const ipWithPort = (ipVersion?: 'v4' | 'v6') => {
   return z.custom<string>(
-    (val: string) => {
+    (val?: string) => {
       const split = val?.split(':');
       if (split?.length !== 2) {
         return false;
