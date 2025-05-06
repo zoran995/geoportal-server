@@ -1,11 +1,23 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { Got, OptionsOfJSONResponseBody } from 'got';
+import {
+  got,
+  type Got,
+  type OptionsOfBufferResponseBody,
+  type OptionsOfJSONResponseBody,
+} from 'got';
 
 import { GOT_INSTANCE_TOKEN } from './constants.js';
 
 @Injectable()
 export class AppHttpService {
   constructor(@Inject(GOT_INSTANCE_TOKEN) private readonly got: Got) {}
+
+  async request(
+    url: string,
+    options?: OptionsOfBufferResponseBody | OptionsOfJSONResponseBody,
+  ) {
+    return got(url, options);
+  }
 
   async get<T>(url: string, options?: OptionsOfJSONResponseBody) {
     return this.got.get<T>(url, options).json<T>();
