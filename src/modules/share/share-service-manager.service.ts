@@ -14,6 +14,7 @@ export class ShareServiceManager {
   constructor(
     private readonly httpService: AppHttpService,
     private readonly logger: LoggerService,
+    private readonly awsLogger: LoggerService,
   ) {}
 
   async initializeProviders(
@@ -51,7 +52,7 @@ export class ShareServiceManager {
         const { S3ShareService } = await import(
           './providers/s3-share.service.js'
         );
-        return new S3ShareService(config, this.logger);
+        return new S3ShareService(config, this.logger, this.awsLogger);
       }
       default:
         throw new Error(

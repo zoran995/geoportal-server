@@ -3,6 +3,7 @@ import type { Request } from 'express';
 import { LoggerService } from 'src/infrastructure/logger/logger.service.js';
 
 import { HttpLoggerMiddleware } from '../http-logger.middleware.js';
+import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service.js';
 
 vi.mock(import('src/infrastructure/logger/logger.service.js'));
 
@@ -23,7 +24,7 @@ describe('HttpLoggerMiddleware', () => {
 
   beforeEach(() => {
     (LoggerService as any).mockClear();
-    httpLogger = new HttpLoggerMiddleware();
+    httpLogger = new HttpLoggerMiddleware(new TestLoggerService());
   });
 
   it('should be defined', () => {

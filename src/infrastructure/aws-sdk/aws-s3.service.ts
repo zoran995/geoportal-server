@@ -23,14 +23,15 @@ import { streamToString } from './stream-to-string.js';
 @Injectable()
 export class AwsS3Service {
   private readonly _s3: S3Client;
-  private readonly logger = new LoggerService(AwsS3Service.name);
 
   constructor(
     @Optional()
     @Inject(AWS_CONFIG_OPTIONS)
     private readonly options: S3ClientConfig,
+    private readonly logger: LoggerService,
   ) {
     this._s3 = new S3Client(this.options);
+    this.logger.setContext(AwsS3Service.name);
   }
 
   async save(params: PutObjectCommandInput) {

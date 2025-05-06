@@ -20,6 +20,7 @@ import { WWWROOT_TOKEN } from 'src/common/utils/index.js';
 import type { ConfigurationType } from 'src/modules/config/index.js';
 
 import { NoopLoggerService } from './helpers/noop-logger.service.js';
+import { LoggerService } from 'src/infrastructure/logger/logger.service.js';
 
 vi.mock('fs');
 vi.hoisted(async () => {
@@ -77,6 +78,12 @@ export class TestController {
 
 @Module({
   imports: [AppModule],
+  providers: [
+    {
+      provide: LoggerService,
+      useClass: NoopLoggerService,
+    },
+  ],
   controllers: [TestController],
 })
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class

@@ -13,6 +13,7 @@ import { AppConfigModule } from 'src/modules/config/index.js';
 
 import { shareConfig } from '../schema/share.config.schema.js';
 import { ShareModule } from '../share.module.js';
+import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service.js';
 
 const handlers = [
   // we need to let local request pass through
@@ -59,8 +60,8 @@ describe('Share Module (e2e)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
         AppConfigModule,
-        AppHttpModule,
         LoggerModule,
+        AppHttpModule,
         ShareModule.forRoot({
           useFactory: () => {
             return shareConfig.parse({
@@ -86,13 +87,7 @@ describe('Share Module (e2e)', () => {
       ],
     })
       .overrideProvider(LoggerService)
-      .useValue({
-        error: vi.fn(),
-        warn: vi.fn(),
-        info: vi.fn(),
-        debug: vi.fn(),
-        verbose: vi.fn(),
-      })
+      .useClass(TestLoggerService)
       .compile();
 
     app = moduleFixture.createNestApplication();

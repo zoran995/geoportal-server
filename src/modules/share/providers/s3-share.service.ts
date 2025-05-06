@@ -47,19 +47,23 @@ export class S3ShareService extends AbstractShareService<ShareS3Config> {
 
   constructor(
     protected readonly config: ShareS3Config,
-    logger: LoggerService,
+    protected readonly logger: LoggerService,
+    awsLogger: LoggerService,
   ) {
     super(config, logger);
-    this.awsS3Service = new AwsS3Service({
-      credentials: config.credentials ? { ...config.credentials } : undefined,
-      endpoint: config.endpoint,
-      region: config.region,
-      forcePathStyle: config.forcePathStyle,
-      requestHandler: new NodeHttpHandler({
-        httpsAgent: new https.Agent(agentConfig),
-        httpAgent: new http.Agent(agentConfig),
-      }),
-    });
+    this.awsS3Service = new AwsS3Service(
+      {
+        credentials: config.credentials ? { ...config.credentials } : undefined,
+        endpoint: config.endpoint,
+        region: config.region,
+        forcePathStyle: config.forcePathStyle,
+        requestHandler: new NodeHttpHandler({
+          httpsAgent: new https.Agent(agentConfig),
+          httpAgent: new http.Agent(agentConfig),
+        }),
+      },
+      awsLogger,
+    );
   }
 
   /**

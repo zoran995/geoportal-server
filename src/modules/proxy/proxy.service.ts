@@ -30,7 +30,7 @@ import { processDuration } from './utils/processDuration.js';
 import { processHeaders } from './utils/processHeaders.js';
 import { ProxyListService } from './utils/proxy-list.service.js';
 import { urlValidator } from './utils/urlValidator.js';
-import got, { Agents, HTTPError, PlainResponse, RequestError } from 'got';
+import { type Agents, HTTPError, type PlainResponse, RequestError } from 'got';
 import {
   HttpProxyAgent,
   HttpProxyAgentOptions,
@@ -40,14 +40,15 @@ import {
 
 @Injectable({ scope: Scope.REQUEST })
 export class ProxyService {
-  private readonly logger = new LoggerService(ProxyService.name);
-
   constructor(
     @Inject(REQUEST) private readonly request: Request,
     @Inject(PROXY_OPTIONS) private readonly proxyOptions: ProxyOptions,
     private readonly httpService: AppHttpService,
     private readonly proxyListService: ProxyListService,
-  ) {}
+    private readonly logger: LoggerService,
+  ) {
+    this.logger.setContext(ProxyService.name);
+  }
 
   /**
    *
@@ -177,126 +178,131 @@ export class ProxyService {
     }
 
     try {
-      const response = await got(remoteUrl.href, {
-        method: this.request.method === 'POST' ? 'POST' : 'GET',
-        headers: effectiveHeadersForFirstAttempt,
-        responseType: 'buffer',
-        agent: proxyAgents,
-        encoding: undefined,
-        body: this.request.method === 'POST' ? this.request.body : undefined,
-        followRedirect: (response: PlainResponse) => {
-          return this.followRedirect(response.headers, remoteUrl);
-        },
-        throwHttpErrors: true,
-        context: {
-          authTypeForThisAttempt: initialAuthType,
-          hostAuthOptions,
-          baseHeadersWithoutAuth,
-          remoteUrlString: remoteUrl.href,
-        } satisfies RequestContext,
-        retry: {
-          limit: 2,
-          methods: ['GET', 'POST'],
-          statusCodes: [403],
-          calculateDelay: (retryObject) => {
-            const requestOptions = retryObject.error.options;
-            const context = requestOptions.context as never as RequestContext;
-
-            // attemptCount is the number of the failed attempt.
-            // If the 2nd attempt (1st retry) just failed (attemptCount === 2),
-            // and it was made with 'none' auth, then do not proceed to the 3rd attempt (2nd retry).
-            if (
-              retryObject.attemptCount === 2 &&
-              context.authTypeForThisAttempt === 'none'
-            ) {
-              this.logger.debug(
-                `Cancelling further retries for ${context.remoteUrlString} as the previous retry was already without authentication.`,
-              );
-              return 0; // Cancel retry
-            }
-
-            // For other cases, retry immediately (or after a very short delay)
-            return 1; // Minimal delay for retry to proceed
+      const response = await this.httpService
+        .got(remoteUrl.href, {
+          method: this.request.method === 'POST' ? 'POST' : 'GET',
+          headers: effectiveHeadersForFirstAttempt,
+          responseType: 'buffer',
+          agent: proxyAgents,
+          encoding: undefined,
+          body: this.request.method === 'POST' ? this.request.body : undefined,
+          followRedirect: (response: PlainResponse) => {
+            return this.followRedirect(response.headers, remoteUrl);
           },
-        },
-        hooks: {
-          beforeRequest: [
-            (options) => {
-              const context = options.context as never as RequestContext;
-              this.logger.debug(
-                `Making request to ${context.remoteUrlString} with auth type: ${context.authTypeForThisAttempt}`,
-              );
-            },
-          ],
-          beforeRetry: [
-            (error, retryCount) => {
-              const requestOptions = error.options;
+          throwHttpErrors: true,
+          context: {
+            authTypeForThisAttempt: initialAuthType,
+            hostAuthOptions,
+            baseHeadersWithoutAuth,
+            remoteUrlString: remoteUrl.href,
+          } satisfies RequestContext,
+          retry: {
+            limit: 2,
+            methods: ['GET', 'POST'],
+            statusCodes: [403],
+            calculateDelay: (retryObject) => {
+              const requestOptions = retryObject.error.options;
               const context = requestOptions.context as never as RequestContext;
 
-              this.logger.debug(
-                `Attempting retry ${retryCount} for status ${
-                  error.response?.statusCode ?? 'N/A'
-                } on ${context.remoteUrlString}.`,
-              );
+              // attemptCount is the number of the failed attempt.
+              // If the 2nd attempt (1st retry) just failed (attemptCount === 2),
+              // and it was made with 'none' auth, then do not proceed to the 3rd attempt (2nd retry).
+              if (
+                retryObject.attemptCount === 2 &&
+                context.authTypeForThisAttempt === 'none'
+              ) {
+                this.logger.debug(
+                  `Cancelling further retries for ${context.remoteUrlString} as the previous retry was already without authentication.`,
+                );
+                return 0; // Cancel retry
+              }
 
-              const failedAttemptAuthType = context.authTypeForThisAttempt;
-              const currentHostAuthOptions = context.hostAuthOptions;
-              const currentBaseHeadersWithoutAuth =
-                context.baseHeadersWithoutAuth;
+              // For other cases, retry immediately (or after a very short delay)
+              return 1; // Minimal delay for retry to proceed
+            },
+          },
+          hooks: {
+            beforeRequest: [
+              (options) => {
+                const context = options.context as never as RequestContext;
+                this.logger.debug(
+                  `Making request to ${context.remoteUrlString} with auth type: ${context.authTypeForThisAttempt}`,
+                );
+              },
+            ],
+            beforeRetry: [
+              (error, retryCount) => {
+                const requestOptions = error.options;
+                const context =
+                  requestOptions.context as never as RequestContext;
 
-              let nextAuthType: 'proxy' | 'none' = 'none';
-              requestOptions.headers = { ...currentBaseHeadersWithoutAuth };
+                this.logger.debug(
+                  `Attempting retry ${retryCount} for status ${
+                    error.response?.statusCode ?? 'N/A'
+                  } on ${context.remoteUrlString}.`,
+                );
 
-              if (retryCount === 1) {
-                if (
-                  failedAttemptAuthType === 'user' &&
-                  currentHostAuthOptions
-                ) {
-                  this.logger.debug('Retrying with proxy auth.');
-                  if (currentHostAuthOptions.authorization) {
-                    requestOptions.headers.authorization =
-                      currentHostAuthOptions.authorization;
+                const failedAttemptAuthType = context.authTypeForThisAttempt;
+                const currentHostAuthOptions = context.hostAuthOptions;
+                const currentBaseHeadersWithoutAuth =
+                  context.baseHeadersWithoutAuth;
+
+                let nextAuthType: 'proxy' | 'none' = 'none';
+                requestOptions.headers = { ...currentBaseHeadersWithoutAuth };
+
+                if (retryCount === 1) {
+                  if (
+                    failedAttemptAuthType === 'user' &&
+                    currentHostAuthOptions
+                  ) {
+                    this.logger.debug('Retrying with proxy auth.');
+                    if (currentHostAuthOptions.authorization) {
+                      requestOptions.headers.authorization =
+                        currentHostAuthOptions.authorization;
+                    }
+                    if (currentHostAuthOptions.headers) {
+                      currentHostAuthOptions.headers.forEach((header) => {
+                        requestOptions.headers[header.name] = header.value;
+                      });
+                    }
+                    nextAuthType = 'proxy';
+                  } else {
+                    this.logger.debug(
+                      'Retrying without authentication (1st retry).',
+                    );
+                    nextAuthType = 'none';
                   }
-                  if (currentHostAuthOptions.headers) {
-                    currentHostAuthOptions.headers.forEach((header) => {
-                      requestOptions.headers[header.name] = header.value;
-                    });
-                  }
-                  nextAuthType = 'proxy';
-                } else {
+                } else if (retryCount === 2) {
+                  // This will only be reached if calculateDelay allowed it (i.e., previous attempt was not 'none')
                   this.logger.debug(
-                    'Retrying without authentication (1st retry).',
+                    'Retrying without authentication (2nd retry).',
                   );
                   nextAuthType = 'none';
                 }
-              } else if (retryCount === 2) {
-                // This will only be reached if calculateDelay allowed it (i.e., previous attempt was not 'none')
-                this.logger.debug(
-                  'Retrying without authentication (2nd retry).',
-                );
-                nextAuthType = 'none';
-              }
-              context.authTypeForThisAttempt = nextAuthType;
-            },
-          ],
-        },
-      }).on('request', (req) => {
-        req.on('socket', (socket) => {
-          this.logger.debug(
-            'Socket assigned to request for: ' + remoteUrl.href,
-          );
+                context.authTypeForThisAttempt = nextAuthType;
+              },
+            ],
+          },
+        })
+        .on('request', (req) => {
+          req.on('socket', (socket) => {
+            this.logger.debug(
+              'Socket assigned to request for: ' + remoteUrl.href,
+            );
 
-          socket.once('lookup', (_err, address: string) => {
-            if (this.proxyListService.addressBlacklisted(address)) {
-              // ip address is blacklisted so emit an error to abort request
-              socket.emit(
-                'error',
-                new ForbiddenException(`IP address is not allowed: ${address}`),
-              );
-            }
+            socket.once('lookup', (_err, address: string) => {
+              if (this.proxyListService.addressBlacklisted(address)) {
+                // ip address is blacklisted so emit an error to abort request
+                socket.emit(
+                  'error',
+                  new ForbiddenException(
+                    `IP address is not allowed: ${address}`,
+                  ),
+                );
+              }
+            });
           });
         });
-      });
 
       const maxAgeSeconds = response.statusCode >= 400 ? undefined : maxAge;
 

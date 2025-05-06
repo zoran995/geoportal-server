@@ -8,6 +8,9 @@ import {
 import { mockClient } from 'aws-sdk-client-mock';
 import { Readable } from 'stream';
 
+import { LoggerService } from 'src/infrastructure/logger/logger.service.js';
+import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service.js';
+
 import { AwsS3Service } from '../aws-s3.service.js';
 
 vi.mock(import('src/infrastructure/logger/logger.service.js'));
@@ -19,7 +22,13 @@ describe('AwsSdkService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AwsS3Service],
+      providers: [
+        AwsS3Service,
+        {
+          provide: LoggerService,
+          useClass: TestLoggerService,
+        },
+      ],
     }).compile();
 
     service = module.get<AwsS3Service>(AwsS3Service);
