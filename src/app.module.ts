@@ -101,7 +101,8 @@ import { LOG_LEVEL_TOKEN } from './infrastructure/logger/index.js';
     {
       provide: LOG_LEVEL_TOKEN,
       useFactory: (configService: ConfigService<ConfigurationType, true>) => {
-        return configService.get('logLevel', { infer: true });
+        const logLevel = configService.get('logLevel', { infer: true });
+        return logLevel;
       },
       inject: [ConfigService],
     },
