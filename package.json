@@ -51,7 +51,6 @@
     "@nestjs/serve-static": "5.0.3",
     "@nestjs/swagger": "11.1.6",
     "@smithy/node-http-handler": "4.0.4",
-    "axios": "github:zoran995/axios.git#geoportal",
     "base-x": "5.0.1",
     "compression": "1.8.0",
     "dotenv": "16.5.0",
@@ -108,8 +107,5 @@
     "unplugin-swc": "1.5.2",
     "vitest": "3.1.2",
     "zod-to-json-schema": "3.24.5"
-  },
-  "resolutions": {
-    "axios": "github:zoran995/axios.git#geoportal"
   }
 }
