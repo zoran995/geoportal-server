@@ -23,7 +23,9 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
   constructor(
     @Inject(PROXY_OPTIONS) private readonly proxyOptions: ProxyConfigType,
     private readonly logger: LoggerService,
-  ) {}
+  ) {
+    this.logger.setContext(ProxyListService.name);
+  }
 
   get blacklist() {
     return this.#blacklist;
@@ -68,14 +70,14 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
   private setBlacklist() {
     const path = this.proxyOptions.blacklistPath;
     if (!path || !fs.existsSync(path)) {
-      this.logger.log('using blacklist set in config;', ProxyListService.name);
+      this.logger.debug('using blacklist set in config;');
       if (isDefined(this.proxyOptions.blacklistedAddresses)) {
         this.#blacklist.length = 0;
         this.#blacklist.push(...this.proxyOptions.blacklistedAddresses);
       }
       return;
     }
-    this.logger.log(`reading blacklist from ${path}`, ProxyListService.name);
+    this.logger.debug(`reading blacklist from ${path}`);
     this.#blacklist = readFileWithoutComments(path);
     this.blacklistWatcher = this.watchFileChanges(path, this.#blacklist);
   }
@@ -83,14 +85,17 @@ export class ProxyListService implements OnModuleInit, OnModuleDestroy {
   private setWhitelist() {
     const path = this.proxyOptions.whitelistPath;
     if (!path || !fs.existsSync(path)) {
-      this.logger.log('using whitelist set in config;', ProxyListService.name);
+      this.logger.debug(
+        'using whitelist set in config;',
+        ProxyListService.name,
+      );
       if (isDefined(this.proxyOptions.allowProxyFor)) {
         this.#whitelist.length = 0;
         this.#whitelist.push(...this.proxyOptions.allowProxyFor);
       }
       return;
     }
-    this.logger.log(`reading whitelist from ${path}`, ProxyListService.name);
+    this.logger.debug(`reading whitelist from ${path}`, ProxyListService.name);
     this.#whitelist = readFileWithoutComments(path);
     this.whitelistWatcher = this.watchFileChanges(path, this.#whitelist);
   }

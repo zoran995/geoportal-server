@@ -30,6 +30,7 @@ import { ProxyWrapperModule } from './modules/proxy-wrapper.module.js';
 import { ShutdownObserver } from './infrastructure/http/shutdown-observer.js';
 import { HTTPS_OPTIONS } from './common/utils/https-options.token.js';
 import { HttpsRedirectMiddleware } from './common/middleware/https-redirect.middleware.js';
+import { LOG_LEVEL_TOKEN } from './infrastructure/logger/index.js';
 
 @Module({
   imports: [
@@ -96,6 +97,13 @@ import { HttpsRedirectMiddleware } from './common/middleware/https-redirect.midd
     {
       provide: APP_PIPE,
       useClass: ZodValidationPipe,
+    },
+    {
+      provide: LOG_LEVEL_TOKEN,
+      useFactory: (configService: ConfigService<ConfigurationType, true>) => {
+        return configService.get('logLevel', { infer: true });
+      },
+      inject: [ConfigService],
     },
   ],
 })

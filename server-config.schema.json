@@ -717,6 +717,12 @@
       },
       "required": ["keyPath", "certPath"],
       "additionalProperties": false
+    },
+    "logLevel": {
+      "type": "string",
+      "enum": ["none", "log", "error", "warn", "debug", "verbose"],
+      "default": "error",
+      "description": "The log level to use."
     }
   },
   "additionalProperties": false,
