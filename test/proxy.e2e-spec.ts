@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { Controller, Get, INestApplication, Post } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { vol } from 'memfs';
@@ -10,6 +10,7 @@ import { AppModule } from 'src/app.module.js';
 import { LoggerService } from 'src/infrastructure/logger/logger.service.js';
 import type { ProxyConfigType } from 'src/modules/proxy/config/schema/proxy-config.dto.js';
 
+import { createServer } from './helpers/http-proxy-server.js';
 import { NoopLoggerService } from './helpers/noop-logger.service.js';
 
 vi.mock('fs');
@@ -98,9 +99,23 @@ const handlers = [
   }),
 ];
 
+@Controller('test')
+export class TestController {
+  @Get()
+  test() {
+    return { data: 'test' };
+  }
+
+  @Post()
+  testPost() {
+    return { data: 'test' };
+  }
+}
+
 async function buildApp() {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
+    controllers: [TestController],
   })
     .overrideProvider(LoggerService)
     .useClass(NoopLoggerService)
@@ -416,32 +431,38 @@ function doCommonTest(methodName: 'get' | 'post') {
   });
 
   describe('with an upstream proxy', () => {
-    const server = setupServer(...handlers);
-
-    beforeAll(() => {
-      server.listen({
-        onUnhandledRequest: 'error',
-      });
-    });
-
-    it.skip('should proxy through upstream proxy', async () => {
+    let PROXY_PORT = 25000;
+    let RESPOSE = 200;
+    if (methodName === 'post') {
+      PROXY_PORT = 25001;
+      RESPOSE = 201;
+    }
+    it('should proxy through upstream proxy', async () => {
       vol.fromJSON({
         './serverconfig.json': JSON.stringify({
           proxy: {
-            upstreamProxy: 'http://proxy/',
+            upstreamProxy: `http://127.0.0.1:${PROXY_PORT}`,
             proxyAllDomains: true,
             blacklistedAddresses: ['202.168.1.1'],
           },
         }),
       });
 
+      const connectSpy = vi.fn();
+
       const { app } = await buildApp();
-      // app.use();
+      const { close: closeProxyServer } = createServer(PROXY_PORT, connectSpy);
+      const appHttpServer = app.getHttpServer();
+      appHttpServer.listen(0);
 
       await request(app.getHttpServer())
-        [methodName]('/api/proxy/example.com')
-        .expect(200);
+        [
+          methodName
+        ](`/api/proxy/http://127.0.0.1:${appHttpServer.address().port}/api/test`)
+        .expect(RESPOSE);
+      expect(connectSpy).toHaveBeenCalledTimes(1);
 
+      closeProxyServer();
       await app.close();
     });
 
@@ -449,30 +470,37 @@ function doCommonTest(methodName: 'get' | 'post') {
       vol.fromJSON({
         './serverconfig.json': JSON.stringify({
           proxy: {
-            upstreamProxy: 'http://proxy/',
-            bypassUpstreamProxyHosts: { 'example.com': true },
+            upstreamProxy: `http://127.0.0.1:${PROXY_PORT}`,
+            bypassUpstreamProxyHosts: { '127.0.0.1:64900': true },
             proxyAllDomains: true,
             blacklistedAddresses: ['202.168.1.1'],
           },
         }),
       });
 
-      const { app } = await buildApp();
-      await request(app.getHttpServer())
-        [methodName]('/api/proxy/example.com')
-        .expect(200);
-      request(app.getHttpServer())
-        [methodName]('/api/proxy/https://example.com/response')
-        .expect(200, { data: 'response success' });
+      const connectSpy = vi.fn();
 
+      const { app } = await buildApp();
+      const { close: closeProxyServer } = createServer(PROXY_PORT, connectSpy);
+      const appHttpServer = app.getHttpServer();
+      appHttpServer.listen(64900);
+
+      await request(app.getHttpServer())
+        [
+          methodName
+        ](`/api/proxy/http://127.0.0.1:${appHttpServer.address().port}/api/test`)
+        .expect(RESPOSE);
+      expect(connectSpy).not.toHaveBeenCalled();
+
+      closeProxyServer();
       await app.close();
     });
 
-    it.skip('is still used when bypassUpstreamProxyHosts is defined but host is not in it', async () => {
+    it('is still used when bypassUpstreamProxyHosts is defined but host is not in it (HTTP target)', async () => {
       vol.fromJSON({
         './serverconfig.json': JSON.stringify({
           proxy: {
-            upstreamProxy: 'http://proxy/',
+            upstreamProxy: `http://127.0.0.1:${PROXY_PORT}`,
             bypassUpstreamProxyHosts: { 'example2.com': true },
             proxyAllDomains: true,
             blacklistedAddresses: ['202.168.1.1'],
@@ -480,16 +508,22 @@ function doCommonTest(methodName: 'get' | 'post') {
         }),
       });
 
+      const connectSpy = vi.fn();
+
       const { app } = await buildApp();
+      const { close: closeProxyServer } = createServer(PROXY_PORT, connectSpy);
+      const appHttpServer = app.getHttpServer();
+      appHttpServer.listen(64900);
+
       await request(app.getHttpServer())
-        [methodName]('/api/proxy/https://example.com/blah')
-        .expect(200);
+        [
+          methodName
+        ](`/api/proxy/http://127.0.0.1:${appHttpServer.address().port}/api/test`)
+        .expect(RESPOSE);
+      expect(connectSpy).toHaveBeenCalledTimes(1);
 
+      closeProxyServer();
       await app.close();
-    });
-
-    afterAll(() => {
-      server.close();
     });
   });
 

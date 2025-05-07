@@ -85,12 +85,6 @@ export class ProxyService {
     ) {
       const url = new URL(this.proxyOptions.upstreamProxy);
       const proxyOptions: HttpProxyAgentOptions | HttpsProxyAgentOptions = {
-        port: url.port
-          ? parseInt(url.port, 10)
-          : url.protocol === 'https:'
-            ? 443
-            : 80,
-        host: url.host,
         proxy: url,
         keepAlive: true,
         keepAliveMsecs: 1000,
