@@ -5992,10 +5992,10 @@ range_check@2.0.4:
     ip6 "^0.2.0"
     ipaddr.js "^1.9.1"
 
-rate-limiter-flexible@5.0.4:
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/rate-limiter-flexible/-/rate-limiter-flexible-5.0.4.tgz#6ee6b1f7bd6e06b364a7ed6afab65d23f88e5a99"
-  integrity sha512-ftYHrIfSqWYDIJZ4yPTrgOduByAp+86gUS9iklv0JoXVM8eQCAjTnydCj1hAT4MmhmkSw86NaFEJ28m/LC1pKA==
+rate-limiter-flexible@7.1.0:
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/rate-limiter-flexible/-/rate-limiter-flexible-7.1.0.tgz#5a94f2b204b34c73c31869e3b85c93fecec46e54"
+  integrity sha512-qXYzKWzlTOf7/BNjz1Jj03AgtTHoJZZAiiJ3hjLf8sqeG+EWZLeQ3xYtMPlMZLonlq+OyJUueHyK/H+q2Zc7Qw==
 
 raw-body@^3.0.0:
   version "3.0.0"
