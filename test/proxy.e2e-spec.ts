@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { Controller, Get, INestApplication, Post } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { vol } from 'memfs';
@@ -10,6 +10,7 @@ import { AppModule } from 'src/app.module.js';
 import { LoggerService } from 'src/infrastructure/logger/logger.service.js';
 import type { ProxyConfigType } from 'src/modules/proxy/config/schema/proxy-config.dto.js';
 
+import { createServer } from './helpers/http-proxy-server.js';
 import { NoopLoggerService } from './helpers/noop-logger.service.js';
 
 vi.mock('fs');
@@ -98,9 +99,23 @@ const handlers = [
   }),
 ];
 
+@Controller('test')
+export class TestController {
+  @Get()
+  test() {
+    return { data: 'test' };
+  }
+
+  @Post()
+  testPost() {
+    return { data: 'test' };
+  }
+}
+
 async function buildApp() {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
+    controllers: [TestController],
   })
     .overrideProvider(LoggerService)
     .useClass(NoopLoggerService)
@@ -123,6 +138,82 @@ describe('Proxy (e2e)', () => {
 
   describe('/ (POST)', () => {
     doCommonTest('post');
+
+    describe('POST body handling', () => {
+      let app: INestApplication;
+      let server: ReturnType<typeof setupServer>;
+
+      beforeAll(async () => {
+        vol.fromJSON({
+          './serverconfig.json': JSON.stringify({
+            proxy: {
+              proxyAllDomains: true, // Allow proxying to example.com
+              postSizeLimit: 1024 * 1024, // Set a specific limit for the size test
+              blacklistedAddresses: ['202.168.1.1'], // Keep existing relevant config
+            },
+          }),
+        });
+
+        server = setupServer(
+          ...[
+            localRequestHandler,
+            http.post(
+              'https://example.com/post-body-test',
+              async ({ request }) => {
+                const requestBody = await request.json();
+                if (
+                  requestBody &&
+                  (requestBody as Record<string, string>).message ===
+                    'hello proxy'
+                ) {
+                  return HttpResponse.json({
+                    success: true,
+                    receivedBody: requestBody,
+                  });
+                }
+                return HttpResponse.json(
+                  { success: false, error: 'Incorrect body received' },
+                  { status: 400 },
+                );
+              },
+            ),
+          ],
+        );
+
+        ({ app } = await buildApp()); // Build the app with this config
+
+        await app.init();
+        server.listen({
+          onUnhandledRequest: 'error',
+        });
+      });
+
+      afterAll(async () => {
+        await app.close();
+        server.close();
+      });
+
+      it('should correctly proxy the POST request body', async () => {
+        const url = 'https://example.com/post-body-test';
+        const postBody = { message: 'hello proxy' };
+
+        await request(app.getHttpServer())
+          .post(`/api/proxy/${url}`)
+          .send(postBody)
+          .expect(200, { success: true, receivedBody: postBody });
+      });
+
+      it('should return 413 if POST body is larger than postSizeLimit (e.g., 1MB)', async () => {
+        const url = 'https://example.com/post-body-test'; // Target URL doesn't strictly matter as NestJS should reject first
+        // Create a body larger than 1MB. A char is 1 byte, 1MB = 1024 * 1024 bytes.
+        const largePostBody = { message: 'a'.repeat(1024 * 1024 + 1) }; // Slightly over 1MB
+
+        await request(app.getHttpServer())
+          .post(`/api/proxy/${url}`)
+          .send(largePostBody)
+          .expect(413); // Payload Too Large
+      });
+    });
   });
 });
 
@@ -340,32 +431,38 @@ function doCommonTest(methodName: 'get' | 'post') {
   });
 
   describe('with an upstream proxy', () => {
-    const server = setupServer(...handlers);
-
-    beforeAll(() => {
-      server.listen({
-        onUnhandledRequest: 'error',
-      });
-    });
-
-    it.skip('should proxy through upstream proxy', async () => {
+    let PROXY_PORT = 25000;
+    let RESPOSE = 200;
+    if (methodName === 'post') {
+      PROXY_PORT = 25001;
+      RESPOSE = 201;
+    }
+    it('should proxy through upstream proxy', async () => {
       vol.fromJSON({
         './serverconfig.json': JSON.stringify({
           proxy: {
-            upstreamProxy: 'http://proxy/',
+            upstreamProxy: `http://127.0.0.1:${PROXY_PORT}`,
             proxyAllDomains: true,
             blacklistedAddresses: ['202.168.1.1'],
           },
         }),
       });
 
+      const connectSpy = vi.fn();
+
       const { app } = await buildApp();
-      // app.use();
+      const { close: closeProxyServer } = createServer(PROXY_PORT, connectSpy);
+      const appHttpServer = app.getHttpServer();
+      appHttpServer.listen(0);
 
       await request(app.getHttpServer())
-        [methodName]('/api/proxy/example.com')
-        .expect(200);
+        [
+          methodName
+        ](`/api/proxy/http://127.0.0.1:${appHttpServer.address().port}/api/test`)
+        .expect(RESPOSE);
+      expect(connectSpy).toHaveBeenCalledTimes(1);
 
+      closeProxyServer();
       await app.close();
     });
 
@@ -373,30 +470,37 @@ function doCommonTest(methodName: 'get' | 'post') {
       vol.fromJSON({
         './serverconfig.json': JSON.stringify({
           proxy: {
-            upstreamProxy: 'http://proxy/',
-            bypassUpstreamProxyHosts: { 'example.com': true },
+            upstreamProxy: `http://127.0.0.1:${PROXY_PORT}`,
+            bypassUpstreamProxyHosts: { '127.0.0.1:64900': true },
             proxyAllDomains: true,
             blacklistedAddresses: ['202.168.1.1'],
           },
         }),
       });
 
-      const { app } = await buildApp();
-      await request(app.getHttpServer())
-        [methodName]('/api/proxy/example.com')
-        .expect(200);
-      request(app.getHttpServer())
-        [methodName]('/api/proxy/https://example.com/response')
-        .expect(200, { data: 'response success' });
+      const connectSpy = vi.fn();
 
+      const { app } = await buildApp();
+      const { close: closeProxyServer } = createServer(PROXY_PORT, connectSpy);
+      const appHttpServer = app.getHttpServer();
+      appHttpServer.listen(64900);
+
+      await request(app.getHttpServer())
+        [
+          methodName
+        ](`/api/proxy/http://127.0.0.1:${appHttpServer.address().port}/api/test`)
+        .expect(RESPOSE);
+      expect(connectSpy).not.toHaveBeenCalled();
+
+      closeProxyServer();
       await app.close();
     });
 
-    it.skip('is still used when bypassUpstreamProxyHosts is defined but host is not in it', async () => {
+    it('is still used when bypassUpstreamProxyHosts is defined but host is not in it (HTTP target)', async () => {
       vol.fromJSON({
         './serverconfig.json': JSON.stringify({
           proxy: {
-            upstreamProxy: 'http://proxy/',
+            upstreamProxy: `http://127.0.0.1:${PROXY_PORT}`,
             bypassUpstreamProxyHosts: { 'example2.com': true },
             proxyAllDomains: true,
             blacklistedAddresses: ['202.168.1.1'],
@@ -404,16 +508,22 @@ function doCommonTest(methodName: 'get' | 'post') {
         }),
       });
 
+      const connectSpy = vi.fn();
+
       const { app } = await buildApp();
+      const { close: closeProxyServer } = createServer(PROXY_PORT, connectSpy);
+      const appHttpServer = app.getHttpServer();
+      appHttpServer.listen(64900);
+
       await request(app.getHttpServer())
-        [methodName]('/api/proxy/https://example.com/blah')
-        .expect(200);
+        [
+          methodName
+        ](`/api/proxy/http://127.0.0.1:${appHttpServer.address().port}/api/test`)
+        .expect(RESPOSE);
+      expect(connectSpy).toHaveBeenCalledTimes(1);
 
+      closeProxyServer();
       await app.close();
-    }, 1000000);
-
-    afterAll(() => {
-      server.close();
     });
   });
 
@@ -617,16 +727,15 @@ function doCommonTest(methodName: 'get' | 'post') {
       server.close();
     });
 
-    it('should retry without auth header if auth fails', async () => {
+    it('should retry without auth header if auth fails (Proxy Auth -> No Auth success)', async () => {
       vol.fromJSON({
         './serverconfig.json': JSON.stringify({
           proxy: {
             proxyAllDomains: true,
-            allowProxyFor: ['example.com'],
             blacklistedAddresses: ['202.168.1.1'],
             proxyAuth: {
               'example.com': {
-                authorization: 'blahfaceauth',
+                authorization: 'proxyDefAuthFails',
               },
             },
           } satisfies Partial<ProxyConfigType>,
@@ -636,31 +745,30 @@ function doCommonTest(methodName: 'get' | 'post') {
       const server = setupServer(
         ...[
           localRequestHandler,
-          http.all('https://example.com/auth', ({ request }) => {
-            if (request.headers.get('Authorization') === 'blahfaceauth') {
-              new HttpResponse(null, { status: 403 });
+          http.all('https://example.com/auth-retry1', ({ request }) => {
+            if (request.headers.get('Authorization') === 'proxyDefAuthFails') {
+              return new HttpResponse(null, { status: 403 });
             }
-
-            return HttpResponse.json({ data: 'response success' });
+            if (!request.headers.get('Authorization')) {
+              return HttpResponse.json({ data: 'success without auth' });
+            }
+            return HttpResponse.error();
           }),
         ],
       );
 
-      server.listen({
-        onUnhandledRequest: 'error',
-      });
-
+      server.listen({ onUnhandledRequest: 'error' });
       const { app } = await buildApp();
 
       await request(app.getHttpServer())
-        [methodName]('/api/proxy/https://example.com/auth')
-        .expect(200, { data: 'response success' });
+        [methodName]('/api/proxy/https://example.com/auth-retry1')
+        .expect(200, { data: 'success without auth' });
 
       await app.close();
       server.close();
     });
 
-    it('should retry with proxy auth when fails with user supplied auth', async () => {
+    it('should retry with proxy auth when fails with user supplied auth (User Auth -> Proxy Auth -> No Auth all fail)', async () => {
       vol.fromJSON({
         './serverconfig.json': JSON.stringify({
           proxy: {
@@ -710,10 +818,195 @@ function doCommonTest(methodName: 'get' | 'post') {
 
       await request(app.getHttpServer())
         [methodName]('/api/proxy/https://example.com/auth')
+        .set('Authorization', 'testUserAuth')
         .expect(403, {
           statusCode: 403,
-          message: 'Response code 403 (Forbidden 3)',
+          message: 'Forbidden 3',
         });
+
+      await app.close();
+      server.close();
+    });
+
+    it('User Auth (fails) -> Proxy Auth (succeeds)', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            blacklistedAddresses: ['202.168.1.1'],
+            proxyAuth: {
+              'example.com': { authorization: 'proxyCorrectAuth' },
+            },
+          },
+        }),
+      });
+
+      const server = setupServer(
+        ...[
+          localRequestHandler,
+          http.all('https://example.com/auth-path', ({ request }) => {
+            const authHeader = request.headers.get('Authorization');
+            if (authHeader === 'userSentWrongAuth') {
+              return new HttpResponse(null, {
+                status: 403,
+                statusText: 'User Auth Failed',
+              });
+            }
+            if (authHeader === 'proxyCorrectAuth') {
+              return HttpResponse.json({ data: 'success with proxy auth' });
+            }
+            return new HttpResponse(null, {
+              status: 500,
+              statusText: 'Test Misconfigured',
+            });
+          }),
+        ],
+      );
+      server.listen({ onUnhandledRequest: 'error' });
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com/auth-path')
+        .set('Authorization', 'userSentWrongAuth')
+        .expect(200, { data: 'success with proxy auth' });
+
+      await app.close();
+      server.close();
+    });
+
+    it('User Auth (fails) -> No Proxy Auth defined -> No Auth (succeeds)', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            blacklistedAddresses: ['202.168.1.1'],
+            proxyAllDomains: true,
+            // No proxyAuth defined for example.com
+          },
+        }),
+      });
+
+      const server = setupServer(
+        ...[
+          localRequestHandler,
+          http.all('https://example.com/auth-path2', ({ request }) => {
+            const authHeader = request.headers.get('Authorization');
+            if (authHeader === 'userSentWrongAuthAgain') {
+              return new HttpResponse(null, {
+                status: 403,
+                statusText: 'User Auth Failed Again',
+              });
+            }
+            if (!authHeader) {
+              // Expecting retry with no auth
+              return HttpResponse.json({ data: 'success with no auth retry' });
+            }
+            return new HttpResponse(null, {
+              status: 500,
+              statusText: 'Test Misconfigured',
+            });
+          }),
+        ],
+      );
+      server.listen({ onUnhandledRequest: 'error' });
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com/auth-path2')
+        .set('Authorization', 'userSentWrongAuthAgain')
+        .expect(200, { data: 'success with no auth retry' });
+
+      await app.close();
+      server.close();
+    });
+
+    it('Proxy Auth (fails) -> No Auth (fails)', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            blacklistedAddresses: ['202.168.1.1'],
+            proxyAuth: {
+              'example.com': { authorization: 'proxyAuthWillFail' },
+            },
+          },
+        }),
+      });
+
+      const server = setupServer(
+        ...[
+          localRequestHandler,
+          http.all('https://example.com/auth-path3', ({ request }) => {
+            const authHeader = request.headers.get('Authorization');
+            if (authHeader === 'proxyAuthWillFail') {
+              return new HttpResponse(null, {
+                status: 403,
+                statusText: 'Proxy Auth Failed As Expected',
+              });
+            }
+            if (!authHeader) {
+              // Retry with no auth
+              return new HttpResponse(null, {
+                status: 403,
+                statusText: 'No Auth Also Failed',
+              });
+            }
+            return new HttpResponse(null, {
+              status: 500,
+              statusText: 'Test Misconfigured',
+            });
+          }),
+        ],
+      );
+      server.listen({ onUnhandledRequest: 'error' });
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com/auth-path3')
+        // No client auth sent, so proxy will use its configured 'proxyAuthWillFail'
+        .expect(403, { statusCode: 403, message: 'No Auth Also Failed' });
+
+      await app.close();
+      server.close();
+    });
+
+    it('No User Auth, No Proxy Auth defined -> First No Auth attempt (fails) -> Final 403 (no retry)', async () => {
+      vol.fromJSON({
+        './serverconfig.json': JSON.stringify({
+          proxy: {
+            proxyAllDomains: true,
+            blacklistedAddresses: ['202.168.1.1'],
+          },
+        }),
+      });
+      let attempt = 0;
+      const server = setupServer(
+        ...[
+          localRequestHandler,
+          http.all('https://example.com/auth-path4', ({ request }) => {
+            const authHeader = request.headers.get('Authorization');
+            attempt += 1;
+            if (!authHeader && attempt === 1) {
+              // Expecting first attempt with no auth
+              return new HttpResponse(null, {
+                status: 403,
+                statusText: 'Initial No Auth Failed',
+              });
+            }
+            // This part should ideally not be reached if calculateDelay works as expected
+            return new HttpResponse(null, {
+              status: 500,
+              statusText: 'Test Misconfigured - Retry Occurred Unexpectedly',
+            });
+          }),
+        ],
+      );
+      server.listen({ onUnhandledRequest: 'error' });
+      const { app } = await buildApp();
+
+      await request(app.getHttpServer())
+        [methodName]('/api/proxy/https://example.com/auth-path4')
+        // No client auth, no proxy auth defined
+        .expect(403, { statusCode: 403, message: 'Initial No Auth Failed' });
 
       await app.close();
       server.close();
@@ -823,7 +1116,7 @@ function doCommonTest(methodName: 'get' | 'post') {
       server.close();
     });
 
-    it('no params appended when mismatch in regex', async () => {
+    it('should not append params when path "/nothing/else" does not match regexPattern "something"', async () => {
       vol.fromJSON({
         './serverconfig.json': JSON.stringify({
           proxy: {
@@ -874,7 +1167,7 @@ function doCommonTest(methodName: 'get' | 'post') {
       server.close();
     });
 
-    it('no params appended when mismatch in regex1', async () => {
+    it('should append "yep=works" (from "nothing" regex) and not "foo=bar" (from "something" regex) for path "/nothing/else"', async () => {
       vol.fromJSON({
         './serverconfig.json': JSON.stringify({
           proxy: {
@@ -934,7 +1227,7 @@ function doCommonTest(methodName: 'get' | 'post') {
       server.close();
     });
 
-    it('no params appended when mismatch in regex2', async () => {
+    it('should append multiple params "foo=bar" and "another=val" when regexPattern "." matches path "/nothing/else"', async () => {
       vol.fromJSON({
         './serverconfig.json': JSON.stringify({
           proxy: {
@@ -991,7 +1284,7 @@ function doCommonTest(methodName: 'get' | 'post') {
       server.close();
     });
 
-    it('no params appended when mismatch in regex3', async () => {
+    it('should append "foo=bar" and preserve existing "already=here" when regexPattern "." matches path "/something"', async () => {
       vol.fromJSON({
         './serverconfig.json': JSON.stringify({
           proxy: {
@@ -1047,7 +1340,7 @@ function doCommonTest(methodName: 'get' | 'post') {
       server.close();
     });
 
-    it('no params appended when mismatch in regex4', async () => {
+    it('should not append "foo=bar" for "example.com" when config is for "example2.com", preserving existing "already=here"', async () => {
       vol.fromJSON({
         './serverconfig.json': JSON.stringify({
           proxy: {
@@ -1172,14 +1465,14 @@ function doCommonTest(methodName: 'get' | 'post') {
     });
 
     it('should block connection to restricted ip address', async () => {
-      const url = 'https://example.com';
+      const url = 'https://127.0.0.1';
 
       await request(app.getHttpServer())
         [methodName](`/api/proxy/${url}`)
         .expect(403);
 
       await app.close();
-    }, 20000);
+    });
 
     afterAll(() => {
       server.close();

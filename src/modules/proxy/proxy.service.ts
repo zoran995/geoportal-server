@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import {
   BadGatewayException,
   BadRequestException,
   ForbiddenException,
   HttpException,
-  HttpStatus,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -12,6 +12,13 @@ import {
 import { REQUEST } from '@nestjs/core';
 
 import type { Request } from 'express';
+import { type Agents, HTTPError, type PlainResponse } from 'got';
+import {
+  HttpProxyAgent,
+  HttpProxyAgentOptions,
+  HttpsProxyAgent,
+  HttpsProxyAgentOptions,
+} from 'hpagent';
 import { URL } from 'url';
 
 import { isDefined } from 'src/common/helpers/index.js';
@@ -30,13 +37,6 @@ import { processDuration } from './utils/processDuration.js';
 import { processHeaders } from './utils/processHeaders.js';
 import { ProxyListService } from './utils/proxy-list.service.js';
 import { urlValidator } from './utils/urlValidator.js';
-import { type Agents, HTTPError, type PlainResponse, RequestError } from 'got';
-import {
-  HttpProxyAgent,
-  HttpProxyAgentOptions,
-  HttpsProxyAgent,
-  HttpsProxyAgentOptions,
-} from 'hpagent';
 
 @Injectable({ scope: Scope.REQUEST })
 export class ProxyService {
@@ -85,12 +85,6 @@ export class ProxyService {
     ) {
       const url = new URL(this.proxyOptions.upstreamProxy);
       const proxyOptions: HttpProxyAgentOptions | HttpsProxyAgentOptions = {
-        port: url.port
-          ? parseInt(url.port, 10)
-          : url.protocol === 'https:'
-            ? 443
-            : 80,
-        host: `${url.host}/`,
         proxy: url,
         keepAlive: true,
         keepAliveMsecs: 1000,
@@ -104,7 +98,7 @@ export class ProxyService {
       };
     }
 
-    const filteredReqHeaders = filterHeaders(
+    let filteredReqHeaders = filterHeaders(
       this.request.headers,
       this.request.socket,
     );
@@ -113,7 +107,8 @@ export class ProxyService {
     // to terriajs-server. Keeping this here so we don't actually end up
     // removing authorization header specified from frontend for proxy request.
     if (this.proxyOptions.basicAuthentication) {
-      this.deleteAuthorizationHeader(filteredReqHeaders);
+      filteredReqHeaders =
+        this.createHeadersWithoutAuthorization(filteredReqHeaders);
     }
 
     return this.#performRequest(remoteUrl, filteredReqHeaders, maxAge, proxy);
@@ -140,7 +135,7 @@ export class ProxyService {
     headers: Record<string, string>,
     maxAge: number,
     proxyAgents?: Agents,
-  ): Promise<unknown> | never {
+  ): Promise<void> {
     const originalIncomingHeaders = { ...headers };
     const hostAuthOptions = this.proxyOptions.proxyAuth[remoteUrl.host];
     let initialAuthType: 'user' | 'proxy' | 'none' = 'none';
@@ -185,7 +180,10 @@ export class ProxyService {
           responseType: 'buffer',
           agent: proxyAgents,
           encoding: undefined,
-          body: this.request.method === 'POST' ? this.request.body : undefined,
+          body:
+            this.request.method === 'POST'
+              ? JSON.stringify(this.request.body)
+              : undefined,
           followRedirect: (response: PlainResponse) => {
             return this.followRedirect(response.headers, remoteUrl);
           },
@@ -204,13 +202,7 @@ export class ProxyService {
               const requestOptions = retryObject.error.options;
               const context = requestOptions.context as never as RequestContext;
 
-              // attemptCount is the number of the failed attempt.
-              // If the 2nd attempt (1st retry) just failed (attemptCount === 2),
-              // and it was made with 'none' auth, then do not proceed to the 3rd attempt (2nd retry).
-              if (
-                retryObject.attemptCount === 2 &&
-                context.authTypeForThisAttempt === 'none'
-              ) {
+              if (context.authTypeForThisAttempt === 'none') {
                 this.logger.debug(
                   `Cancelling further retries for ${context.remoteUrlString} as the previous retry was already without authentication.`,
                 );
@@ -250,11 +242,8 @@ export class ProxyService {
                 let nextAuthType: 'proxy' | 'none' = 'none';
                 requestOptions.headers = { ...currentBaseHeadersWithoutAuth };
 
-                if (retryCount === 1) {
-                  if (
-                    failedAttemptAuthType === 'user' &&
-                    currentHostAuthOptions
-                  ) {
+                if (failedAttemptAuthType === 'user') {
+                  if (currentHostAuthOptions) {
                     this.logger.debug('Retrying with proxy auth.');
                     if (currentHostAuthOptions.authorization) {
                       requestOptions.headers.authorization =
@@ -268,17 +257,19 @@ export class ProxyService {
                     nextAuthType = 'proxy';
                   } else {
                     this.logger.debug(
-                      'Retrying without authentication (1st retry).',
+                      `Retrying without authentication (retry ${retryCount} after user auth failed).`,
                     );
                     nextAuthType = 'none';
                   }
-                } else if (retryCount === 2) {
-                  // This will only be reached if calculateDelay allowed it (i.e., previous attempt was not 'none')
+                } else {
+                  // This covers failedAttemptAuthType === 'proxy'.
+                  // If failedAttemptAuthType were 'none', calculateDelay should have prevented this retry.
                   this.logger.debug(
-                    'Retrying without authentication (2nd retry).',
+                    `Retrying without authentication (retry ${retryCount} after ${failedAttemptAuthType} auth failed).`,
                   );
                   nextAuthType = 'none';
                 }
+
                 context.authTypeForThisAttempt = nextAuthType;
               },
             ],
@@ -314,75 +305,59 @@ export class ProxyService {
 
       this.request.res?.status(response.statusCode);
       this.request.res?.write(response.body);
-
-      return response;
     } catch (error: unknown) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const err = error as any;
-      // before redirect may throw BadRequestException we catch it here
-      // and throw instance of it
+
       this.logger.error(
-        `An error occurred during proxy request to ${remoteUrl.href}`,
-        err as never,
+        `Proxy request to ${remoteUrl.href} failed: ${err.message}`,
+        err.stack,
+        {
+          code: err.code,
+          statusCode: (err as HTTPError).response?.statusCode,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+          responseBody: (err as HTTPError).response?.body
+            ?.toString()
+            ?.substring(0, 500), // Log snippet
+        },
       );
 
-      if (
-        err instanceof RequestError &&
-        err.cause instanceof ForbiddenException
-      ) {
+      if (err.cause instanceof ForbiddenException) {
+        // For IP blacklist from socket event
         throw new ForbiddenException(err.cause.message);
       }
+
       if (err instanceof HTTPError) {
+        let responseBodyContent: string | object =
+          err.response.statusMessage ?? 'Proxy request failed';
+
+        const rawBody = err.response.body;
+        if (Buffer.isBuffer(rawBody)) {
+          const bodyStr = rawBody.toString();
+          try {
+            if (bodyStr.startsWith('{') && bodyStr.endsWith('}')) {
+              responseBodyContent = JSON.parse(bodyStr);
+            } else if (bodyStr.length > 0) {
+              responseBodyContent = bodyStr;
+            }
+          } catch {
+            this.logger.debug(
+              'Failed to parse error response body as JSON, using raw string.',
+            );
+            if (bodyStr.length > 0) {
+              responseBodyContent = bodyStr;
+            }
+          }
+        } else if (typeof rawBody === 'string' && rawBody.length > 0) {
+          responseBodyContent = rawBody;
+        }
+
         if (err.response.statusCode === 403) {
           this.logger.warn(
             `All authentication retries failed for ${remoteUrl.href}, final status 403.`,
           );
-          throw new HttpException(
-            `Response code ${err.response.statusCode} (${err.response.statusMessage})`,
-            err.response.statusCode,
-          );
         }
-        // Attempt to parse body if it's JSON, otherwise use statusMessage or default
-        let messageBody: string = err.response.body;
-        if (Buffer.isBuffer(messageBody)) {
-          try {
-            const bodyStr = messageBody.toString();
-            // Check if it's a JSON string before parsing
-            if (bodyStr.startsWith('{') && bodyStr.endsWith('}')) {
-              messageBody = JSON.parse(bodyStr);
-            } else {
-              messageBody = bodyStr; // Use string if not JSON
-            }
-          } catch {
-            this.logger.debug(
-              'Failed to parse error response body as JSON, using as string.',
-            );
-            messageBody = JSON.stringify(messageBody);
-          }
-        }
-
-        throw new HttpException(
-          messageBody ?? err.response.statusMessage ?? 'Proxy request failed',
-          err.response.statusCode,
-        );
-      } else if (err.code === 'ECONNREFUSED') {
-        throw new BadGatewayException();
-      }
-      if (
-        (err.response?.status in HttpStatus ||
-          err.response?.statusCode in HttpStatus) &&
-        err.message
-      ) {
-        throw new HttpException(
-          err.message as never,
-          (err.response?.status as never) ||
-            (err.response?.statusCode as never),
-        );
-      }
-
-      if (err instanceof HttpException) {
-        // Re-throw if already a NestJS HttpException
-        throw err;
+        throw new HttpException(responseBodyContent, err.response.statusCode);
       }
 
       if (err.code === 'ECONNREFUSED') {
@@ -391,7 +366,14 @@ export class ProxyService {
         );
       }
 
-      throw new InternalServerErrorException('Proxy error');
+      if (err instanceof HttpException) {
+        // Re-throw if already a NestJS HttpException
+        throw err;
+      }
+
+      throw new InternalServerErrorException(
+        `Proxy error for ${remoteUrl.href}: ${err.message || 'Unknown error'}`,
+      );
     }
   }
 
@@ -454,9 +436,12 @@ export class ProxyService {
    * Deletes authorization header from header object
    * @param headers - request headers
    */
-  private deleteAuthorizationHeader(headers: Record<string, unknown>) {
-    delete headers.authorization;
-    return headers;
+  private createHeadersWithoutAuthorization(
+    headers: Record<string, string>,
+  ): Record<string, string> {
+    const newHeaders = { ...headers };
+    delete newHeaders.authorization;
+    return newHeaders;
   }
 
   /**
