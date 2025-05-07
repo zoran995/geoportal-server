@@ -9,5 +9,4 @@ export class TestLoggerService extends LoggerService {
   override warn = vi.fn();
   override debug = vi.fn();
   override verbose = vi.fn();
-  override info = vi.fn();
 }

@@ -2,9 +2,10 @@ import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import type { z } from 'zod';
 
-import { configuration } from '../../config/index.js';
+import { LoggerService } from 'src/infrastructure/logger/index.js';
+import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service.js';
 
-import { LoggerService } from '../../../infrastructure/logger/index.js';
+import { configuration } from '../../config/index.js';
 import { PROXY_OPTIONS, ProxyListService } from '../../proxy/index.js';
 import { ShareConfigType } from '../../share/index.js';
 import type { serverConfigResponse } from '../schema/safe-settings.schema.js';
@@ -41,9 +42,7 @@ describe('ServerConfigController', () => {
         ProxyListService,
         {
           provide: LoggerService,
-          useValue: {
-            log: vi.fn(),
-          },
+          useClass: TestLoggerService,
         },
       ],
       controllers: [ServerConfigController],

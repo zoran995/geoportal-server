@@ -1,5 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { LoggerService } from 'src/infrastructure/logger/index.js';
+import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service.js';
+
 import { Proj4Controller } from '../proj4.controller.js';
 import { Proj4Service } from '../proj4.service.js';
 
@@ -12,6 +15,10 @@ describe('Proj4Controller', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [Proj4Controller],
       providers: [
+        {
+          provide: LoggerService,
+          useClass: TestLoggerService,
+        },
         {
           provide: Proj4Service,
           useValue: {

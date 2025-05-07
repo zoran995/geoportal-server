@@ -2,16 +2,16 @@ import { z } from 'zod';
 
 import { createZodDto } from 'nestjs-zod';
 
-import { portSchema } from 'src/common/validators/index.js';
 import { httpsSchema, serveStatic } from 'src/common/schema/index.js';
+import { portSchema } from 'src/common/validators/index.js';
 
+import { logLevelSchema } from 'src/infrastructure/logger/index.js';
 import { rateLimit } from 'src/infrastructure/rate-limiter/index.js';
 
 import { basicAuthentication } from '../../basic-auth/index.js';
 import { feedbackConfig } from '../../feedback/config/schema/feedback.config.schema.js';
 import { proxyConfig } from '../../proxy/index.js';
 import { shareConfig } from '../../share/schema/share.config.schema.js';
-
 import { contentSecurityPolicy } from './ContentSecurityPolicy.schema.js';
 
 export const configuration = z.object({
@@ -87,6 +87,8 @@ export const configuration = z.object({
   wwwroot: z.string().default('./wwwroot'),
 
   https: httpsSchema.optional().describe(''),
+
+  logLevel: logLevelSchema.optional().describe('The log level to use.'),
 });
 
 export type ConfigurationType = z.infer<typeof configuration>;

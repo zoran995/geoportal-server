@@ -9,13 +9,18 @@ import { Response } from 'express';
 import { existsSync } from 'fs';
 import path from 'path';
 
+import { LoggerService } from 'src/infrastructure/logger/index.js';
+
 import { HttpExceptionFilter } from './http-exception.filter.js';
 import { WWWROOT_TOKEN } from '../utils/index.js';
 
 @Catch(InternalServerErrorException)
 export class InternalServerErrorExceptionFilter extends HttpExceptionFilter {
-  constructor(@Inject(WWWROOT_TOKEN) private readonly wwwroot: string) {
-    super();
+  constructor(
+    @Inject(WWWROOT_TOKEN) private readonly wwwroot: string,
+    logger: LoggerService,
+  ) {
+    super(logger);
   }
   catch(exception: InternalServerErrorException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();

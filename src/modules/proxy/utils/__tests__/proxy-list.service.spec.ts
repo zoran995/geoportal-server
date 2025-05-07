@@ -1,16 +1,18 @@
+import type { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { fs, vol } from 'memfs';
+
+import { LoggerService } from 'src/infrastructure/logger/index.js';
+import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service.js';
 
 import {
   proxyConfig,
   type ProxyConfigType,
 } from '../../config/schema/proxy-config.dto.js';
+import type { ProxyOptions } from '../../proxy-options.js';
 import { DEFAULT_BLACKLIST, PROXY_OPTIONS } from '../../proxy.constants.js';
 import { ProxyListService } from '../proxy-list.service.js';
-import type { INestApplication } from '@nestjs/common';
-import { LoggerService } from 'src/infrastructure/logger/index.js';
-import type { ProxyOptions } from '../../proxy-options.js';
 
 vi.mock('fs');
 
@@ -41,9 +43,7 @@ describe('ProxyListService', () => {
       providers: [
         {
           provide: LoggerService,
-          useValue: {
-            log: vi.fn(),
-          },
+          useClass: TestLoggerService,
         },
         {
           provide: PROXY_OPTIONS,

@@ -5,6 +5,8 @@ import { createMock } from '@golevelup/ts-vitest';
 import type { Request } from 'express';
 
 import { POST_SIZE_LIMIT } from 'src/common/interceptor/index.js';
+import { LoggerService } from 'src/infrastructure/logger/logger.service.js';
+import { TestLoggerService } from 'src/infrastructure/logger/test-logger.service.js';
 
 import { SHARE_OPTIONS } from '../share.constants.js';
 import { ShareController } from '../share.controller.js';
@@ -41,6 +43,10 @@ describe('ShareController', () => {
       imports: [],
       controllers: [ShareController],
       providers: [
+        {
+          provide: LoggerService,
+          useClass: TestLoggerService,
+        },
         {
           provide: ShareService,
           useValue: shareServiceMock,
