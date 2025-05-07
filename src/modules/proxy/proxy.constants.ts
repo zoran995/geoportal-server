@@ -2,7 +2,7 @@ export const PROXY_OPTIONS = Symbol('PROXY_OPTIONS');
 export const DURATION_REGEX = /^(\d+|\d+\.\d+)(ms|s|m|h|d|w|y)$/;
 export const PROTOCOL_REGEX = /^\w+:\//;
 export const DO_NOT_PROXY_REGEX =
-  /^(?:Host|X-Forwarded-Host|Proxy-Connection|Connection|Keep-Alive|Transfer-Encoding|TE|Trailer|Proxy-Authorization|Proxy-Authenticate|Upgrade|Expires|pragma|Strict-Transport-Security)$/i;
+  /^(?:Host|X-Forwarded-Host|Proxy-Connection|Connection|Keep-Alive|Transfer-Encoding|TE|Trailer|Proxy-Authorization|Proxy-Authenticate|Upgrade|Expires|pragma|Strict-Transport-Security|Content-Length|content-encoding)$/i;
 export const DEFAULT_MAX_AGE_SECONDS = 1209600;
 export const DEFAULT_MAX_SIZE = 102400;
 
