@@ -5851,10 +5851,10 @@ range_check@2.0.4:
     ip6 "^0.2.0"
     ipaddr.js "^1.9.1"
 
-rate-limiter-flexible@5.0.4:
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/rate-limiter-flexible/-/rate-limiter-flexible-5.0.4.tgz#6ee6b1f7bd6e06b364a7ed6afab65d23f88e5a99"
-  integrity sha512-ftYHrIfSqWYDIJZ4yPTrgOduByAp+86gUS9iklv0JoXVM8eQCAjTnydCj1hAT4MmhmkSw86NaFEJ28m/LC1pKA==
+rate-limiter-flexible@7.2.0:
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/rate-limiter-flexible/-/rate-limiter-flexible-7.2.0.tgz#34e4f6df1f81b086346dac5ad49255897e7e29ca"
+  integrity sha512-hrf0vIS/WOBegnHg+uPXxsXhuQYlNGfZiCmK5Wgudb12xlZUhpv9yD23yp/EW6BKQosshqnIQRQV+r3jyfIGQg==
 
 raw-body@^3.0.0:
   version "3.0.0"
