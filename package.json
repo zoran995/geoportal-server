@@ -59,7 +59,7 @@
     "helmet": "8.1.0",
     "hpagent": "1.2.0",
     "nestjs-zod": "4.3.1",
-    "nodemailer": "7.0.0",
+    "nodemailer": "9.0.1",
     "proj4-cli-defs": "1.0.0",
     "range_check": "2.0.4",
     "rate-limiter-flexible": "5.0.4",
